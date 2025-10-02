@@ -179,20 +179,6 @@
 ;; AI Tools
 ;; ----------------------------------------------------------------------------
 
-;; ============================================================================
-;; Copilot Configuration - AI code completion
-;; ============================================================================
-
-(with-eval-after-load 'copilot
-  (setq copilot-max-char 200000)             ; Maximum characters to send to Copilot
-  (add-to-list 'copilot-disable-predicates   ; Disable in apheleia scratch buffers
-               (lambda ()
-                 (string-match-p "\\*apheleia-" (buffer-name))))
-
-  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)       ; Accept with Tab
-  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)         ; Accept with TAB
-  (define-key copilot-completion-map (kbd "C-<tab>") 'copilot-accept-completion-by-word))  ; Accept word by word
-
 ;; ----------------------------------------------------------------------------
 ;; Terminal
 ;; ----------------------------------------------------------------------------

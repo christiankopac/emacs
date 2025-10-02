@@ -378,6 +378,9 @@
             :branch "main")
   :hook (prog-mode . copilot-mode))
 
+;; Load AI tools configuration
+(load-file (expand-file-name "config/ai/ai-tools.el" user-emacs-directory))
+
 ;; ----------------------------------------------------------------------------
 ;; Terminal Packages
 ;; ----------------------------------------------------------------------------
