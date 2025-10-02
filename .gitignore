@@ -34,3 +34,5 @@ tree-sitter
 \#*#
 /.emacs.desktop
 /.emacs.desktop.lock
+
+forge-database.sqlite
