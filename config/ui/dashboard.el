@@ -38,9 +38,10 @@
 ;; Configure dashboard settings before loading
 (setq dashboard-startup-banner (my/dashboard-random-banner)         ; Random ASCII banner
       dashboard-show-shortcuts t                                    ; Show keyboard shortcuts
-      dashboard-items `((recents   . 5)   ; Recent files list
-                        (bookmarks . 5)   ; Bookmarks list
-                        (agenda    . 10)) ; Agenda list
+      dashboard-items `((recents   . 3)
+                        (agenda    . 3)
+                        (projects  . 3)
+                        (bookmarks . 3)) 
       dashboard-startupify-list '(dashboard-insert-banner          ; Layout order for dashboard
                                   dashboard-insert-newline
                                   dashboard-insert-banner-title
