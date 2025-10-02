@@ -171,6 +171,12 @@
   (with-eval-after-load 'fontaine
     (load-file (expand-file-name "config/ui/fonts-ligatures.el" user-emacs-directory))))
 
+(use-package show-font
+  :ensure t
+  :bind
+  (("C-c s f" . show-font-select-preview)
+   ("C-c s t" . show-font-tabulated)))
+
 ;; ----------------------------------------------------------------------------
 ;; UI: Menus & Dashboard
 ;; ----------------------------------------------------------------------------
