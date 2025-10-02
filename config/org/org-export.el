@@ -4,7 +4,8 @@
 ;; Enable multiple export backends
 ;; ============================================================================
 
-(setq org-export-backends '(ascii html icalendar latex md odt org))  ; Available export formats
+;; (setq org-export-backends '(ascii html icalendar latex md odt org))  ; Available export formats
+(setq org-export-backends '(html icalendar md odt org))  ; Available export formats
 
 ;; ============================================================================
 ;; Global export settings
@@ -44,37 +45,35 @@
         .todo { color: #d73a49; font-weight: bold; }
         .done { color: #28a745; font-weight: bold; }
         .priority { color: #e36209; font-weight: bold; }
-      </style>")                                 ; Custom CSS for clean, modern look
-
-(setq org-export-directory "~/Sync/org/attachments/exports")  ; Default export directory
+      </style>")                                
 
 ;; ============================================================================
 ;; Ensure export directory exists
 ;; ============================================================================
 
-(unless (file-directory-p org-export-directory)
-  (make-directory org-export-directory t))
+;; (unless (file-directory-p org-export-directory)
+  ;; (make-directory org-export-directory t))
 
 ;; ============================================================================
 ;; Custom export function to save in export directory
 ;; ============================================================================
 
-(defun my/org-export-to-directory (backend)
-  "Export current org file to specified BACKEND in export directory."
-  (let ((org-export-output-directory org-export-directory))
-    (org-export-to-file backend (concat org-export-directory
-                                        (file-name-sans-extension
-                                         (file-name-nondirectory buffer-file-name))
-                                        (pcase backend
-                                          ('html ".html")
-                                          ('md ".md")
-                                          (_ ".export"))))))
+;; (defun my/org-export-to-directory (backend)
+;;   "Export current org file to specified BACKEND in export directory."
+;;   (let ((org-export-output-directory org-export-directory))
+;;     (org-export-to-file backend (concat org-export-directory
+;;                                         (file-name-sans-extension
+;;                                          (file-name-nondirectory buffer-file-name))
+;;                                         (pcase backend
+;;                                           ('html ".html")
+;;                                           ('md ".md")
+;;                                           (_ ".export"))))))
 
 ;; ============================================================================
 ;; Additional export settings
 ;; ============================================================================
 
-(setq org-export-date-timestamp-format "%e %B %Y")  ; Date format: "1 January 2024"
+;; (setq org-export-date-timestamp-format "%e %B %Y")  ; Date format: "1 January 2024"
 
 ;; ============================================================================
 ;; Export keybindings

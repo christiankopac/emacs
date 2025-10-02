@@ -1,84 +1,95 @@
 ;;; fonts-ligatures.el --- Fonts and ligatures configuration
 
 ;; ============================================================================
+;; Font Variables - Ensure they're defined before fontaine configuration
+;; ============================================================================
+
+;; Define font variables if not already defined
+(unless (boundp 'my/font-serif)
+  (defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text."))
+
+(unless (boundp 'my/font-monospace)
+  (defvar my/font-monospace "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text."))
+
+;; ============================================================================
 ;; Fontaine Configuration - Font configuration
 ;; ============================================================================
 
 (with-eval-after-load 'fontaine
   (setq fontaine-presets
-        '((regular
-           :default-family "MonoLisa Nerd Font"
+        '((regular                            
+           :default-family my/font-monospace
            :default-weight normal
            :default-height 90
-           :variable-pitch-family "ETBookOT"
+           :variable-pitch-family my/font-serif
            :variable-pitch-weight normal
            :variable-pitch-height 1.0
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 1.0
            :bold-weight bold
            :italic-slant italic
            :line-spacing nil)
           
           (writing
-           :default-family "MonoLisa Nerd Font" ; Monospace for UI/code
+           :default-family my/font-monospace 
            :default-weight normal
-           :default-height 90                   ; Normal UI size
-           :variable-pitch-family "ETBookOT"       ; Serif for prose ONLY
+           :default-height 90                   
+           :variable-pitch-family my/font-serif 
            :variable-pitch-weight normal
-           :variable-pitch-height 140           ; Large absolute size
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :variable-pitch-height 140           
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 90
            :bold-weight bold
            :italic-slant italic
            :line-spacing 0.2)
           
-          (org-reading                           ; ← LOADED BY DEFAULT IN ORG FILES
-           :default-family "MonoLisa Nerd Font" ; Monospace for UI/code
+          (org-reading                          
+           :default-family my/font-monospace 
            :default-weight normal
-           :default-height 90                   ; Normal UI size
-           :variable-pitch-family "ETBookOT"       ; Serif for prose ONLY
+           :default-height 90                   
+           :variable-pitch-family my/font-serif      
            :variable-pitch-weight normal
-           :variable-pitch-height 1.4          ; Comfortable reading size
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :variable-pitch-height 1.4  
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 90
            :bold-weight bold
            :italic-slant italic
            :line-spacing 0.2)
           
           (presentation
-           :default-family "MonoLisa Nerd Font" ; Monospace for UI/code
+           :default-family my/font-monospace 
            :default-weight normal
-           :default-height 110                  ; Larger UI
-           :variable-pitch-family "ETBookOT"       ; Serif for prose ONLY
+           :default-height 110   
+           :variable-pitch-family my/font-serif      
            :variable-pitch-weight normal
-           :variable-pitch-height 220           ; Large absolute size
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :variable-pitch-height 220           
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 110
            :bold-weight bold
            :italic-slant italic
            :line-spacing 0.2)
           
           (compact
-           :default-family "MonoLisa Nerd Font"
+           :default-family my/font-monospace
            :default-weight normal
            :default-height 85
-           :variable-pitch-family "ETBookOT"
+           :variable-pitch-family my/font-serif
            :variable-pitch-weight normal
            :variable-pitch-height 0.9
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 1.0
            :bold-weight bold
            :italic-slant italic
            :line-spacing nil)
           
           (large
-           :default-family "MonoLisa Nerd Font" ; Monospace for UI/code
+           :default-family my/font-monospace 
            :default-weight normal
-           :default-height 90                   ; Normal UI size
-           :variable-pitch-family "ETBookOT"       ; Serif for prose ONLY
+           :default-height 90                  
+           :variable-pitch-family my/font-serif       
            :variable-pitch-weight normal
-           :variable-pitch-height 180           ; Large absolute size
-           :fixed-pitch-family "MonoLisa Nerd Font"
+           :variable-pitch-height 180           
+           :fixed-pitch-family my/font-monospace
            :fixed-pitch-height 90
            :bold-weight bold
            :italic-slant italic
@@ -96,24 +107,21 @@
   (global-set-key (kbd "C-c M-f t") 'fontaine-set-preset))
 
 ;; ============================================================================
-;; Ligatures Configuration - Ligatures configuration
-;; ============================================================================
-;; ============================================================================
 ;; Ligatures Variables - Define before packages load
 ;; ============================================================================
 
 ;; Ligatures variables (define before packages load)
-(defvar my/ligatures-general '("www")
-  "General ligatures for all modes.")
+;; (defvar my/ligatures-general '("www")
+;;   "General ligatures for all modes.")
 
-(defvar my/ligatures-prog-mode
-  '("|||>" "<||>" "<|||" "<|>" "|>" "<|" "::" ":::" "==" "===" "=/=" "!==" "<==" "<=>" "=>" "->" "<-" "<<-" "->>" "<<" ">>" "<<<" ">>>" "<~" "~>" "-<" ">-" "=<<" ">>=" "<=<" ">=>" "<*" "*>" ":-" "-:" "++" "+++" "**" "***" "~~" "~~>" "::=" ":=" ".." "..." "//" "/*" "*/" "##" "###" "&&" "||")
-  "Programming mode ligatures.")
+;; (defvar my/ligatures-prog-mode
+;;   '("|||>" "<||>" "<|||" "<|>" "|>" "<|" "::" ":::" "==" "===" "=/=" "!==" "<==" "<=>" "=>" "->" "<-" "<<-" "->>" "<<" ">>" "<<<" ">>>" "<~" "~>" "-<" ">-" "=<<" ">>=" "<=<" ">=>" "<*" "*>" ":-" "-:" "++" "+++" "**" "***" "~~" "~~>" "::=" ":=" ".." "..." "//" "/*" "*/" "##" "###" "&&" "||")
+;;   "Programming mode ligatures.")
 
-(with-eval-after-load 'ligature
-  (ligature-set-ligatures 't my/ligatures-general)
-  (ligature-set-ligatures 'prog-mode my/ligatures-prog-mode)
-  ;; Don't apply ligatures to org-mode to avoid conflicts with org-hide-leading-stars
-  (global-ligature-mode t))
+;; (with-eval-after-load 'ligature
+;;   (ligature-set-ligatures 't my/ligatures-general)
+;;   (ligature-set-ligatures 'prog-mode my/ligatures-prog-mode)
+;;   ;; Don't apply ligatures to org-mode to avoid conflicts with org-hide-leading-stars
+;;   (global-ligature-mode t))
 
 (provide 'fonts-ligatures)

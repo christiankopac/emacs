@@ -18,6 +18,21 @@
                   gc-cons-percentage 0.1)))
 
 ;; ----------------------------------------------------------------------------
+;; BOILERPLATE: Custom Macros
+;; ----------------------------------------------------------------------------
+
+;; Define custom-set-faces! macro for Doom-style face configuration
+(defmacro custom-set-faces! (&rest faces)
+  "Set custom faces with Doom-style syntax.
+FACES is a list of face specifications in the format (FACE :attribute value ...)."
+  `(custom-set-faces
+    ,@(mapcar (lambda (face-spec)
+                (let ((face (car face-spec))
+                      (attrs (cdr face-spec)))
+                  `'(,face ((t ,attrs)))))
+              faces)))
+
+;; ----------------------------------------------------------------------------
 ;; BOILERPLATE: Elpaca Package Manager Configuration
 ;; ----------------------------------------------------------------------------
 
@@ -87,20 +102,6 @@
 (tool-bar-mode -1)    ; Also fixed: use -1 instead of nil
 (setq inhibit-startup-screen 1)
 
-;; ----------------------------------------------------------------------------
-;; Shared Variables
-;; ----------------------------------------------------------------------------
-
-;; Font Variables
-;; ----------------------------------------------------------------------------
-;; NOTE: Sans serif fonts is not used
-;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
-(defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
-;; Monospace base font
-;; (defvar my/font-mono "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
-(defvar my/font-mono "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text.")
-
-
 ;; Add config subdirectories to load-path
 (add-to-list 'load-path (expand-file-name "config/core" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "config/ui" user-emacs-directory))
@@ -125,7 +126,7 @@
 (use-package modus-themes :defer t :ensure t)
 (use-package poet-theme :ensure t :defer t)
 (use-package doric-themes :ensure t :defer t)
-(use-package ef-themes :ensure t :defer t)
+;; (use-package ef-themes :ensure t :defer t)
 (use-package standard-themes :ensure t :defer t)
 (use-package everforest
   :ensure (:host github 
@@ -167,9 +168,9 @@
 
 (use-package fontaine :ensure t :if (display-graphic-p))
 
-(use-package ligature :ensure t :after org)
+;; (use-package ligature :ensure t :after org)
 
-(use-package ox-tufte :ensure t)
+;; (use-package ox-tufte :ensure t)
 
 ;; Load font configuration after fontaine is ready (only in graphical mode)
 (when (display-graphic-p)
@@ -291,7 +292,7 @@
 (setq org-gtd-update-ack "3.0.0")
 (use-package org-gtd :ensure t :after (org transient))
 
-(use-package org-journal :ensure t)
+;; (use-package org-journal :ensure t)
 
 ;; Load org configurations
 (load-file (expand-file-name "config/org/org-core.el" user-emacs-directory))
@@ -346,6 +347,7 @@
 (use-package denote-menu :ensure t :after denote)
 (use-package denote-explore :ensure t :after denote)
 (use-package denote-sequence :ensure t :after denote)
+(use-package denote-journal :ensure t :after denote)
 
 ;; Load denote configuration after Elpaca initialization
 (add-hook 'elpaca-after-init-hook

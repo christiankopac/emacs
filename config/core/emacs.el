@@ -5,46 +5,26 @@
 ;; ----------------------------------------------------------------------------
 
 (setq-default
-  ;; Set tab width to 4 spaces for display
-  tab-width 4
-  ;; Use spaces instead of tabs for indentation
-  indent-tabs-mode nil
-  ;; Default line width for text wrapping (M-q)
-  fill-column 80
-  ;; Scroll smoothly without jumping
-  scroll-conservatively 10000
-  ;; Disable automatic vertical scrolling adjustments (improves performance)
-  auto-window-vscroll nil
-  ;; Save clipboard contents before killing text in Emacs
-  save-interprogram-paste-before-kill t
-  ;; Make apropos (help search) search more extensively
-  apropos-do-all t
-  ;; Paste at point, not at mouse cursor position
-  mouse-yank-at-point t
-  ;; Enable faster scrolling at the cost of some accuracy
-  fast-but-imprecise-scrolling t
-  ;; Disable auto-save files (#file#)
-  auto-save-default nil
-  ;; Disable lockfiles (.#file)
-  create-lockfiles nil
-  ;; Create backup files (file~)
-  make-backup-files t
-  ;; Keep 6 newest versions of backup files
-  kept-new-versions 6
-  ;; Keep 2 oldest versions of backup files
-  kept-old-versions 2
-  ;; Always add newline at end of file
-  require-final-newline t
-  ;; No margin when scrolling (cursor can reach top/bottom)
-  scroll-margin 0
-  ;; Keep cursor position when scrolling
-  scroll-preserve-screen-position 1
-  ;; Store all backup files in one directory instead of cluttering directories
-  backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
-  ;; Enable versioned backups
-  version-control t
-  ;; Delete old backup versions without asking
-  delete-old-versions t
+  tab-width 4 ;; Set tab width to 4 spaces for display
+  indent-tabs-mode nil ;; Use spaces instead of tabs for indentation
+  fill-column 80 ;; Default line width for text wrapping (M-q)
+  scroll-conservatively 10000 ;; Scroll smoothly without jumping
+  auto-window-vscroll nil ;; Disable automatic vertical scrolling adjustments (improves performance)
+  save-interprogram-paste-before-kill t ;; Save clipboard contents before killing text in Emacs
+  apropos-do-all t ;; Make apropos (help search) search more extensively
+  mouse-yank-at-point t ;; Paste at point, not at mouse cursor position
+  fast-but-imprecise-scrolling t ;; Enable faster scrolling at the cost of some accuracy
+  auto-save-default nil ;; Disable auto-save files (#file#)
+  create-lockfiles nil ;; Disable lockfiles (.#file)
+  make-backup-files t ;; Create backup files (file~)
+  kept-new-versions 5 ;; Keep 6 newest versions of backup files
+  kept-old-versions 5 ;; Keep 2 oldest versions of backup files
+  require-final-newline t ;; Always add newline at end of file
+  scroll-margin 0 ;; No margin when scrolling (cursor can reach top/bottom)
+  scroll-preserve-screen-position 1 ;; Keep cursor position when scrolling
+  backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))) ;; Store all backup files in one directory instead of cluttering directories
+  version-control t ;; Enable versioned backups
+  delete-old-versions t ;; Delete old backup versions without asking
   history-length 50 ;; Remember last 50 commands
   ; save-place-mode 1 ;; Remember last cursor position in a file
   )
@@ -123,12 +103,18 @@
 ;; Default Fonts
 ;; ----------------------------------------------------------------------------
 
-;; NOTE: Fonts are now managed by fontaine (see config/ui/fonts-ligatures.el)
-;; This section is kept for reference but commented out to avoid conflicts.
-;; 
+;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
+
+(defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text.")
+;; (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
+
+;; (defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
+(defvar my/font-monospace "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text.")
+
+
 (when (display-graphic-p)
-  (set-face-attribute 'default nil :family my/font-mono)
+  (set-face-attribute 'default nil :family my/font-monospace)
   (set-face-attribute 'variable-pitch nil :family my/font-serif)
-  (set-face-attribute 'fixed-pitch nil :family my/font-mono))
+  (set-face-attribute 'fixed-pitch nil :family my/font-monospace))
 
 (provide 'emacs-config)

@@ -55,7 +55,7 @@ Title: Interesting idea about productivity
 Quick journal entries organized by date in a single file with hierarchical date tree structure.
 
 ### Location
-All journal entries in: `~/Sync/org/agenda/journal.org`
+All journal entries in: `~/Sync/org/journal.org`
 
 ### Usage
 
@@ -136,7 +136,7 @@ Description of accomplishment...
 ```
 
 **Review:**
-- Open `~/Sync/org/agenda/journal.org`
+- Open `~/Sync/org/journal.org`
 - Navigate with TAB (collapse/expand)
 - Search with `C-s` or `C-c s s`
 

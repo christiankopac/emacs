@@ -162,7 +162,7 @@
 (with-eval-after-load 'magit
   (setq magit-repository-directories '(("~/src/projects" . 1)    ; Search for repos in projects (depth 1)
                                         ("~/src/lab" . 1)         ; Search in lab (depth 1)
-                                        ("~/src/github.com/" . 2))))  ; Search in github.com (depth 2)
+                                        ("~/src/github.com/christiankopac" . 2))))  ; Search in github.com (depth 2)
 
 ;; ============================================================================
 ;; Diff-hl Configuration - Show git changes in fringe

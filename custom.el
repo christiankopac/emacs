@@ -5,15 +5,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(org-agenda-files
-   '("/home/christian/Sync/org/agenda/inbox.org"
-     "/home/christian/Sync/org/agenda/log.org"
-     "/home/christian/Sync/org/agenda/gtd/areas.org"
-     "/home/christian/Sync/org/agenda/gtd/horizons.org"
-     "/home/christian/Sync/org/agenda/gtd/inbox.org"
-     "/home/christian/Sync/org/agenda/gtd/projects.org"
-     "/home/christian/Sync/org/agenda/gtd/tasks.org"
-     "/home/christian/Sync/org/agenda/gtd/vision.org"
-     "/home/christian/Documents/Sync/org/agenda/journal/2025-10-02.org"))
+   '("/home/christian/Sync/org/gtd/inbox.org"      ;; unprocessed tasks
+     "/home/christian/Sync/org/gtd/tasks.org"      ;; processed tasks -> actions/habits/projects/calendar
+     "/home/christian/Sync/org/gtd/areas.org"      ;; areas of focus -> goals
+     "/home/christian/Sync/org/gtd/horizons.org"   ;; horizons of focus -> vision
+     "/home/christian/Sync/org/gtd/vision.org"))
  '(package-selected-packages '(copilot everforest-theme))
  '(package-vc-selected-packages
    '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main")
@@ -27,6 +23,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(jinx-misspelled ((t (:underline t :foreground unspecified))))
+ '(denote-faces-link ((t (:foreground "#8be9fd" :underline t))))
+ '(jinx-misspelled ((t (:underline t :foreground nil))))
  '(org-document-info-keyword ((t (:underline nil))))
- '(org-modern-date-inactive ((t (:inherit org-modern-label :background "gray20" :foreground "gray70" :family "MonoLisa Nerd Font")))))
+ '(org-modern-date-inactive ((t (:inherit org-modern-label :background "gray20" :foreground "gray70" :family "MonoLisa Nerd Font"))))
+ '(outline-1 ((t (:weight bold :height 1.1))))
+ '(xref-line-number ((t (:inherit line-number))))
+ '(xref-match ((t (:inherit isearch)))))
+
+;; Font overrides to force custom fonts regardless of theme
+(custom-set-faces
+ '(default ((t (:family "JuliaMono Nerd Font Mono"))))
+ '(variable-pitch ((t (:family "ETBookOT"))))
+ '(fixed-pitch ((t (:family "JuliaMono Nerd Font Mono")))))

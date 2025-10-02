@@ -547,7 +547,7 @@ Org-capture style quick entry for today's journal log. Perfect for capturing tho
 - Only shows the entry you're typing (like org-capture)
 - Automatically creates journal if needed
 - Timestamps each entry
-- Saved to: `~/Sync/org/journal/daily/`
+- Saved to: `~/Sync/org/journal/`
 
 ---
 

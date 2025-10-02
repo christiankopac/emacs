@@ -9,12 +9,10 @@
 (global-set-key (kbd "C-c SPC") 'my-quick-jump-map)
 
 ;; Quick directory jumps with icons
-(define-key my-quick-jump-map (kbd "a") 
-  (lambda () (interactive) (dired "~/Sync/org/agenda/")))
 (define-key my-quick-jump-map (kbd "g") 
-  (lambda () (interactive) (dired "~/Sync/org/agenda/gtd/")))
+  (lambda () (interactive) (dired "~/Sync/org/gtd/")))
 (define-key my-quick-jump-map (kbd "j") 
-  (lambda () (interactive) (dired "~/Sync/org/agenda/journal/daily/")))
+  (lambda () (interactive) (dired "~/Sync/org/journal/")))
 
 ;; Set better descriptions using which-key
 (with-eval-after-load 'which-key

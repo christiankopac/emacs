@@ -287,12 +287,12 @@ Your journal system includes both denote-based daily journals and org-capture-ba
 
 ### Quick Journal (Org Capture with Datetree)
 
-**Keybindings:** 
+**Keybindings:**
 - `C-c c j` - Journal entry with prompt
 - `C-c c J` - Quick journal (no prompt)
 
 **Features:**
-- All entries in single file: `~/Sync/org/agenda/journal.org`
+- All entries in single file: `~/Sync/org/journal.org`
 - Week-based datetree structure
 - Automatic timestamps
 - Easy to search and review
@@ -585,7 +585,7 @@ Insert web link with title automatically fetched:
 **Screenshot:** `C-c n s`
 **Yank from clipboard:** `C-c n y`
 
-Automatically saves images to `assets/images/` with timestamps.
+Automatically saves images to `attach/images/` with timestamps.
 
 ---
 
@@ -677,4 +677,3 @@ If it's not in your GTD system, it doesn't exist. Capture everything.
 ---
 
 *Last Updated: 2025-09-30*
-
