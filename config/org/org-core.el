@@ -75,7 +75,7 @@
           ))
   
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))  ; Habit states
+        '((sequence "TODO(t)" "NEXT(n)" "ACTIVE(a)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))  ; Habit states
   
   ;; Ensure fixed-pitch font for code and technical elements
   ;; These should always use monospace, regardless of theme
