@@ -539,7 +539,7 @@ M-x all-the-icons-install-fonts
 
 2. **Reduce delay:**
    ```elisp
-   (setq which-key-idle-delay 0.3)
+   (setq which-key-idle-delay 0.1)
    ```
 
 3. **Check if suppressed:**

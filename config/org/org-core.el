@@ -52,26 +52,30 @@
           (:startgrouptag)
           ("area"          . ?a)
           (:grouptags)
-          ("health"        . ?h)
-          ("relationships" . ?r)
-          ("finance"       . ?f)
-          ("career"        . ?c)
-          ("learning"      . ?l)
-          ("home"          . ?o)
+          ("health"        . ?h)  ;; sleep, meditation, journaling
+          ("finance"       . ?f)  ;; budgeting, investing, debt
+          ("career"        . ?c)  ;; job, promotion, side hustle
+          ("relationships" . ?r)  ;; friends, family, partner
+          ("learning"      . ?l)  ;; reading, courses, podcasts
+          ("home"          . ?o)  ;; cleaning, organizing, cooking
+          ("creative"      . ?C)  ;; art, writing, music
+          ("growth"        . ?g)  ;; journaling, self-reflection, personal development
           (:endgrouptag)
           
           ;; Contexts
-          ("@work"         . ?w)
-          ("@personal"     . ?p)
+          ("@work"         . ?w)  ;; work, office, meetings
+          ("@personal"     . ?p)  ;; personal, home, family
+          ("@errands"      . ?e)  ;; errands, shopping, running
+          ("@waiting"      . ?W)  ;; waiting, delegated, blocked
           
           ;; Energy levels
-          ("quick"         . ?q)
-          ("focus"         . ?z)))
+          ("quick"         . ?q)  ;; low-energy, short tasks (<15 min)
+          ("focus"         . ?z)  ;; high-energy, deep work (>30 min)
+          ("low"           . ?L)  ;; low-energy, long tasks (>60 min)
+          ))
   
-  ;; TODO workflow states
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")      ; Task states
-          (sequence "DEVELOPING(v)" "BUILDING(b)" "PRACTICING(p)" "|" "ESTABLISHED(e)" "DROPPED(x)")))  ; Habit states
+        '((sequence "TODO(t)" "NEXT(n)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))  ; Habit states
   
   ;; Ensure fixed-pitch font for code and technical elements
   ;; These should always use monospace, regardless of theme

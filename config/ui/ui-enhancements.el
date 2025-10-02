@@ -27,7 +27,7 @@
 ;; Which-key - Show available keybindings
 (with-eval-after-load 'which-key
   (which-key-mode)                                        ; Enable which-key
-  (setq which-key-idle-delay 0.5)                         ; Show after 0.5s
+  (setq which-key-idle-delay 0.1)                         ; Show after 0.1s
   (which-key-add-key-based-replacements                   ; Descriptive labels
     "C-c c" "Capture"
     "C-c a" "Agenda"

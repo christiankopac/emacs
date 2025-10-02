@@ -381,19 +381,21 @@ TITLE is an optional title for the source block."
 ;; ============================================================================
 
 (with-eval-after-load 'org-modern
-  (setq org-modern-timestamp t                                ; Style timestamps
-        org-modern-priority '((?A . "󰅐") (?B . "󰅐") (?C . "󰅐"))  ; Priority indicators
-        org-modern-priority-align '(t . t)                    ; Align priority symbols
+  (setq org-modern-timestamp t                                
+        org-modern-priority '((?A . "🔥") (?B . "🌶️") (?C . "🫑"))  
+        org-modern-priority-align '(t . t)                       ; Align priority symbols
         org-modern-keyword '(("date" . "\uf455")                 ; Date symbol
                              ("filetags" . "\uea66")             ; File tags symbol
                              ("identifier" . "\ueb11")           ; Identifier symbol
-                             (t . "▶"))                      ; Default keyword symbol
-        org-modern-fold-stars '(("󰅐" . "󰅐")   ; Level 1: Solid diamond / hollow diamond
-                               ("󰅐" . "󰅐")   ; Level 2: White square / black square
-                               ("󰅐" . "󰅐")    ; Level 3: Half-filled circle / half-filled circle (opposite)
-                               ("󰅐" . "󰅐")    ; Level 4: Empty diamond / solid diamond
-                               ("󰅐" . "󰅐"))   ; Level 5: Empty circle / solid circle
-        org-modern-table nil)                 ; Disable table styling
+                             (t . "▶"))                          ; Default keyword symbol
+        org-modern-fold-stars '(("◈" . "◇")   
+                               ("⦿" . "◦")   
+                               ("⊙" . "•")   
+                               ("▸" . "▹")   
+                               ("▪" . "▫"))  
+        org-modern-table nil
+        org-modern-block-name nil
+        )
   
   (add-hook 'org-mode-hook 'org-modern-mode))  ; Enable org-modern for org buffers
 

@@ -226,8 +226,9 @@
   '("org" "markdown" "html" "latex" "plain")
   "Supported output formats for file conversion.")
 
-;; Load which-key configuration
-(load-file (expand-file-name "config/ui/which-key.el" user-emacs-directory))
+;; Load which-key configuration after which-key is loaded
+(with-eval-after-load 'which-key
+  (load-file (expand-file-name "config/ui/which-key.el" user-emacs-directory)))
 
 ;; ----------------------------------------------------------------------------
 ;; Org Packages

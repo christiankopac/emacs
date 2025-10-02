@@ -46,8 +46,8 @@
 (with-eval-after-load 'flycheck
   (global-flycheck-mode t)                                           ; Enable flycheck globally
   (setq flycheck-check-syntax-automatically '(save mode-enabled))    ; Check on save and when enabled
-  (setq flycheck-display-errors-delay 0.3)                           ; Show errors after 0.3s delay
-  (setq flycheck-idle-change-delay 0.8)                              ; Wait 0.8s after typing before checking
+  (setq flycheck-display-errors-delay 0.1)                           ; Show errors after 0.1s delay
+  (setq flycheck-idle-change-delay 0.3)                              ; Wait 0.3s after typing before checking
   (setq flycheck-highlighting-mode 'lines)                           ; Highlight entire lines with errors
   (setq flycheck-indication-mode 'right-fringe)                      ; Show indicators in right fringe
   (setq flycheck-display-errors-function #'flycheck-display-error-messages-unless-error-list)  ; Smart error display
