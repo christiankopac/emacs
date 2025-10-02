@@ -1,7 +1,7 @@
 ;;; dashboard.el --- Dashboard startup screen configuration
 
 ;; ============================================================================
-;; Variables and Functions
+;; Dashboard Configuration - Startup screen configuration
 ;; ============================================================================
 
 (defvar my/dashboard-footer-messages

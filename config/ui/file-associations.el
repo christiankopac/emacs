@@ -1,7 +1,5 @@
 ;;; file-associations.el --- External program associations and file managers
 
-;;; Dired
-
 ;; ============================================================================
 ;; Dired - File manager for Emacs
 ;; ============================================================================
@@ -35,6 +33,7 @@
 ;; OpenWith - Open files with external programs
 ;; ============================================================================
 ;; IMPORTANT: Must be configured and enabled BEFORE dired/dirvish loads
+;; ============================================================================
 
 (with-eval-after-load 'openwith
   ;; Configure file associations
@@ -80,11 +79,17 @@
 
 ;; NOTE: mixed-pitch configuration moved to org-core.el
 
-;; Grip mode - Live preview markdown in browser
+;; ============================================================================
+;; Grip mode Configuration - Live preview markdown in browser
+;; ============================================================================
+
 (with-eval-after-load 'markdown-mode
   (define-key markdown-mode-command-map (kbd "g") 'grip-mode))  ; Toggle grip preview
 
-;; Helm - Alternative completion framework
+;; ============================================================================
+;; Helm Configuration - Alternative completion framework
+;; ============================================================================
+
 (global-set-key (kbd "C-c M-h") 'helm-command-prefix)     ; Helm command prefix
 (with-eval-after-load 'helm
   (setq helm-split-window-inside-p t                      ; Split inside current window

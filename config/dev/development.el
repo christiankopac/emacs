@@ -25,7 +25,10 @@
 ;; Development Tools
 ;; ----------------------------------------------------------------------------
 
-;; Sideline - Show diagnostics and info in margin
+;; ============================================================================
+;; Sideline Configuration - Show diagnostics and info in margin
+;; ============================================================================
+
 (with-eval-after-load 'sideline
   (setq sideline-backends-left '(sideline-flycheck)   ; Show flycheck errors on left
         sideline-backends-right '(sideline-lsp)       ; Show LSP info on right
@@ -34,7 +37,10 @@
   
   (add-hook 'flycheck-mode-hook 'sideline-mode))      ; Enable sideline with flycheck
 
-;; Project - Built-in project management
+;; ============================================================================
+;; Project Configuration - Built-in project management
+;; ============================================================================
+
 (setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))  ; Additional project root markers
 
 (global-set-key (kbd "C-c p f") 'project-find-file)      ; Find file in project
@@ -42,7 +48,10 @@
 (global-set-key (kbd "C-c p g") 'project-find-regexp)    ; Search in project
 (global-set-key (kbd "C-c p s") 'project-switch-project) ; Switch between projects
 
-;; Flycheck - On-the-fly syntax checking
+;; ============================================================================
+;; Flycheck Configuration - On-the-fly syntax checking
+;; ============================================================================
+
 (with-eval-after-load 'flycheck
   (global-flycheck-mode t)                                           ; Enable flycheck globally
   (setq flycheck-check-syntax-automatically '(save mode-enabled))    ; Check on save and when enabled
@@ -68,11 +77,17 @@
             (lambda ()
               (setq-local flycheck-checkers '(sh-bash sh-shellcheck)))))
 
-;; Sideline-flycheck - Display flycheck errors in sideline
+;; ============================================================================
+;; Sideline-flycheck Configuration - Display flycheck errors in sideline
+;; ============================================================================
+
 (with-eval-after-load 'sideline-flycheck
   (add-hook 'flycheck-mode-hook 'sideline-flycheck-setup))  ; Setup flycheck integration
 
-;; Hl-todo - Highlight TODO keywords in comments
+;; ============================================================================
+;; Hl-todo Configuration - Highlight TODO keywords in comments
+;; ============================================================================
+
 (setq hl-todo-keyword-faces 
       '(("TODO"   . "#FFCC02")   ; Yellow - tasks to do
         ("FIXME"  . "#FF3838")   ; Red - bugs to fix
@@ -82,7 +97,10 @@
         ("NOTE"   . "#4CC9F0")   ; Blue - important notes
         ("HACK"   . "#E0AAFF"))) ; Pink - temporary solutions
 
-;; Tree-sitter - Better syntax highlighting and parsing
+;; ============================================================================
+;; Tree-sitter Configuration - Better syntax highlighting and parsing
+;; ============================================================================
+
 (with-eval-after-load 'tree-sitter
   (require 'tree-sitter-langs)                               ; Load language definitions
   (global-tree-sitter-mode)                                  ; Enable tree-sitter globally
@@ -96,7 +114,10 @@
 ;; Formatting
 ;; ----------------------------------------------------------------------------
 
-;; Format-all - Format buffer with appropriate formatter
+;; ============================================================================
+;; Format-all Configuration - Format buffer with appropriate formatter
+;; ============================================================================
+
 (global-set-key (kbd "C-c f f") 'format-all-buffer)  ; Format current buffer
 
 ;; Which-key descriptions for development
@@ -104,7 +125,10 @@
   (which-key-add-key-based-replacements
     "C-c f f" "󰏧 Format Buffer"))
 
-;; Apheleia - Auto-format on save
+;; ============================================================================
+;; Apheleia Configuration - Auto-format on save
+;; ============================================================================
+
 (with-eval-after-load 'apheleia
   ;; Disable apheleia for denote-generated network HTML files
   (add-to-list 'apheleia-inhibit-functions
@@ -115,25 +139,37 @@
   (apheleia-global-mode 1))  ; Enable automatic formatting on save
 
 ;; ----------------------------------------------------------------------------
-;; Version Control
+;; Version Control Configuration
 ;; ----------------------------------------------------------------------------
 
-;; Magit - Git interface
+;; ============================================================================
+;; Magit Configuration - Git interface
+;; ============================================================================
+
 (global-set-key (kbd "C-x g") 'magit-status)  ; Open magit status buffer
 (with-eval-after-load 'magit
   (setq magit-repository-directories '(("~/src/projects" . 1)    ; Search for repos in projects (depth 1)
                                         ("~/src/lab" . 1)         ; Search in lab (depth 1)
                                         ("~/src/github.com/" . 2))))  ; Search in github.com (depth 2)
 
-;; Diff-hl - Show git changes in fringe
+;; ============================================================================
+;; Diff-hl Configuration - Show git changes in fringe
+;; ============================================================================
+
 (with-eval-after-load 'diff-hl
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh)  ; Update diff-hl after magit operations
   (global-diff-hl-mode 1))                                          ; Enable diff-hl globally
 
-;; Git-timemachine - Step through git history
+;; ============================================================================
+;; Git-timemachine Configuration - Step through git history
+;; ============================================================================
+
 (global-set-key (kbd "C-x v t") 'git-timemachine)  ; Browse file's git history
 
-;; Git-messenger - Show commit message at point
+;; ============================================================================
+;; Git-messenger Configuration - Show commit message at point
+;; ============================================================================
+
 (global-set-key (kbd "C-x v p") 'git-messenger:popup-message)  ; Show commit info for current line
 (with-eval-after-load 'git-messenger
   (setq git-messenger:show-detail t          ; Show detailed commit info
@@ -143,7 +179,10 @@
 ;; AI Tools
 ;; ----------------------------------------------------------------------------
 
-;; Copilot - AI code completion
+;; ============================================================================
+;; Copilot Configuration - AI code completion
+;; ============================================================================
+
 (with-eval-after-load 'copilot
   (setq copilot-max-char 200000)             ; Maximum characters to send to Copilot
   (add-to-list 'copilot-disable-predicates   ; Disable in apheleia scratch buffers
@@ -158,7 +197,10 @@
 ;; Terminal
 ;; ----------------------------------------------------------------------------
 
-;; Eat - Emulate A Terminal
+;; ============================================================================
+;; Eat Configuration - Emulate A Terminal
+;; ============================================================================
+
 (global-set-key (kbd "C-c t e") 'eat)             ; Open terminal
 (global-set-key (kbd "C-c t E") 'eat-other-window)  ; Open terminal in other window
 
@@ -171,7 +213,10 @@
   (setq eat-shell-prompt-annotation-face 'eat-shell-prompt-annotation)  ; Face for annotation
   (setq eat-shell-prompt-annotation-format " [%s]"))       ; Format: [annotation]
 
-;; Exec-path-from-shell - Import PATH from shell
+;; ============================================================================
+;; Exec-path-from-shell Configuration - Import PATH from shell
+;; ============================================================================
+
 (with-eval-after-load 'exec-path-from-shell
   (when (memq window-system '(mac ns x))     ; Only on macOS and X window systems
     (exec-path-from-shell-initialize)))      ; Import shell environment variables

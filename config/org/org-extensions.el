@@ -395,7 +395,7 @@ TITLE is an optional title for the source block."
                                ("▪" . "▫"))  
         org-modern-table nil
         org-modern-block-name nil
-        )
+        )                 ; Disable table styling
   
   (add-hook 'org-mode-hook 'org-modern-mode))  ; Enable org-modern for org buffers
 

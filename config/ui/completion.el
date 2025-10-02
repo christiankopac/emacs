@@ -1,18 +1,27 @@
 ;;; completion.el --- Completion system configuration
 
-;; Vertico - Vertical completion UI
+;; ============================================================================
+;; Vertico Configuration - Vertical completion UI
+;; ============================================================================
+
 (with-eval-after-load 'vertico
   (vertico-mode)                      ; Enable vertico
   (setq vertico-cycle t               ; Cycle from bottom to top
         vertico-resize t              ; Resize minibuffer to fit candidates
         vertico-count 25))            ; Show 25 candidates
 
-;; Corfu - In-buffer completion popup
+;; ============================================================================
+;; Corfu Configuration - In-buffer completion popup
+;; ============================================================================
+
 (with-eval-after-load 'corfu
   (setq corfu-auto t                  ; Enable automatic completion
         corfu-cycle t))               ; Cycle through candidates
 
-;; Orderless - Flexible completion style
+;; ============================================================================
+;; Orderless Configuration - Flexible completion style
+;; ============================================================================
+
 (with-eval-after-load 'orderless
   ;; More flexible matching styles
   (setq completion-styles '(orderless basic)              ; Use orderless and basic styles
@@ -39,15 +48,25 @@
   ;; Allow leading wildcards
   (setq completion-pcm-leading-wildcard t))
 
-;; Marginalia - Rich annotations in minibuffer
+;; ============================================================================
+;; Marginalia Configuration - Rich annotations in minibuffer
+;; ============================================================================
+
 (with-eval-after-load 'marginalia
   (marginalia-mode))                  ; Enable annotations for completions
 
-;; Consult - Consulting completing-read
+
+;; ============================================================================
+;; Consult Configuration - Consulting completing-read
+;; ============================================================================
+
 (with-eval-after-load 'consult
   (setq consult-line-start-from-top t))  ; Start consult-line from top of buffer
 
-;; Embark-Consult - Integration between embark and consult
+;; ============================================================================
+;; Embark-Consult Configuration - Integration between embark and consult
+;; ============================================================================
+
 (with-eval-after-load 'embark
   (add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode))  ; Enable preview in embark collect
 

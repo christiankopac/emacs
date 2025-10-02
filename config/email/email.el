@@ -1,6 +1,9 @@
 ;;; email.el --- Email configuration (mu4e, message, smtpmail, bbdb, consult-mu)
 
-;; Mu4e init
+;; ============================================================================
+;; Mu4e Configuration - Email client
+;; ============================================================================
+
 (when (file-exists-p "/usr/local/bin/mu")
   (setq mu4e-mu-binary "/usr/local/bin/mu"))
 
@@ -150,19 +153,28 @@
     (define-key mu4e-main-mode-map [menu-bar consult-mu search-fastmail]
                 '("Search Fastmail" . consult-mu-search-fastmail))))
 
+;; ============================================================================
 ;; Message mode configuration
+;; ============================================================================
+
 (setq message-send-mail-function 'smtpmail-send-it
       message-kill-buffer-on-exit t
       send-mail-function 'smtpmail-send-it)
 
+;; ============================================================================
 ;; SMTP configuration with pass integration
+;; ============================================================================
+
 (setq smtpmail-auth-credentials
       `(("smtp.gmail.com" 587 "christian.kopac@gmail.com"
          ,(lambda () (string-trim (shell-command-to-string "pass show email/gmail"))))
         ("smtp.fastmail.com" 465 "hello@christiankopac.com"
          ,(lambda () (string-trim (shell-command-to-string "pass show email/fastmail"))))))
 
-;; BBDB configuration
+;; ============================================================================
+;; BBDB configuration - Address book
+;; ============================================================================
+
 (setq bbdb-file "~/.bbdb"
       bbdb-offer-save 1
       bbdb-use-pop-up nil

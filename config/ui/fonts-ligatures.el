@@ -1,14 +1,9 @@
 ;;; fonts-ligatures.el --- Fonts and ligatures configuration
 
-;; Ligatures variables (define before packages load)
-(defvar my/ligatures-general '("www")
-  "General ligatures for all modes.")
+;; ============================================================================
+;; Fontaine Configuration - Font configuration
+;; ============================================================================
 
-(defvar my/ligatures-prog-mode
-  '("|||>" "<||>" "<|||" "<|>" "|>" "<|" "::" ":::" "==" "===" "=/=" "!==" "<==" "<=>" "=>" "->" "<-" "<<-" "->>" "<<" ">>" "<<<" ">>>" "<~" "~>" "-<" ">-" "=<<" ">>=" "<=<" ">=>" "<*" "*>" ":-" "-:" "++" "+++" "**" "***" "~~" "~~>" "::=" ":=" ".." "..." "//" "/*" "*/" "##" "###" "&&" "||")
-  "Programming mode ligatures.")
-
-;; Fontaine configuration
 (with-eval-after-load 'fontaine
   (setq fontaine-presets
         '((regular
@@ -100,10 +95,25 @@
   (global-set-key (kbd "C-c M-f l") (lambda () (interactive) (fontaine-set-preset 'large)))
   (global-set-key (kbd "C-c M-f t") 'fontaine-set-preset))
 
-;; Ligatures configuration
+;; ============================================================================
+;; Ligatures Configuration - Ligatures configuration
+;; ============================================================================
+;; ============================================================================
+;; Ligatures Variables - Define before packages load
+;; ============================================================================
+
+;; Ligatures variables (define before packages load)
+(defvar my/ligatures-general '("www")
+  "General ligatures for all modes.")
+
+(defvar my/ligatures-prog-mode
+  '("|||>" "<||>" "<|||" "<|>" "|>" "<|" "::" ":::" "==" "===" "=/=" "!==" "<==" "<=>" "=>" "->" "<-" "<<-" "->>" "<<" ">>" "<<<" ">>>" "<~" "~>" "-<" ">-" "=<<" ">>=" "<=<" ">=>" "<*" "*>" ":-" "-:" "++" "+++" "**" "***" "~~" "~~>" "::=" ":=" ".." "..." "//" "/*" "*/" "##" "###" "&&" "||")
+  "Programming mode ligatures.")
+
 (with-eval-after-load 'ligature
   (ligature-set-ligatures 't my/ligatures-general)
   (ligature-set-ligatures 'prog-mode my/ligatures-prog-mode)
+  (ligature-set-ligatures 'org-mode my/ligatures-prog-mode)  ; Enable ligatures in Org mode
   (global-ligature-mode t))
 
 (provide 'fonts-ligatures)

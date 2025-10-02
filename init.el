@@ -82,9 +82,9 @@
 
 ;; Basic UI settings
 (show-paren-mode t)
-(scroll-bar-mode nil)
-(menu-bar-mode nil) 
-(tool-bar-mode nil) ;
+(scroll-bar-mode -1)  ; Disable with -1, not nil
+(menu-bar-mode -1)    ; Also fixed: use -1 instead of nil
+(tool-bar-mode -1)    ; Also fixed: use -1 instead of nil
 (setq inhibit-startup-screen 1)
 
 ;; ----------------------------------------------------------------------------
@@ -189,7 +189,40 @@
 (use-package helm :ensure t)
 (use-package helm-org :ensure t :after (helm org))
 (use-package multiple-cursors :ensure t)
-(use-package mood-line :ensure t)
+(use-package mood-line 
+  :ensure t
+  :config
+  (setq mood-line-glyph-alist mood-line-glyphs-fira-code
+        mood-line-show-encoding-information nil
+        mood-line-show-eol-style nil
+        mood-line-show-cursor-point t
+        mood-line-right-align nil
+        mood-line-percent-position nil)
+  ;; Customize faces (only if they exist)
+  (when (facep 'mood-line-modified)
+    (set-face-attribute 'mood-line-modified nil
+                        :foreground "#d08770"
+                        :weight 'bold))
+  (when (facep 'mood-line-status-neutral)
+    (set-face-attribute 'mood-line-status-neutral nil
+                        :foreground "#88c0d0"))
+  (when (facep 'mood-line-status-info)
+    (set-face-attribute 'mood-line-status-info nil
+                        :foreground "#81a1c1"))
+  (when (facep 'mood-line-status-success)
+    (set-face-attribute 'mood-line-status-success nil
+                        :foreground "#a3be8c"))
+  (when (facep 'mood-line-status-warning)
+    (set-face-attribute 'mood-line-status-warning nil
+                        :foreground "#ebcb8b"))
+  (when (facep 'mood-line-status-error)
+    (set-face-attribute 'mood-line-status-error nil
+                        :foreground "#bf616a"))
+  (when (facep 'mood-line-encoding)
+    (set-face-attribute 'mood-line-encoding nil
+                        :inherit 'mood-line-unimportant))
+  ;; Enable mood-line
+  (mood-line-mode 1))
 (use-package openwith 
   :ensure t
   :init
@@ -433,6 +466,22 @@
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
+
+;; ============================================================================
+;; Force Disable Scrollbars - Final attempt
+;; ============================================================================
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            ;; Force disable scrollbars (in case something re-enabled them)
+            ;; Call the functions, don't use setq on them!
+            (when (fboundp 'scroll-bar-mode)
+              (scroll-bar-mode -1))
+            (when (fboundp 'horizontal-scroll-bar-mode)
+              (horizontal-scroll-bar-mode -1))
+            ;; Disable on all frames
+            (dolist (frame (frame-list))
+              (set-frame-parameter frame 'vertical-scroll-bars nil)
+              (set-frame-parameter frame 'horizontal-scroll-bars nil))))
 
 ;; ============================================================================
 ;; Load Theme - Everforest Hard Dark

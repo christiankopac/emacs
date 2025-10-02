@@ -1,6 +1,9 @@
 ;;; ui-enhancements.el --- UI improvements and visual enhancements
 
-;; Spacious padding - Add breathing room to UI
+ ;; ============================================================================
+;; Spacious Padding Configuration - Add breathing room to UI
+;; ============================================================================
+
 (with-eval-after-load 'spacious-padding
   (setq line-spacing 3)                                    ; Extra line spacing
   (setq spacious-padding-subtle-frame-lines               ; Subtle mode-line borders
@@ -18,13 +21,19 @@
         beacon-blink-when-focused t                       ; Blink on window focus
         beacon-dont-blink-commands '(dashboard-refresh-buffer))) ; Don't blink on dashboard refresh
 
-;; Helpful - Better help buffers
+;; ============================================================================
+;; Helpful Configuration - Better help buffers
+;; ============================================================================
+
 (global-set-key (kbd "C-h f") 'helpful-function)          ; Describe function
 (global-set-key (kbd "C-h x") 'helpful-command)           ; Describe command
 (global-set-key (kbd "C-h k") 'helpful-key)               ; Describe key
 (global-set-key (kbd "C-h v") 'helpful-variable)          ; Describe variable
 
-;; Which-key - Show available keybindings
+;; ============================================================================
+;; Which-key Configuration - Show available keybindings
+;; ============================================================================
+
 (with-eval-after-load 'which-key
   (which-key-mode)                                        ; Enable which-key
   (setq which-key-idle-delay 0.1)                         ; Show after 0.1s
@@ -36,14 +45,8 @@
     "C-c x c" "Extract Concept"
     "C-c d" "Denote"))
 
-
-;; mood line
-(with-eval-after-load 'mood-line
-  (mood-line-mode)
-  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
-  ;; (setq mood-line-glyph-alist mood-line-glyphs-unicode)
-)
-
-
+;; ============================================================================
+;; Mood-line Configuration - Moved to init.el
+;; ============================================================================
 
 (provide 'ui-enhancements)

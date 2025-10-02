@@ -27,6 +27,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(jinx-misspelled ((t (:underline t :foreground nil))))
+ '(jinx-misspelled ((t (:underline t :foreground unspecified))))
  '(org-document-info-keyword ((t (:underline nil))))
  '(org-modern-date-inactive ((t (:inherit org-modern-label :background "gray20" :foreground "gray70" :family "MonoLisa Nerd Font")))))

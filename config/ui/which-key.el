@@ -1,6 +1,9 @@
 ;;; which-key.el --- Comprehensive which-key definitions
 
-;; Add which-key descriptions
+;; ============================================================================
+;; Which-key Configuration - Show available keybindings
+;; ============================================================================
+
 (which-key-add-key-based-replacements
   "C-c a" "📅 Agenda"
   "C-c b" "📋 Consult Buffer"

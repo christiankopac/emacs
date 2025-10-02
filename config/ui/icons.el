@@ -1,12 +1,17 @@
 ;;; icons.el --- Icons configuration
 
-;; All The Icons - Icon set for Emacs
+;; ============================================================================
+;; All The Icons Configuration - Icon set for Emacs
+;; ============================================================================
+
 (setq all-the-icons-scale-factor 0.8)               ; Scale icons to 80% size
 
 ;; NOTE: all-the-icons-dired is DISABLED when using dirvish
-;; Dirvish uses nerd-icons instead for better compatibility
 
-;; Nerd Icons - Icon set for dirvish and modern UI
+;; ============================================================================
+;; Nerd Icons Configuration - Icon set for dirvish and modern UI
+;; ============================================================================
+
 (with-eval-after-load 'dirvish
   ;; Use nerd-icons for both GUI and terminal (requires nerd-fonts in terminal)
   (setq dirvish-mode-line-format              ; Simplified mode-line
