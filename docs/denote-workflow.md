@@ -1173,13 +1173,6 @@ Regularly check backlinks (`C-c d b`) to discover unexpected connections.
 - Use `C-c d R` to rename with signature
 - Check for double `==` in filename
 
-### Issue: Journal entries not appearing in calendar
-
-**Solution:**
-- Verify `denote-journal-calendar-mode` is enabled
-- Check journal files are in correct directory
-- Refresh calendar view
-
 ---
 
 ## Resources
