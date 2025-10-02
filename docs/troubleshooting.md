@@ -312,6 +312,7 @@ rm -rf ~/.emacs.d/elpa/
 
 3. **Exclude large directories:**
    Create `.gitignore` or `.ignore`:
+   
    ```
    node_modules/
    dist/

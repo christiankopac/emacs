@@ -43,13 +43,15 @@
 
 (with-eval-after-load 'project
   (setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))
-  
-  ;; Add directories to project list (limit to 1 level deep)
-  (project-remember-projects-under "~/src/github.com/christiankopac" t 1)
-  (project-remember-projects-under "~/src/projects" t 1)
-  (project-remember-projects-under "~/src/projects-cli" t 1)
-  (project-remember-projects-under "~/src/projects-music" t 1)
-  (project-remember-projects-under "~/src/cv" t 1))
+
+
+
+  ;; Add directories to project list (non-recursive - 1 level only)
+  (project-remember-projects-under "~/src/github.com/christiankopac" nil)
+  (project-remember-projects-under "~/src/projects" nil)
+  (project-remember-projects-under "~/src/projects-cli" nil)
+  (project-remember-projects-under "~/src/projects-music" nil)
+  (project-remember-projects-under "~/src/cv/ck-cv-and-cover-typst" nil))
 
 
 (global-set-key (kbd "C-c p f") 'project-find-file)      ; Find file in project
