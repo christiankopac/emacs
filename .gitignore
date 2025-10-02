@@ -1,0 +1,13 @@
+.cache
+auto-save-list
+backups
+eln-cache
+elpa
+recentf
+tramp
+
+# network security
+/network-security.data
+
+# network security
+/network-security.data
