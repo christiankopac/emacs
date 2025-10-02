@@ -92,9 +92,13 @@
 ;; ----------------------------------------------------------------------------
 
 ;; Font Variables
-(defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
+;; ----------------------------------------------------------------------------
+;; NOTE: Sans serif fonts is not used
+;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
-(defvar my/font-mono "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
+;; (defvar my/font-mono "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
+(defvar my/font-mono "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text.")
+
 
 ;; Add config subdirectories to load-path
 (add-to-list 'load-path (expand-file-name "config/core" user-emacs-directory))
