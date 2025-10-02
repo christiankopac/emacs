@@ -377,6 +377,25 @@ TITLE is an optional title for the source block."
 (global-set-key (kbd "C-c w w") 'org-web-tools-insert-link-for-url)  ; Insert link with title
 
 ;; ============================================================================
+;; Ox-Tufte Configuration - Tufte-style HTML export
+;; ============================================================================
+
+;; Ox-Tufte - Tufte CSS export backend for Org mode
+(with-eval-after-load 'ox-tufte
+  ;; Include footnotes at bottom for better mobile compatibility
+  (setq org-tufte-include-footnotes-at-bottom t)
+  
+  ;; Custom margin note symbol (default is ⊕)
+  (setq org-tufte-margin-note-symbol "⊕")
+  
+  ;; Enable Tufte export backend
+  (add-to-list 'org-export-backends 'tufte-html))
+
+;; Keybindings for Tufte export
+(global-set-key (kbd "C-c e t") 'org-tufte-export-to-html)  ; Export to Tufte HTML
+(global-set-key (kbd "C-c e T") 'org-tufte-export-to-html-and-open)  ; Export and open
+
+;; ============================================================================
 ;; Org Modern Configuration - Modern UI elements for org
 ;; ============================================================================
 

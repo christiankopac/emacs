@@ -164,6 +164,8 @@
 
 (use-package ligature :ensure t :after org)
 
+(use-package ox-tufte :ensure t)
+
 ;; Load font configuration after fontaine is ready (only in graphical mode)
 (when (display-graphic-p)
   (with-eval-after-load 'fontaine
@@ -371,6 +373,7 @@
 ;; ----------------------------------------------------------------------------
 
 (use-package gptel :ensure t)
+
 (use-package copilot
   :ensure t
   :vc (:url "https://github.com/copilot-emacs/copilot.el"
