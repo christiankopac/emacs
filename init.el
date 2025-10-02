@@ -118,7 +118,8 @@
 
 (use-package modus-themes :defer t :ensure t)
 (use-package poet-theme :ensure t :defer t)
-;; (use-package ef-themes :ensure t :defer t)
+(use-package doric-themes :ensure t :defer t)
+(use-package ef-themes :ensure t :defer t)
 (use-package standard-themes :ensure t :defer t)
 (use-package everforest
   :ensure (:host github 
@@ -188,6 +189,7 @@
 (use-package helm :ensure t)
 (use-package helm-org :ensure t :after (helm org))
 (use-package multiple-cursors :ensure t)
+(use-package mood-line :ensure t)
 (use-package openwith 
   :ensure t
   :init
@@ -225,10 +227,6 @@
 (defvar my/pandoc-output-formats
   '("org" "markdown" "html" "latex" "plain")
   "Supported output formats for file conversion.")
-
-;; Load which-key configuration after which-key is loaded
-(with-eval-after-load 'which-key
-  (load-file (expand-file-name "config/ui/which-key.el" user-emacs-directory)))
 
 ;; ----------------------------------------------------------------------------
 ;; Org Packages

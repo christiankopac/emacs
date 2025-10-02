@@ -36,4 +36,14 @@
     "C-c x c" "Extract Concept"
     "C-c d" "Denote"))
 
+
+;; mood line
+(with-eval-after-load 'mood-line
+  (mood-line-mode)
+  (setq mood-line-glyph-alist mood-line-glyphs-fira-code)
+  ;; (setq mood-line-glyph-alist mood-line-glyphs-unicode)
+)
+
+
+
 (provide 'ui-enhancements)
