@@ -8,7 +8,7 @@
   (vertico-mode)                      ; Enable vertico
   (setq vertico-cycle t               ; Cycle from bottom to top
         vertico-resize t              ; Resize minibuffer to fit candidates
-        vertico-count 25))            ; Show 25 candidates
+        vertico-count 20))            ; Show 25 candidates
 
 ;; ============================================================================
 ;; Corfu Configuration - In-buffer completion popup

@@ -113,7 +113,7 @@
 (with-eval-after-load 'ligature
   (ligature-set-ligatures 't my/ligatures-general)
   (ligature-set-ligatures 'prog-mode my/ligatures-prog-mode)
-  (ligature-set-ligatures 'org-mode my/ligatures-prog-mode)  ; Enable ligatures in Org mode
+  ;; Don't apply ligatures to org-mode to avoid conflicts with org-hide-leading-stars
   (global-ligature-mode t))
 
 (provide 'fonts-ligatures)

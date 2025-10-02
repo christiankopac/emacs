@@ -188,7 +188,9 @@
       org-catch-invisible-edits 'show-and-error
       org-special-ctrl-a/e t
       org-insert-heading-respect-content t
-      org-agenda-tags-column 0)
+      org-agenda-tags-column 0
+      org-hide-leading-stars t
+      )
 
 ;; Babel - Execute code in source blocks (wrapped to load after Org)
 (with-eval-after-load 'org

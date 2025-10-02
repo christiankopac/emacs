@@ -94,6 +94,7 @@
 ;; Font Variables
 (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
+(defvar my/font-mono "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
 
 ;; Add config subdirectories to load-path
 (add-to-list 'load-path (expand-file-name "config/core" user-emacs-directory))
@@ -159,12 +160,14 @@
 ;; UI: Fonts & Ligatures
 ;; ----------------------------------------------------------------------------
 
-(use-package fontaine :ensure t)
+(use-package fontaine :ensure t :if (display-graphic-p))
+
 (use-package ligature :ensure t :after org)
 
-;; Load font configuration after fontaine is ready
-(with-eval-after-load 'fontaine
-  (load-file (expand-file-name "config/ui/fonts-ligatures.el" user-emacs-directory)))
+;; Load font configuration after fontaine is ready (only in graphical mode)
+(when (display-graphic-p)
+  (with-eval-after-load 'fontaine
+    (load-file (expand-file-name "config/ui/fonts-ligatures.el" user-emacs-directory))))
 
 ;; ----------------------------------------------------------------------------
 ;; UI: Menus & Dashboard

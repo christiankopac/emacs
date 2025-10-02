@@ -388,6 +388,9 @@ TITLE is an optional title for the source block."
                              ("filetags" . "\uea66")             ; File tags symbol
                              ("identifier" . "\ueb11")           ; Identifier symbol
                              (t . "▶"))                          ; Default keyword symbol
+        ;; Heading stars - use invisible stars for clean appearance
+        org-modern-star '("" "" "" "" "" "")
+        ;; Fold indicators (collapsed/expanded)
         org-modern-fold-stars '(("◈" . "◇")   
                                ("⦿" . "◦")   
                                ("⊙" . "•")   
@@ -395,7 +398,7 @@ TITLE is an optional title for the source block."
                                ("▪" . "▫"))  
         org-modern-table nil
         org-modern-block-name nil
-        )                 ; Disable table styling
+        )         
   
   (add-hook 'org-mode-hook 'org-modern-mode))  ; Enable org-modern for org buffers
 

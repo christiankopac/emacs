@@ -99,13 +99,12 @@
 ;; Default Fonts
 ;; ----------------------------------------------------------------------------
 
-;; Set default fonts for graphical display (not terminal)
+;; NOTE: Fonts are now managed by fontaine (see config/ui/fonts-ligatures.el)
+;; This section is kept for reference but commented out to avoid conflicts.
+;; 
 (when (display-graphic-p)
-  ;; Main monospace font for code
-  (set-face-attribute 'default nil :family "MonoLisa")
-  ;; Variable-pitch font for prose (requires my/font-serif to be defined)
+  (set-face-attribute 'default nil :family my/font-mono)
   (set-face-attribute 'variable-pitch nil :family my/font-serif)
-  ;; Fixed-pitch font for tables and code blocks
-  (set-face-attribute 'fixed-pitch nil :family "DejaVu Sans Mono"))
+  (set-face-attribute 'fixed-pitch nil :family my/font-mono))
 
 (provide 'emacs-config)
