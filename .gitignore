@@ -1,13 +1,22 @@
 .cache
+*_archive
 auto-save-list
 backups
-eln-cache
+
+# package manager
 elpa
+eln-cache
+
+# packages
 recentf
 tramp
+.org-id-locations
+*_flymake.*
+/eshell/history
+/eshell/lastdir
+transient
+tree-sitter
 
 # network security
 /network-security.data
-
-# network security
 /network-security.data
