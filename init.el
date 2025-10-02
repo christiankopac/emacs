@@ -96,6 +96,7 @@
 ;; NOTE: Sans serif fonts is not used
 ;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
+;; Monospace base font
 ;; (defvar my/font-mono "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
 (defvar my/font-mono "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text.")
 
@@ -262,11 +263,11 @@
 (when (display-graphic-p)
   (context-menu-mode))
 
-;; Auto-refresh buffers
-(global-auto-revert-mode 1)
-(setq auto-revert-verbose nil
-      auto-revert-use-notify nil
-      auto-revert-stop-on-user-input nil)
+(setq global-auto-revert-non-file-buffers t) ;; auto-revert non-file buffers
+(global-auto-revert-mode 1)  ;; emacs watches for changes to files and updates the buffer
+(setq auto-revert-verbose nil       ;; don't show messages
+      auto-revert-use-notify nil    ;; don't show notifications
+      auto-revert-stop-on-user-input nil) ;; don't stop on user input
 
 ;; File Conversion Variables
 (defvar my/pandoc-input-formats
@@ -336,8 +337,20 @@
 ;; Denote Packages
 ;; ----------------------------------------------------------------------------
 
-;; Load denote configuration (all packages defined there)
-(load-file (expand-file-name "config/org/denote.el" user-emacs-directory))
+;; Install denote packages first
+(use-package denote :ensure t)
+(use-package denote-org :ensure t :after denote)
+(use-package denote-silo :ensure t :after denote)
+(use-package consult-denote :ensure t :after denote)
+(use-package denote-markdown :ensure t :after denote)
+(use-package denote-menu :ensure t :after denote)
+(use-package denote-explore :ensure t :after denote)
+(use-package denote-sequence :ensure t :after denote)
+
+;; Load denote configuration after Elpaca initialization
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (load-file (expand-file-name "config/org/denote.el" user-emacs-directory))))
 
 ;; ----------------------------------------------------------------------------
 ;; Language Specific Packages
@@ -463,7 +476,8 @@
 ;; ----------------------------------------------------------------------------
 
 (global-set-key (kbd "C-c b") 'consult-buffer)
-(global-set-key (kbd "C-c f") 'consult-fd)
+;; C-c f f is a non-prefix key, so C-c f cannot be a prefix
+;; (global-set-key (kbd "C-c f") 'consult-fd)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c c") 'org-capture)

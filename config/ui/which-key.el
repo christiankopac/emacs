@@ -9,7 +9,8 @@
   "C-c b" "📋 Consult Buffer"
   "C-c c" "✏️ Capture"
   "C-c d" "📝 Denote"
-  "C-c f" "🔍 Consult Find"
+  ;; C-c f f is a non-prefix key, so C-c f cannot be a prefix
+  ;; "C-c f" "🔍 Consult Find"
   "C-c l" "🔗 Store Link"
   
   ;; Helpful key bindings

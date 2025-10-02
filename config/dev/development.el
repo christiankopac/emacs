@@ -129,12 +129,13 @@
 ;; Format-all Configuration - Format buffer with appropriate formatter
 ;; ============================================================================
 
-(global-set-key (kbd "C-c f f") 'format-all-buffer)  ; Format current buffer
+;; Format buffer keybinding - using C-c F to avoid prefix conflicts
+(global-set-key (kbd "C-c F") 'format-all-buffer)  ; Format current buffer
 
 ;; Which-key descriptions for development
 (with-eval-after-load 'which-key
   (which-key-add-key-based-replacements
-    "C-c f f" "󰏧 Format Buffer"))
+    "C-c F" "󰏧 Format Buffer"))
 
 ;; ============================================================================
 ;; Apheleia Configuration - Auto-format on save

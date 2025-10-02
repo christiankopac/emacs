@@ -1,469 +1,284 @@
 ;;; denote.el --- Denote note-taking system configuration
 
+;; ----------------------------------------------------------------------------
+;; Prefer ripgrep, then ugrep, otherwise use grep
+;; Prefer ripgrep, then ugrep, and fall back to regular grep.
+(setq xref-search-program
+      (cond
+       ((or (executable-find "ripgrep")
+            (executable-find "rg"))
+        'ripgrep)
+       ((executable-find "ugrep")
+        'ugrep)
+       (t
+        'grep)))
+
+;; ============================================================================
+;; Backlinks buffer display helper functions
+;; ============================================================================
+
+(defun my-denote-backlink-heading (file)
+  "Show only the title, nothing else."
+  (or (denote-retrieve-title-or-filename file (denote-filetype-heuristics file))
+      "[No title]"))
+
+;; Compatibility shims for different Denote versions
+(unless (fboundp 'denote-retrieve-filename-identifier)
+  (defalias 'denote-retrieve-filename-identifier 'denote-extract-id-from-string
+    "Compatibility shim for older Denote versions."))
+
+(unless (fboundp 'denote-get-backlinks)
+  (defalias 'denote-get-backlinks 'denote-backlinks-get
+    "Compatibility shim for older Denote versions."))
+
+(unless (fboundp 'denote-retrieve-front-matter-title-value)
+  (defalias 'denote-retrieve-front-matter-title-value 'denote-retrieve-title-value
+    "Compatibility shim for older Denote versions."))
+
 ;; ============================================================================
 ;; Core Denote Configuration
 ;; ============================================================================
 
-(use-package denote
-  :ensure t
-  :custom
-  (denote-directory "~/Sync/org/notes/")              ; Main directory for notes
-  (denote-infer-keywords t)                           ; Auto-suggest keywords from file names
-  (denote-sort-keywords t)                            ; Sort keywords alphabetically
-  (denote-file-type 'org)                             ; Use Org format for notes
-  (denote-prompts '(title keywords subdirectory))     ; Prompt for title, keywords, and subdirectory
-  (denote-allow-multi-word-keywords t)                ; Allow spaces in keywords
-  (denote-date-prompt-use-org-read-date t)            ; Use org-mode date picker
-  (denote-backlinks-show-context t)                   ; Show surrounding text in backlinks
-  (denote-save-files t)                               ; Auto-save after operations
-  (denote-known-keywords '("fleeting" "permanent" "literature" "reference" "project" "movie" "daily" "journal"))
-  (denote-subdirectories '("fleeting-notes" "permanent-notes" "literature-notes" "movies"))
-  :bind
-  (("C-c d n" . denote)                           ; Create new note
-   ("C-c d N" . denote-subdirectory)              ; Create note in subdirectory
-   ("C-c d f" . denote-open-or-create)            ; Open or create note
-   ("C-c d l" . denote-link)                      ; Insert link to note
-   ("C-c d b" . denote-backlinks)))               ; Show backlinks
+;; Denote configuration
+(setq denote-directory "~/Sync/org/notes/")
+(setq denote-infer-keywords t)
+(setq denote-sort-keywords t)
+(setq denote-file-type 'org)
+(setq denote-prompts '(title keywords subdirectory))
+(setq denote-allow-multi-word-keywords t)
+(setq denote-date-prompt-use-org-read-date t)
+(setq denote-save-files t)
+(setq denote-known-keywords '("fleeting" "permanent" "literature" "reference" "project" "movie" "daily" "journal"))
+(setq denote-subdirectories '("fleeting" "permanent" "literature" "movies"))
+(setq denote-query-format-heading-function #'my-denote-backlink-heading)
+(setq denote-query-sorting 'last-modified)
+(setq denote-backlinks-display-buffer-action
+      '(;;(display-buffer-in-side-window)
+        (display-buffer-reuse-window display-buffer-in-side-window)
+        (side . bottom)
+        (dedicated . t)
+        (window-width . 45)
+        (slot . 0)
+        (preserve-size . (t .t))
+        (window-parameters . ((no-delete-other-windows . t)))))
+;; Hide link paths, show only filenames
+(setq denote-backlinks-show-context nil)
+(setq denote-backlinks-show-files t)
+;; Enable line wrapping in backlinks buffer
+(setq denote-backlinks-buffer-major-mode 'org-mode)
+;; Clean link descriptions
+(setq denote-link-description-format "%t")
+
+;; Denote hooks
+(add-hook 'denote-query-mode-hook
+          (lambda ()
+            (outline-hide-body)
+            (setq-local outline-minor-mode-highlight 'override)
+            (read-only-mode 1)))
+
+(add-hook 'denote-query-mode-hook
+          (lambda ()
+            (visual-line-mode 1)
+            (setq-local truncate-lines nil)
+            (setq-local word-wrap t)))
+
+;; Denote key bindings
+(global-set-key (kbd "C-c d n") 'denote)
+(global-set-key (kbd "C-c d N") 'denote-subdirectory)
+(global-set-key (kbd "C-c d f") 'denote-open-or-create)
+(global-set-key (kbd "C-c d l") 'denote-link)
+(global-set-key (kbd "C-c d b") 'denote-backlinks)
+(global-set-key (kbd "C-c d t") 'denote-backlinks-toggle-context)
+
+(custom-set-faces
+ '(outline-1 ((t (:weight bold :height 1.1))))
+ '(denote-faces-link ((t (:foreground "#8be9fd" :underline t))))
+ '(xref-line-number ((t (:inherit line-number))))
+ '(xref-match ((t (:inherit isearch)))))
 
 ;; ============================================================================
 ;; Helper Functions: Date and File Operations
 ;; ============================================================================
 
-(defun my/denote-get-file-creation-date (file)
-  "Get file creation date as time object.
-Falls back to modification time if creation time not available."
-  (let ((attrs (file-attributes file)))
-    (or (file-attribute-creation-time attrs)
-        (file-attribute-modification-time attrs))))
-
-;; ============================================================================
-;; Custom Functions: Dired Operations
-;; ============================================================================
-
-;; Bind dired conversion function to dired-mode
-(with-eval-after-load 'dired
-  (define-key dired-mode-map (kbd "C-c d C") 'my/dired-convert-date-files-to-denote-daily-journal)
-  (define-key dired-mode-map (kbd "C-c d s") 'my/dired-denote-add-signature-to-marked)
-  (define-key dired-mode-map (kbd "C-c d k") 'my/dired-denote-add-keywords-to-marked)
-  (define-key dired-mode-map (kbd "C-c d d") 'my/dired-denote-move-marked-to-subdirectory)
-  (define-key dired-mode-map (kbd "C-c d r") 'my/dired-denote-rename-marked-with-date)
-  (define-key dired-mode-map (kbd "C-c d R") 'my/dired-denote-rename-with-de-slugified-title)
-  ;; Relationship functions - use different prefix to avoid conflicts
-  (define-key dired-mode-map (kbd "C-c d l c") 'my/denote-dired-add-child-relationship)
-  (define-key dired-mode-map (kbd "C-c d l p") 'my/denote-dired-add-parent-relationship)
-  (define-key dired-mode-map (kbd "C-c d l s") 'my/denote-dired-add-sibling-relationships)
-  (define-key dired-mode-map (kbd "C-c d l r") 'my/denote-dired-add-relationship-with-prompt))
-
-(defun my/dired-denote-add-signature-to-marked ()
-  "Add signature to marked files using Denote's rename function."
-  (interactive nil dired-mode)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (if-let* ((marks (dired-get-marked-files))
-            (signature (read-string "Enter signature: ")))
-      (progn
-        (dolist (file marks)
-          (denote-rename-file file nil nil signature nil))
-        (revert-buffer)
-        (message "Added signature to %d files" (length marks)))
-    (user-error "No marked files")))
-
-(defun my/dired-denote-add-keywords-to-marked ()
-  "Add or modify keywords for all marked files using Denote's rename function."
-  (interactive nil dired-mode)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (if-let* ((marks (dired-get-marked-files))
-            (keywords-str (read-string "Enter keywords (comma-separated): ")))
-      (let ((keywords (mapcar 'string-trim (split-string keywords-str "," t))))
-        (dolist (file marks)
-          (let* ((existing-keywords (denote-retrieve-filename-keywords file))
-                 (all-keywords (delete-dups (append existing-keywords keywords))))
-            (denote-rename-file file nil all-keywords nil nil)))
-        (revert-buffer)
-        (message "Added keywords to %d files" (length marks)))
-    (user-error "No marked files")))
-
-(defun my/dired-denote-move-marked-to-subdirectory ()
-  "Move all marked files to a subdirectory using Denote's rename function."
-  (interactive nil dired-mode)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (if-let* ((marks (dired-get-marked-files))
-            (subdir (read-string "Enter subdirectory name: ")))
-      (progn
-        (dolist (file marks)
-          (denote-rename-file file nil nil nil subdir))
-        (revert-buffer)
-        (message "Moved %d files to subdirectory '%s'" (length marks) subdir))
-    (user-error "No marked files")))
-
-(defun my/dired-denote-rename-marked-with-date ()
-  "Rename marked files using date from frontmatter or file creation date."
-  (interactive nil dired-mode)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (if-let* ((marks (dired-get-marked-files)))
-      (progn
-        (dolist (file marks)
-          (let* ((frontmatter-date (denote-retrieve-front-matter file 'date))
-                 (file-date (or frontmatter-date (my/denote-get-file-creation-date file)))
-                 (new-id (if file-date
-                            (format "%sT120000" (format-time-string "%Y%m%d" file-date))
-                          (denote-retrieve-filename-identifier file))))
-            (denote-rename-file file new-id nil nil nil)))
-        (revert-buffer)
-        (message "Renamed %d files with date" (length marks)))
-    (user-error "No marked files")))
-
-(defun my/dired-denote-rename-with-de-slugified-title ()
-  "Rename marked files using de-slugified title as input."
-  (interactive nil dired-mode)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (if-let* ((marks (dired-get-marked-files)))
-      (progn
-        (dolist (file marks)
-          (let* ((title (denote-retrieve-filename-title file))
-                 (de-slugified-title (my/denote-de-slugify-title title)))
-            (denote-rename-file file nil nil de-slugified-title nil)))
-        (revert-buffer)
-        (message "Renamed %d files with de-slugified titles" (length marks)))
-    (user-error "No marked files")))
-
-(defun my/denote-de-slugify-title (slugified-title)
-  "Convert a slugified title back to a readable title.
-Converts hyphens to spaces and capitalizes words properly."
-  (when slugified-title
-    (let ((de-slugified (replace-regexp-in-string "-" " " slugified-title)))
-      ;; Capitalize each word
-      (mapconcat 'capitalize (split-string de-slugified " " t) " "))))
-
-;; ============================================================================
-;; Denote Relationship Functions for Dired
-;; ============================================================================
-
-(defun my/denote-dired-add-child-relationship ()
-  "Add child relationship to all marked files in Dired.
-Creates a child relationship from the first marked file to all others."
-  (interactive nil dired-mode)
-  (if-let* ((marks (dired-get-marked-files))
-            (parent (car marks))
-            (children (cdr marks)))
-      (progn
-        (message "Adding child relationships from %s to %d files..." 
-                 (file-name-nondirectory parent) (length children))
-        (dolist (child children)
-          (when (and (file-exists-p parent) (file-exists-p child))
-            (with-current-buffer (find-file-noselect parent)
-              (denote-link child)
-              (save-buffer))
-            (message "Added child relationship: %s -> %s" 
-                     (file-name-nondirectory parent) (file-name-nondirectory child))))
-        (message "Successfully added child relationships to %d files" (length children)))
-    (user-error "Need at least 2 marked files; aborting")))
-
-(defun my/denote-dired-add-parent-relationship ()
-  "Add parent relationship to all marked files in Dired.
-Creates a parent relationship from all marked files to the first one."
-  (interactive nil dired-mode)
-  (if-let* ((marks (dired-get-marked-files))
-            (child (car marks))
-            (parents (cdr marks)))
-        (progn
-        (message "Adding parent relationships from %d files to %s..." 
-                 (length parents) (file-name-nondirectory child))
-        (dolist (parent parents)
-          (when (and (file-exists-p parent) (file-exists-p child))
-            (with-current-buffer (find-file-noselect parent)
-              (denote-link child)
-              (save-buffer))
-            (message "Added parent relationship: %s -> %s" 
-                     (file-name-nondirectory parent) (file-name-nondirectory child))))
-        (message "Successfully added parent relationships from %d files" (length parents)))
-    (user-error "Need at least 2 marked files; aborting")))
-
-(defun my/denote-dired-add-sibling-relationships ()
-  "Add sibling relationships between all marked files in Dired.
-Creates bidirectional links between all marked files."
-  (interactive nil dired-mode)
-  (if-let* ((marks (dired-get-marked-files))
-            (files marks))
-      (progn
-        (message "Adding sibling relationships between %d files..." (length files))
-        (let ((count 0))
-          (dolist (file1 files)
-            (dolist (file2 files)
-              (when (and (not (equal file1 file2))
-                         (file-exists-p file1) 
-                         (file-exists-p file2))
-                (denote-add-links file1 file2)
-                (setq count (1+ count)))))
-          (message "Successfully added %d sibling relationships" count)))
-    (user-error "Need at least 2 marked files; aborting")))
-
-(defun my/denote-dired-add-relationship-with-prompt ()
-  "Add relationship between marked files with user choice.
-Prompts for relationship type: child, parent, or sibling."
-  (interactive nil dired-mode)
-  (if-let* ((marks (dired-get-marked-files)))
-      (let ((choice (completing-read "Relationship type: " 
-                                     '("child" "parent" "sibling") 
-                                     nil t)))
-        (cond
-         ((string= choice "child")
-          (my/denote-dired-add-child-relationship))
-         ((string= choice "parent")
-          (my/denote-dired-add-parent-relationship))
-         ((string= choice "sibling")
-          (my/denote-dired-add-sibling-relationships))
-         (t (user-error "Invalid choice: %s" choice))))
-    (user-error "No marked files; aborting")))
-
-;; ============================================================================
-;; Utility Functions: File Conversion
-;; ============================================================================
-
-(defun my/convert-date-files-to-denote-daily-journal ()
-  "Convert files in format YYYY-MM-DD.org to Denote daily journal format.
-Searches in denote-directory for files matching YYYY-MM-DD.org pattern
-and renames them to Denote format with 'journal' and 'daily' keywords."
+(defun my/denote-date ()
+  "Insert current date in Denote format."
   (interactive)
-  (let* ((denote-dir (expand-file-name denote-directory))
-         (files (directory-files denote-dir t "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$"))
-         (converted-count 0))
-    
-    (if (null files)
-        (message "No files matching YYYY-MM-DD.org pattern found in %s" denote-dir)
-      
-      (when (yes-or-no-p (format "Found %d daily journal file(s) to convert. Proceed? " (length files)))
-        (dolist (old-file files)
-          (when (my/convert-date-file-to-denote-daily-journal old-file)
-            (setq converted-count (1+ converted-count))))
-        
-        (message "Converted %d/%d files to Denote daily journal format" converted-count (length files))))))
+  (insert (format-time-string "%Y%m%d")))
 
-(defun my/dired-convert-date-files-to-denote-daily-journal ()
-  "Convert marked (or current) files in dired from YYYY-MM-DD.org to Denote daily journal format.
-Works with marked files in dired, or the file at point if none marked.
-Files are converted in-place (in the current directory)."
+(defun my/denote-datetime ()
+  "Insert current datetime in Denote format."
   (interactive)
-  (unless (derived-mode-p 'dired-mode)
-    (user-error "This command only works in dired"))
-  
-  (let* ((files (dired-get-marked-files nil nil))  ; Get marked files or file at point
-         (matching-files (seq-filter
-                         (lambda (f)
-                           (and (file-regular-p f)  ; Make sure it's a regular file
-                                (string-match "^[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}\\.org$"
-                                            (file-name-nondirectory f))))
-                         files))
-         (converted-count 0))
-    
-    (message "DEBUG: Found %d marked files, %d matching pattern" (length files) (length matching-files))
-    
-    (if (null files)
-        (message "No files marked or at point")
-      (if (null matching-files)
-          (message "No files matching YYYY-MM-DD.org pattern in %d selected file(s). Selected: %s" 
-                   (length files)
-                   (mapconcat #'file-name-nondirectory files ", "))
-        
-        (when (yes-or-no-p (format "Convert %d marked file(s) to Denote daily journal format? " (length matching-files)))
-          (dolist (file matching-files)
-            (message "Converting: %s" file)
-            (when (my/convert-date-file-to-denote-daily-journal file)
-              (setq converted-count (1+ converted-count))))
-          
-          (revert-buffer)  ; Refresh dired to show new filenames
-          (message "Converted %d/%d files to Denote daily journal format" converted-count (length matching-files)))))))
+  (insert (format-time-string "%Y%m%dT%H%M%S")))
 
-;; ============================================================================
-;; Custom Functions: Note Creation
-;; ============================================================================
-
-;; Custom function: Create fleeting note (quick capture)
-(defun my/denote-fleeting ()
-  "Create a new fleeting note in fleeting-notes subdirectory."
+(defun my/denote-today ()
+  "Open or create today's daily note."
   (interactive)
-  (let ((denote-directory (expand-file-name "fleeting-notes/" denote-directory)))
-    (denote (read-string "Fleeting note title: ")
-            '("fleeting"))))
+  (let ((today (format-time-string "%Y%m%d")))
+    (denote-open-or-create
+     (format "%s--daily-note__daily" today)
+     'org)))
 
-(global-set-key (kbd "C-c d F") 'my/denote-fleeting)  ; Quick fleeting note
+;; ============================================================================
+;; Denote Menu Integration
+;; ============================================================================
 
-;; Custom function: Create movie note with template
-(defun my/denote-movie ()
-  "Create a movie note with pre-filled metadata."
+;; Denote Menu configuration
+(setq denote-menu-file-name-column-width 50)
+(setq denote-menu-date-column-width 12)
+(setq denote-menu-keywords-column-width 30)
+(setq denote-menu-sort-files 'denote-menu-sort-by-modification-date)
+(global-set-key (kbd "C-c d m") 'denote-menu)
+
+;; ============================================================================
+;; Denote Markdown Support
+;; ============================================================================
+
+;; (use-package denote-markdown
+;;   :ensure t
+;;   :after denote
+;;   :config
+;;   (when (boundp 'denote-file-types)
+;;     (add-to-list 'denote-file-types 'markdown)))
+
+;; ============================================================================
+;; Denote Org Support
+;; ============================================================================
+
+;; (use-package denote-org
+;;   :ensure t
+;;   :after denote)
+
+;; ============================================================================
+;; Denote Silo Support
+;; ============================================================================
+
+;; (use-package denote-silo
+;;   :ensure t
+;;   :after denote
+;;   :config
+;;   (when (boundp 'denote-directory)
+;;     (setq denote-silo-directory denote-directory)))
+
+;; ============================================================================
+;; Consult Integration
+;; ============================================================================
+
+;; Consult Denote key bindings
+(global-set-key (kbd "C-c d r") 'consult-denote)
+(global-set-key (kbd "C-c d R") 'consult-denote-in-context)
+
+;; ============================================================================
+;; Key Bindings
+;; ============================================================================
+
+;; Additional global key bindings
+(global-set-key (kbd "C-c d t") 'my/denote-today)
+(global-set-key (kbd "C-c d d") 'my/denote-date)
+(global-set-key (kbd "C-c d D") 'my/denote-datetime)
+
+;; ============================================================================
+;; Templates and Workflows
+;; ============================================================================
+
+;; Daily note template
+(defun my/denote-daily-note-template ()
+  "Template for daily notes."
+  (concat
+   "#+title: %^{Title}\n"
+   "#+date: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n"
+   "#+filetags: :daily:\n\n"
+   "* Morning\n"
+   "- \n\n"
+   "* Afternoon\n"
+   "- \n\n"
+   "* Evening\n"
+   "- \n\n"
+   "* Notes\n"
+   "- \n\n"
+   "* Tomorrow\n"
+   "- \n"))
+
+;; Project note template
+(defun my/denote-project-note-template ()
+  "Template for project notes."
+  (concat
+   "#+title: %^{Project Title}\n"
+   "#+date: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n"
+   "#+filetags: :project:\n\n"
+   "* Overview\n"
+   "%?\n\n"
+   "* Goals\n"
+   "- [ ] \n\n"
+   "* Tasks\n"
+   "- [ ] \n\n"
+   "* Notes\n"
+   "- \n\n"
+   "* Resources\n"
+   "- \n"))
+
+;; ============================================================================
+;; Integration with Other Packages
+;; ============================================================================
+
+;; Integration with org-roam (if used)
+;; (when (featurep 'org-roam)
+;;   (setq denote-org-link-description-function
+;;         (lambda (file)
+;;           (or (denote-retrieve-title-or-filename file)
+;;               (file-name-nondirectory file)))))
+
+;; Integration with embark
+(when (featurep 'embark)
+  (defun my/denote-embark-actions ()
+    "Add denote-specific embark actions."
+    (add-to-list 'embark-file-actions
+                 '(denote-open-or-create . find-file))
+    (add-to-list 'embark-file-actions
+                 '(denote-link . denote-link))))
+
+;; ============================================================================
+;; Customization and Themes
+;; ============================================================================
+
+;; Custom faces for denote
+(defface denote-faces-link
+  '((t (:foreground "#8be9fd" :underline t)))
+  "Face for denote links.")
+
+(defface denote-faces-subdirectory
+  '((t (:foreground "#50fa7b" :weight bold)))
+  "Face for denote subdirectories.")
+
+(defface denote-faces-keyword
+  '((t (:foreground "#ffb86c" :weight bold)))
+  "Face for denote keywords.")
+
+;; ============================================================================
+;; Utility Functions
+;; ============================================================================
+
+(defun my/denote-find-recent-notes (n)
+  "Find N most recent denote notes."
+  (interactive "nNumber of recent notes: ")
+  (let ((notes (denote-directory-files)))
+    (setq notes (sort notes (lambda (a b)
+                              (time-less-p
+                               (nth 5 (file-attributes b))
+                               (nth 5 (file-attributes a))))))
+    (dolist (note (seq-take notes n))
+      (find-file note))))
+
+(defun my/denote-archive-old-notes ()
+  "Archive notes older than 1 year."
   (interactive)
-  (let* ((title (read-string "Movie title: "))
-         (year (read-string "Year: "))
-         (director (read-string "Director: "))
-         (genre (read-string "Genre: "))
-         (rating (read-string "Rating (1-10): "))
-         (denote-directory (expand-file-name "movies/" denote-directory))
-         (keywords '("movie")))
-    ;; Create the note
-    (denote title keywords)
-    ;; Insert template
-    (goto-char (point-max))
-    (insert "\n* Movie Information\n\n")
-    (insert (format "- Year: %s\n" year))
-    (insert (format "- Director: %s\n" director))
-    (insert (format "- Genre: %s\n" genre))
-    (insert (format "- Rating: %s/10\n" rating))
-    (insert (format "- Watched: %s\n" (format-time-string "[%Y-%m-%d %a]")))
-    (insert "\n* Summary\n\n")
-    (insert "\n* Notes\n\n")
-    (insert "\n* Quotes\n\n")
-    (insert "\n* Related Movies\n\n")
-    (save-buffer)))
-
-(global-set-key (kbd "C-c d v") 'my/denote-movie)  ; Create movie note (v = video/movie)
+  (let ((cutoff (time-subtract (current-time) (* 365 24 60 60))))
+    (dolist (file (denote-directory-files))
+      (when (time-less-p (nth 5 (file-attributes file)) cutoff)
+        (denote-archive-file file)))))
 
 ;; ============================================================================
-;; Denote-org Configuration - Org integration for denote
+;; End of Configuration
 ;; ============================================================================
 
-(use-package denote-org
-  :after denote
-  :ensure t
-  :commands
-  ( denote-org-link-to-heading
-    denote-org-backlinks-for-heading
-    denote-org-extract-org-subtree
-    denote-org-convert-links-to-file-type
-    denote-org-convert-links-to-denote-type
-    denote-org-dblock-insert-files
-    denote-org-dblock-insert-links
-    denote-org-dblock-insert-backlinks
-    denote-org-dblock-insert-missing-links
-    denote-org-dblock-insert-files-as-headings))
-
-;; ============================================================================
-;; Denote-silo Configuration - Silo management for denote
-;; ============================================================================
-
-(use-package denote-silo
-  :after denote
-  :ensure t
-  :custom
-  (denote-silo-directories
-   (list denote-directory
-         "~/Sync/org/notes/"
-         "~/Sync/org/programming/"
-         "~/Sync/org/music"))
-  :bind
-  (("C-c d S" . denote-silo-create-note)           ; Create note in silo
-   ("C-c d s o" . denote-silo-open-or-create)      ; Open or create in silo
-   ("C-c d s s" . denote-silo-select-silo-then-command) ; Select silo then command
-   ("C-c d s d" . denote-silo-dired)               ; Open silo in dired
-   ("C-c d s c" . denote-silo-cd)))                ; Change to silo directory
-
-;; ============================================================================
-;; Consult-denote Configuration - Search notes with consult
-;; ============================================================================
-
-(use-package consult-denote
-  :after denote
-  :ensure t
-  :bind
-  (("C-c s d" . consult-denote-find)   ; Find note with preview
-   ("C-c s g" . consult-denote-grep)))  ; Grep in notes
-
-;; ============================================================================
-;; Denote-markdown Configuration - Markdown support for denote
-;; ============================================================================
-
-(use-package denote-markdown
-  :after denote
-  :ensure t
-  :bind
-  (("C-c d C-m" . denote-markdown-convert-to-markdown)))  ; Convert to markdown (rarely used)
-
-;; ============================================================================
-;; Denote-menu Configuration - List notes in a buffer
-;; ============================================================================
-
-(use-package denote-menu
-  :after denote
-  :ensure t
-  :bind
-  (("C-c d M" . denote-menu-list-notes)))  ; Show all notes in menu
-
-;; ============================================================================
-;; Denote-explore Configuration - Visualize note connections
-;; ============================================================================
-
-(use-package denote-explore
-  :after denote
-  :ensure t
-  :bind
-  (("C-c x c" . denote-explore-count-notes)         ; Count all notes
-   ("C-c x k" . denote-explore-count-keywords)      ; Count keywords
-   ("C-c x d" . denote-explore-duplicate-notes)     ; Find duplicates
-   ("C-c x z" . denote-explore-zero-keywords)       ; Notes without keywords
-   ("C-c x s" . denote-explore-single-keywords)     ; Notes with one keyword
-   ("C-c x o" . denote-explore-sync-metadata)       ; Sync metadata
-   ("C-c x r" . denote-explore-rename-keyword)      ; Rename keyword
-   ("C-c x n" . denote-explore-network)             ; Generate network graph
-   ("C-c x w" . denote-explore-random-walk)         ; Random walk through notes
-   ("C-c x l" . denote-explore-random-links)        ; Random linked notes
-   ("C-c x t" . denote-explore-barchart-timeline)   ; Timeline chart
-   ("C-c x b" . denote-explore-barchart-backlinks)  ; Backlinks chart
-   ("C-c x g" . denote-explore-barchart-degree)     ; Degree chart
-   ("C-c x i" . denote-explore-isolated-notes)      ; Find isolated notes
-   ("C-c x m" . denote-explore-missing-links))      ; Find broken links
-  :config
-  ;; Which-key descriptions for denote-explore
-  (with-eval-after-load 'which-key
-    (which-key-add-key-based-replacements
-      "C-c x" "Denote Explore"
-      "C-c x c" "󰊫 Count Notes"
-      "C-c x k" "󰏫 Count Keywords"
-      "C-c x d" "󰆐 Find Duplicates"
-      "C-c x z" "󰅖 Zero Keywords"
-      "C-c x s" "󰎽 Single Keywords"
-      "C-c x o" "󰆐 Sync Metadata"
-      "C-c x r" "󰆐 Rename Keyword"
-      "C-c x n" "󰘦 Network View"
-      "C-c x w" "󰖟 Random Walk"
-      "C-c x l" "󰖟 Random Links"
-      "C-c x t" "󰊫 Timeline Chart"
-      "C-c x b" "󰊫 Backlinks Chart"
-      "C-c x g" "󰊫 Degree Chart"
-      "C-c x i" "󰅖 Isolated Notes"
-      "C-c x m" "󰆐 Missing Links")))
-
-;; ============================================================================
-;; Denote Sequence - Sequential numbering for notes
-;; ============================================================================
-
-(use-package denote-sequence
-  :ensure t
-  :after denote
-  :bind
-  ( :map global-map
-    ;; "C-c d s" prefix for denote [s]equence commands
-    ;; Additional commands available:
-    ;; - `denote-sequence-new-parent'
-    ;; - `denote-sequence-new-sibling'
-    ;; - `denote-sequence-new-child'
-    ;; - `denote-sequence-new-child-of-current'
-    ;; - `denote-sequence-new-sibling-of-current'
-    ("C-c d s s" . denote-sequence)
-    ("C-c d s f" . denote-sequence-find)
-    ("C-c d s l" . denote-sequence-link)
-    ("C-c d s d" . denote-sequence-dired)
-    ("C-c d s r" . denote-sequence-reparent)
-    ("C-c d s c" . denote-sequence-convert))
-  :config
-  ;; The default sequence scheme is `numeric'; can also use `alphanumeric'
-  (setq denote-sequence-scheme 'alphanumeric))
-
-(provide 'denote-config)
+(provide 'denote)
+;;; denote.el ends here

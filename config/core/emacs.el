@@ -44,7 +44,10 @@
   ;; Enable versioned backups
   version-control t
   ;; Delete old backup versions without asking
-  delete-old-versions t)
+  delete-old-versions t
+  history-length 50 ;; Remember last 50 commands
+  ; save-place-mode 1 ;; Remember last cursor position in a file
+  )
 
 ;; ----------------------------------------------------------------------------
 ;; UI Elements
@@ -73,16 +76,12 @@
 
 ;; Use 'y' and 'n' instead of 'yes' and 'no'
 (setq use-short-answers t
-      ;; Disable the annoying bell sound
-      ring-bell-function 'ignore
-      ;; Disable popup dialogs, use minibuffer instead
-      use-dialog-box nil
-      ;; Disable file selection dialogs
-      use-file-dialog nil
-      ;; Don't compact font caches during GC (improves performance with many fonts)
-      inhibit-compacting-font-caches t
-      ;; Don't highlight text in non-selected windows (improves performance)
-      highlight-nonselected-windows nil)
+      ring-bell-function 'ignore       ;; Disable the annoying bell sound
+      use-dialog-box nil               ;; Disable popup dialogs, use minibuffer instead
+      use-file-dialog nil              ;; Disable file selection dialogs
+      inhibit-compacting-font-caches t ;; Don't compact font caches during GC (improves performance with many fonts)
+      highlight-nonselected-windows nil;; Don't highlight text in non-selected windows (improves performance)
+      )
 
 ;; ----------------------------------------------------------------------------
 ;; Useful Modes
@@ -94,6 +93,31 @@
 (global-hl-line-mode t)
 ;; Replace selected text when typing
 (delete-selection-mode t)
+
+
+;; ----------------------------------------------------------------------------
+;; Reload and Restart Emacs
+;; ----------------------------------------------------------------------------
+
+;; Reload Emacs configuration
+(defun my/reload-emacs-config ()
+  "Reload Emacs configuration file."
+  (interactive)
+  (load-file user-init-file)
+  (message "Emacs configuration reloaded!"))
+
+(global-set-key (kbd "C-c e r") 'my/reload-emacs-config)
+
+;; Restart Emacs
+(defun my/restart-emacs ()
+  "Restart Emacs."
+  (interactive)
+  (when (yes-or-no-p "Really restart Emacs? ")
+    (save-some-buffers)
+    (kill-emacs)
+    (start-process "emacs" nil "emacs")))
+
+(global-set-key (kbd "C-c e R") 'my/restart-emacs)
 
 ;; ----------------------------------------------------------------------------
 ;; Default Fonts
