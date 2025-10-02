@@ -5,6 +5,7 @@ backups
 
 # package manager
 elpa
+elpaca
 eln-cache
 
 # packages
@@ -20,3 +21,16 @@ tree-sitter
 # network security
 /network-security.data
 /network-security.data
+
+# emacs
+*.elc
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+*~
+\#*#
+/.emacs.desktop
+/.emacs.desktop.lock
