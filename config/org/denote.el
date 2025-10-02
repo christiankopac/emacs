@@ -445,77 +445,25 @@ Files are converted in-place (in the current directory)."
 ;; ============================================================================
 
 (use-package denote-sequence
+  :ensure t
   :after denote
+  :bind
+  ( :map global-map
+    ;; "C-c d s" prefix for denote [s]equence commands
+    ;; Additional commands available:
+    ;; - `denote-sequence-new-parent'
+    ;; - `denote-sequence-new-sibling'
+    ;; - `denote-sequence-new-child'
+    ;; - `denote-sequence-new-child-of-current'
+    ;; - `denote-sequence-new-sibling-of-current'
+    ("C-c d s s" . denote-sequence)
+    ("C-c d s f" . denote-sequence-find)
+    ("C-c d s l" . denote-sequence-link)
+    ("C-c d s d" . denote-sequence-dired)
+    ("C-c d s r" . denote-sequence-reparent)
+    ("C-c d s c" . denote-sequence-convert))
   :config
-  (setq denote-sequence-directory "~/Sync/org/denote/"  ; Same as denote directory
-        denote-sequence-prefix "seq"                    ; Prefix for sequence files
-        denote-sequence-format "%s-%03d"                ; Format: seq-001, seq-002, etc.
-        denote-sequence-start 1                         ; Start numbering from 1
-        denote-sequence-pad-width 3                     ; Pad with zeros: 001, 002, etc.
-        denote-sequence-auto-increment t                 ; Auto-increment sequence numbers
-        denote-sequence-sort-function 'string<)         ; Sort sequences alphabetically
-
-  ;; Keybindings for denote-sequence
-  (global-set-key (kbd "C-c d s n") 'denote-sequence-create)           ; Create new sequence note
-  (global-set-key (kbd "C-c d s l") 'denote-sequence-list)             ; List all sequences
-  (global-set-key (kbd "C-c d s f") 'denote-sequence-find)             ; Find sequence by number
-  (global-set-key (kbd "C-c d s r") 'denote-sequence-rename)           ; Rename sequence
-  (global-set-key (kbd "C-c d s d") 'denote-sequence-delete)           ; Delete sequence
-  (global-set-key (kbd "C-c d s i") 'denote-sequence-insert-link)      ; Insert sequence link
-  (global-set-key (kbd "C-c d s t") 'denote-sequence-tag)              ; Tag sequence
-  (global-set-key (kbd "C-c d s a") 'denote-sequence-add-to-sequence) ; Add to existing sequence
-  
-  ;; Custom functions for denote-sequence
-  (defun my/denote-sequence-create-with-template (template)
-    "Create a new sequence note with a specific template."
-    (interactive "sTemplate name: ")
-    (let ((note (denote-sequence-create)))
-      (when note
-        (with-current-buffer (find-file-noselect note)
-          (insert (format "#+TITLE: %s\n" (denote-retrieve-filename-title note)))
-          (insert (format "#+DATE: %s\n" (format-time-string "%Y-%m-%d")))
-          (insert (format "#+FILETAGS: :%s:\n" template))
-          (insert "\n")
-          (insert (format "* %s\n" template))
-          (insert "\n")
-          (insert "Content goes here...\n")
-          (save-buffer)))))
-
-  (defun my/denote-sequence-create-daily ()
-    "Create a daily sequence note."
-    (interactive)
-    (my/denote-sequence-create-with-template "daily"))
-
-  (defun my/denote-sequence-create-weekly ()
-    "Create a weekly sequence note."
-    (interactive)
-    (my/denote-sequence-create-with-template "weekly"))
-
-  (defun my/denote-sequence-create-monthly ()
-    "Create a monthly sequence note."
-    (interactive)
-    (my/denote-sequence-create-with-template "monthly"))
-
-  ;; Additional keybindings for templates
-  (global-set-key (kbd "C-c d s d") 'my/denote-sequence-create-daily)     ; Daily sequence
-  (global-set-key (kbd "C-c d s w") 'my/denote-sequence-create-weekly)    ; Weekly sequence
-  (global-set-key (kbd "C-c d s m") 'my/denote-sequence-create-monthly)   ; Monthly sequence
-
-  ;; Integration with org-agenda (only if directory exists)
-  (when (file-directory-p denote-sequence-directory)
-    (add-to-list 'org-agenda-files denote-sequence-directory))
-
-  ;; Custom face for sequence numbers
-  (defface denote-sequence-number
-    '((t :inherit font-lock-constant-face :weight bold))
-    "Face for denote sequence numbers.")
-
-  ;; Highlight sequence numbers in buffers
-  (add-hook 'denote-sequence-mode-hook
-            (lambda ()
-              (font-lock-add-keywords nil
-                '(("\\bseq-\\([0-9]+\\)\\b" 1 'denote-sequence-number t)))))
-
-  (provide 'denote-sequence-config))
+  ;; The default sequence scheme is `numeric'; can also use `alphanumeric'
+  (setq denote-sequence-scheme 'alphanumeric))
 
 (provide 'denote-config)
