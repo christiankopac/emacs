@@ -41,7 +41,16 @@
 ;; Project Configuration - Built-in project management
 ;; ============================================================================
 
-(setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))  ; Additional project root markers
+(with-eval-after-load 'project
+  (setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))
+  
+  ;; Add directories to project list
+  (project-remember-projects-under "~/src/github.com/christiankopac" t)
+  (project-remember-projects-under "~/src/projects" t)
+  (project-remember-projects-under "~/src/projects-cli" t)
+  (project-remember-projects-under "~/src/projects-music" t)
+  (project-remember-projects-under "~/src/cv" t))
+
 
 (global-set-key (kbd "C-c p f") 'project-find-file)      ; Find file in project
 (global-set-key (kbd "C-c p d") 'project-find-dir)       ; Find directory in project
