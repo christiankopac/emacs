@@ -192,7 +192,7 @@ Use the journal system: `C-c j m`
 **Checklist:**
 - [ ] Clear physical inbox
 - [ ] Clear email inbox
-- [ ] Clear notes/capture
+- [ ] Clear 2_denote/capture
 - [ ] Review project list
 - [ ] Review next actions
 - [ ] Review waiting for
@@ -256,13 +256,13 @@ Use the journal system: `C-c j m`
 ### Agenda Files
 
 Your agenda searches these directories:
-- `~/Sync/org/agenda/`
+- `~/Sync/2_denote/agenda/`
 - `~/Sync/org/gtd/`
 
 ### Archive
 
 Completed tasks are archived to:
-- `~/Sync/org/archive/[filename]_archive`
+- `~/Sync/2_denote/archive/[filename]_archive`
 
 **Archive Command:** `C-c C-x C-a`
 
@@ -275,7 +275,7 @@ Move items between files and headings.
 **Refile Targets:**
 - Current file (up to level 3)
 - Agenda files (up to level 2)
-- Notes files (up to level 2)
+- denote files (up to level 2)
 - GTD files (up to level 2)
 - Archive files (up to level 2)
 
@@ -303,7 +303,7 @@ Your journal system includes both denote-based daily journals and org-capture-ba
 ** 2025-W40
 *** 2025-09-30 Monday
 **** 14:23 Had productive morning
-Notes about what happened...
+denote about what happened...
 
 **** 16:45 Completed project milestone
 Description of accomplishment...
@@ -319,7 +319,7 @@ Today's plan and thoughts...
 ```
 C-c c j
 Entry: Productive morning session
-[Type your notes]
+[Type your denote]
 C-c C-c to save
 ```
 
@@ -347,7 +347,7 @@ Creates/opens separate daily journal files with:
 - Date header
 - Carryover TODOs from previous day
 - Automatic agenda integration
-- Linking between daily notes
+- Linking between daily denote
 
 **File Location:** `~/Sync/org/journal/YYYY-MM-DD.org`
 
@@ -502,7 +502,7 @@ Shows:
 Include content from other org files:
 
 ```org
-#+transclude: [[file:~/Sync/org/notes/project.org::*Goals]]
+#+transclude: [[file:~/Sync/2_denote/2_denote/project.org::*Goals]]
 ```
 
 ---

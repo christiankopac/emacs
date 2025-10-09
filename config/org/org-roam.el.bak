@@ -5,8 +5,8 @@
 ;; ============================================================================
 
 (with-eval-after-load 'org-roam
-  (setq org-roam-directory "~/Sync/org/roam/"              ; Roam directory
-        org-roam-db-location "~/Sync/org/roam/org-roam.db" ; Database location
+  (setq org-roam-directory "~/Sync/2_denote/roam/"              ; Roam directory
+        org-roam-db-location "~/Sync/2_denote/roam/org-roam.db" ; Database location
         org-roam-db-gc-threshold most-positive-fixnum      ; Disable auto-gc
         org-roam-completion-everywhere t                   ; Enable completion everywhere
         org-roam-node-display-template (concat "${title:*} " (propertize "${tags:10}" 'face 'org-tag))

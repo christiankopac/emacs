@@ -6,7 +6,7 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 - **Simplicity:** Plain text files with consistent naming
 - **Flexibility:** Works with any text editor
 - **Portability:** No database, just files
-- **Linking:** Easy cross-references between notes
+- **Linking:** Easy cross-references between denote
 - **Discoverability:** Built-in search and navigation
 
 ---
@@ -15,9 +15,9 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 
 1. [Core Concepts](#core-concepts)
 2. [File Naming Convention](#file-naming-convention)
-3. [Creating Notes](#creating-notes)
-4. [Linking Notes](#linking-notes)
-5. [Finding and Exploring Notes](#finding-and-exploring-notes)
+3. [Creating denote](#creating-denote)
+4. [Linking denote](#linking-denote)
+5. [Finding and Exploring denote](#finding-and-exploring-denote)
 6. [Journal Integration](#journal-integration)
 7. [Templates](#templates)
 8. [Keybindings Reference](#keybindings-reference)
@@ -30,27 +30,27 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 
 ### The Denote Philosophy
 
-1. **Files are notes** - Each note is a plain text file
+1. **Files are denote** - Each note is a plain text file
 2. **Filenames are metadata** - Information encoded in filename
 3. **Links are simple** - Use `[[denote:ID]]` format
-4. **Search is king** - Find notes by content, not location
-5. **Signatures organize** - Group related notes with signatures
+4. **Search is king** - Find denote by content, not location
+5. **Signatures organize** - Group related denote with signatures
 6. **Subdirectories categorize** - Organize by type and workflow stage
 
 ### Directory Structure
 
 ```
-~/Sync/org/notes/          # Main notes directory
-  ├── fleeting-notes/      # Quick captures, temporary thoughts
+~/Sync/2_denote/2_denote/          # Main denote directory
+  ├── fleeting-2_denote/      # Quick captures, temporary thoughts
   │   └── 20250930T120000--quick-idea__fleeting.org
-  ├── permanent-notes/     # Processed, evergreen notes
+  ├── permanent-2_denote/     # Processed, evergreen denote
   │   └── 20250930T130000--concept-note__permanent.org
-  ├── literature-notes/    # Book and article summaries
+  ├── literature-2_denote/    # Book and article summaries
   │   └── 20250930T140000--book-summary__literature.org
   ├── movies/              # Movie tracking and reviews
   │   └── 20250930T150000--the-matrix__movie.org
-  └── [root level]         # General notes
-      └── 20250930T160000--meeting-notes__work_project.org
+  └── [root level]         # General denote
+      └── 20250930T160000--meeting-denote__work_project.org
 ```
 
 ---
@@ -74,12 +74,12 @@ IDENTIFIER==SIGNATURE--TITLE__KEYWORDS.EXTENSION
 2. **Signature** (optional)
    - Format: `==SIGNATURE`
    - Example: `==project-alpha`
-   - Groups related notes
+   - Groups related denote
    - Good for series, projects, or categories
 
 3. **Title** (required)
    - Format: `--title-with-hyphens`
-   - Example: `--meeting-notes`
+   - Example: `--meeting-denote`
    - Human-readable description
    - Spaces converted to hyphens
 
@@ -112,7 +112,7 @@ IDENTIFIER==SIGNATURE--TITLE__KEYWORDS.EXTENSION
 
 ---
 
-## Creating Notes
+## Creating denote
 
 ### Basic Note Creation
 
@@ -125,22 +125,22 @@ Creates a new note with prompts for:
 4. Signature (optional)
 
 **Available Subdirectories:**
-- `fleeting-notes` - Quick captures
-- `permanent-notes` - Processed knowledge
-- `literature-notes` - Book/article notes
+- `fleeting-denote` - Quick captures
+- `permanent-denote` - Processed knowledge
+- `literature-denote` - Book/article denote
 - `movies` - Movie tracking
-- `[root]` - General notes
+- `[root]` - General denote
 
 **Example Flow:**
 ```
 C-c d n
 Title: Project Planning
 Keywords: work, project, alpha
-Subdirectory: permanent-notes/
+Subdirectory: permanent-2_denote/
 Signature: project-alpha
 ```
 
-Result: `permanent-notes/20250930T120000==project-alpha--project-planning__work_project_alpha.org`
+Result: `permanent-2_denote/20250930T120000==project-alpha--project-planning__work_project_alpha.org`
 
 ---
 
@@ -151,7 +151,7 @@ Result: `permanent-notes/20250930T120000==project-alpha--project-planning__work_
 Creates a fleeting note (temporary thought/idea) with minimal prompts.
 
 **Features:**
-- Automatically saves to `fleeting-notes/` subdirectory
+- Automatically saves to `fleeting-2_denote/` subdirectory
 - Automatically adds "fleeting" keyword
 - Quick capture for ideas during the day
 
@@ -159,14 +159,14 @@ Creates a fleeting note (temporary thought/idea) with minimal prompts.
 ```
 C-c d F
 Title: Interesting productivity insight
-→ Creates: fleeting-notes/20250930T120000--interesting-productivity-insight__fleeting.org
+→ Creates: fleeting-2_denote/20250930T120000--interesting-productivity-insight__fleeting.org
 ```
 
 **Workflow:**
 1. Capture thoughts throughout the day with `C-c d F`
-2. Process daily/weekly (review fleeting notes)
-3. Promote valuable notes to permanent notes
-4. Delete or archive processed fleeting notes
+2. Process daily/weekly (review fleeting denote)
+3. Promote valuable denote to permanent denote
+4. Delete or archive processed fleeting denote
 
 ---
 
@@ -224,7 +224,7 @@ Creates a movie tracking note with pre-filled metadata template.
 
 * Summary
 
-* Notes
+* denote
 
 * Quotes
 
@@ -237,7 +237,7 @@ Creates a movie tracking note with pre-filled metadata template.
 
 ---
 
-## Linking Notes
+## Linking denote
 
 ### Insert Link to Existing Note
 
@@ -258,26 +258,26 @@ Opens completion menu to select and insert link.
 
 **Keybinding:** `C-c d b`
 
-Display all notes linking to current note.
+Display all denote linking to current note.
 
 **Use Case:**
 - Discover connections
 - See context
-- Navigate related notes
+- Navigate related denote
 
 ---
 
-## Finding and Exploring Notes
+## Finding and Exploring denote
 
 ### Explore Commands
 
 Denote Explore provides powerful navigation and discovery tools.
 
-#### Count Notes
+#### Count denote
 
 **Keybinding:** `C-c x c`
 
-Count total number of notes in your denote directory.
+Count total number of denote in your denote directory.
 
 ---
 
@@ -313,11 +313,11 @@ Generate an interactive network visualization of note connections.
 
 **Keybinding:** `C-c x b`
 
-Generate a bar chart showing notes sorted by number of backlinks.
+Generate a bar chart showing denote sorted by number of backlinks.
 
 **Use Case:**
-- Find most referenced notes
-- Identify hub notes
+- Find most referenced denote
+- Identify hub denote
 - Understand note importance
 
 ---
@@ -326,10 +326,10 @@ Generate a bar chart showing notes sorted by number of backlinks.
 
 **Keybinding:** `C-c x g`
 
-Generate a bar chart showing notes sorted by total connections (degree).
+Generate a bar chart showing denote sorted by total connections (degree).
 
 **Use Case:**
-- Find hub notes (many connections)
+- Find hub denote (many connections)
 - Identify orphans (no connections)
 - Discover central concepts
 
@@ -348,15 +348,15 @@ Generate a timeline showing note creation over time.
 
 ---
 
-#### Isolated Notes
+#### Isolated denote
 
 **Keybinding:** `C-c x i`
 
-Find notes with no links (neither linking out nor being linked to).
+Find denote with no links (neither linking out nor being linked to).
 
 **Use Case:**
-- Identify orphan notes
-- Notes needing integration
+- Identify orphan denote
+- denote needing integration
 - Cleanup candidates
 
 ---
@@ -365,10 +365,10 @@ Find notes with no links (neither linking out nor being linked to).
 
 **Keybinding:** `C-c x m`
 
-Find broken links (links pointing to non-existent notes).
+Find broken links (links pointing to non-existent denote).
 
 **Use Case:**
-- Identify deleted notes still referenced
+- Identify deleted denote still referenced
 - Cleanup broken references
 - Maintain note integrity
 
@@ -378,11 +378,11 @@ Find broken links (links pointing to non-existent notes).
 
 **Keybinding:** `C-c x w`
 
-Start a random walk through your notes, following random links.
+Start a random walk through your denote, following random links.
 
 **Use Case:**
 - Serendipitous discovery
-- Review old notes
+- Review old denote
 - Spark creativity
 
 ---
@@ -399,11 +399,11 @@ Open a random note that has links (for exploration).
 
 **Keybinding:** `C-c x d`
 
-Find notes with duplicate or very similar titles.
+Find denote with duplicate or very similar titles.
 
 **Use Case:**
 - Identify duplicate content
-- Merge similar notes
+- Merge similar denote
 - Cleanup organization
 
 ---
@@ -412,10 +412,10 @@ Find notes with duplicate or very similar titles.
 
 **Keybinding:** `C-c x z`
 
-Find notes without any keywords.
+Find denote without any keywords.
 
 **Use Case:**
-- Identify untagged notes
+- Identify untagged denote
 - Improve discoverability
 - Maintenance task
 
@@ -425,10 +425,10 @@ Find notes without any keywords.
 
 **Keybinding:** `C-c x s`
 
-Find notes with only one keyword.
+Find denote with only one keyword.
 
 **Use Case:**
-- Identify under-tagged notes
+- Identify under-tagged denote
 - Improve categorization
 
 ---
@@ -449,7 +449,7 @@ Synchronize front-matter metadata with filename metadata.
 
 **Keybinding:** `C-c x r`
 
-Rename a keyword across all notes.
+Rename a keyword across all denote.
 
 **Features:**
 - Updates filenames
@@ -479,15 +479,15 @@ Find and open a note by title, keywords, or signature.
 
 ---
 
-#### Search All Notes
+#### Search All denote
 
-**Grep in Notes:** `C-c s g`
+**Grep in denote:** `C-c s g`
 
-Full-text search across all notes using `consult-denote-grep`.
+Full-text search across all denote using `consult-denote-grep`.
 
 **Find Note with Preview:** `C-c s d`
 
-Find and open notes with live preview using `consult-denote-find`.
+Find and open denote with live preview using `consult-denote-find`.
 
 **Example Searches (in grep):**
 ```
@@ -502,11 +502,11 @@ TODO.*@work               # Regex search
 
 **Command:** `M-x denote-find-by-keywords`
 
-Filter notes by one or more keywords (no default keybinding).
+Filter denote by one or more keywords (no default keybinding).
 
 **Example:**
-- Select `work` → Shows all work notes
-- Then select `project` → Shows work AND project notes
+- Select `work` → Shows all work denote
+- Then select `project` → Shows work AND project denote
 
 ---
 
@@ -514,7 +514,7 @@ Filter notes by one or more keywords (no default keybinding).
 
 **Command:** `M-x denote-find-by-signature`
 
-Show all notes with a specific signature (no default keybinding).
+Show all denote with a specific signature (no default keybinding).
 
 ---
 
@@ -528,7 +528,7 @@ Denote includes a journal system that integrates with the calendar.
 
 Creates or opens today's daily journal with a structured template including:
 - Morning Planning section
-- Daily Notes/Log
+- Daily 2_denote/Log
 - Evening Reflection
 
 **Quick Log Entry:** `C-c j l` ⭐
@@ -577,9 +577,9 @@ In calendar mode:
 
 Your configuration includes several templates:
 
-#### Meeting Notes
+#### Meeting denote
 ```org
-#+title: Meeting Notes - [Topic]
+#+title: Meeting denote - [Topic]
 #+date: [Date]
 #+filetags: :meeting:
 
@@ -597,7 +597,7 @@ Your configuration includes several templates:
 * Next Steps
 ```
 
-#### Book Notes
+#### Book denote
 ```org
 #+title: [Book Title]
 #+date: [Date]
@@ -667,20 +667,20 @@ Add templates to your capture system:
 
 | Keybinding | Command | Description |
 |------------|---------|-------------|
-| `C-c x c` | denote-explore-count-notes | Count all notes |
+| `C-c x c` | denote-explore-count-denote | Count all denote |
 | `C-c x k` | denote-explore-count-keywords | Count keywords |
-| `C-c x d` | denote-explore-duplicate-notes | Find duplicates |
-| `C-c x z` | denote-explore-zero-keywords | Notes without keywords |
-| `C-c x s` | denote-explore-single-keywords | Notes with one keyword |
+| `C-c x d` | denote-explore-duplicate-denote | Find duplicates |
+| `C-c x z` | denote-explore-zero-keywords | denote without keywords |
+| `C-c x s` | denote-explore-single-keywords | denote with one keyword |
 | `C-c x o` | denote-explore-sync-metadata | Sync metadata |
 | `C-c x r` | denote-explore-rename-keyword | Rename keyword |
 | `C-c x n` | denote-explore-network | Generate network graph |
-| `C-c x w` | denote-explore-random-walk | Random walk through notes |
-| `C-c x l` | denote-explore-random-links | Random linked notes |
+| `C-c x w` | denote-explore-random-walk | Random walk through denote |
+| `C-c x l` | denote-explore-random-links | Random linked denote |
 | `C-c x t` | denote-explore-barchart-timeline | Timeline chart |
 | `C-c x b` | denote-explore-barchart-backlinks | Backlinks chart |
 | `C-c x g` | denote-explore-barchart-degree | Degree chart |
-| `C-c x i` | denote-explore-isolated-notes | Find isolated notes |
+| `C-c x i` | denote-explore-isolated-denote | Find isolated denote |
 | `C-c x m` | denote-explore-missing-links | Find broken links |
 
 ### Denote Journal
@@ -695,7 +695,7 @@ Add templates to your capture system:
 | Keybinding | Command | Description |
 |------------|---------|-------------|
 | `C-c s d` | consult-denote-find | Find note with preview |
-| `C-c s g` | consult-denote-grep | Full-text search in notes |
+| `C-c s g` | consult-denote-grep | Full-text search in denote |
 
 ### Link Management
 
@@ -709,7 +709,7 @@ Add templates to your capture system:
 
 ### Workflow 1: Project Documentation
 
-**Goal:** Document a project with multiple related notes.
+**Goal:** Document a project with multiple related denote.
 
 **Steps:**
 1. Create project index: `C-c d n`
@@ -717,22 +717,22 @@ Add templates to your capture system:
    - Signature: `project-alpha`
    - Keywords: `project, work`
 
-2. Create project notes with same signature:
-   - Meeting notes: `C-c d n` → signature: `project-alpha`
+2. Create project denote with same signature:
+   - Meeting denote: `C-c d n` → signature: `project-alpha`
    - Technical specs: `C-c d n` → signature: `project-alpha`
    - Progress updates: `C-c d n` → signature: `project-alpha`
 
 3. Link them together:
-   - In index note, use `C-c d l` to link to project notes
+   - In index note, use `C-c d l` to link to project denote
 
 4. Explore project:
-   - `C-c x s` → Select `project-alpha` → See all notes
+   - `C-c x s` → Select `project-alpha` → See all denote
 
 ---
 
-### Workflow 2: Research and Literature Notes
+### Workflow 2: Research and Literature denote
 
-**Goal:** Take notes on research papers, books, and articles.
+**Goal:** Take denote on research papers, books, and articles.
 
 **Steps:**
 1. Create literature note: `C-c d n`
@@ -740,7 +740,7 @@ Add templates to your capture system:
    - Keywords: `literature, [topic]`
    - Use book template if available
 
-2. While reading, create atomic notes:
+2. While reading, create atomic denote:
    - Select interesting passage
    - `M-x denote-region` → Create note from region
    - Add keywords: `concept, [topic]`
@@ -789,13 +789,13 @@ Add templates to your capture system:
 
 3. Evening review:
    - Process journal entries
-   - Extract important insights into permanent notes
-   - Use `M-x denote-region` to create notes from journal entries
+   - Extract important insights into permanent denote
+   - Use `M-x denote-region` to create denote from journal entries
 
 4. Weekly review:
    - Search journals: `C-c s g` and search for "journal"
    - Identify patterns and themes
-   - Update project notes
+   - Update project denote
 
 ---
 
@@ -804,47 +804,47 @@ Add templates to your capture system:
 **Goal:** Build interconnected knowledge base.
 
 **Steps:**
-1. **Capture fleeting notes (temporary):**
+1. **Capture fleeting denote (temporary):**
    ```
    Throughout the day:
    C-c d F → Quick idea
    C-c d F → Interesting observation
    C-c d F → Book quote
    ```
-   All saved to `fleeting-notes/` automatically.
+   All saved to `fleeting-2_denote/` automatically.
 
 2. **Daily/Weekly Processing:**
    ```
-   Open fleeting-notes directory
+   Open fleeting-denote directory
    For each note, ask:
    - Is this valuable? → Create permanent note
    - Is this trivial? → Delete it
-   - Is this for reference? → Move to literature-notes
+   - Is this for reference? → Move to literature-denote
    ```
 
-3. **Create permanent notes:**
+3. **Create permanent denote:**
    ```
    C-c d n
    Title: [Concept in your own words]
    Keywords: permanent [topic]
-   Subdirectory: permanent-notes/
+   Subdirectory: permanent-2_denote/
    
    Write:
    - One idea per note
    - In your own words
-   - Link to related notes with C-c d l
+   - Link to related denote with C-c d l
    ```
 
 4. **Link extensively:**
    - Every permanent note links to at least one other
    - Use `C-c d l` for linking
-   - Create structure notes (index notes) to organize themes
+   - Create structure denote (index denote) to organize themes
 
 5. **Discover emergent structures:**
    - `C-c x n` → View network graph
-   - `C-c x d` → Find hub notes (most connected)
+   - `C-c x d` → Find hub denote (most connected)
    - `C-c x b` → Explore connection paths
-   - `C-c x i` → Find isolated notes to connect
+   - `C-c x i` → Find isolated denote to connect
 
 **Example Processing Flow:**
 ```
@@ -855,14 +855,14 @@ Permanent: "Narrative Memory Advantage"
     Links to: [[Memory Formation]], [[Storytelling]], [[Learning Methods]]
     ↓
 Structure Note: "Effective Learning Techniques"
-    Links to multiple permanent notes about learning
+    Links to multiple permanent denote about learning
 ```
 
 ---
 
 ### Workflow 5: Movie/Media Tracking
 
-**Goal:** Build personal media library with notes and insights.
+**Goal:** Build personal media library with denote and insights.
 
 **After Watching a Movie:**
 
@@ -878,7 +878,7 @@ Structure Note: "Effective Learning Techniques"
 
 2. **Fill in while fresh (5-10 minutes):**
    - **Summary:** 2-3 sentence plot summary
-   - **Notes:** 
+   - **denote:** 
      - What stood out
      - Cinematography highlights
      - Key scenes
@@ -907,7 +907,7 @@ C-c x k → Browse by genre/keyword
   → See all "thriller" movies
   → Compare ratings
 
-C-c s d → Search movie notes
+C-c s d → Search movie denote
   → "Kubrick" → Find all Kubrick films
   → "neo-noir" → Find by style
 
@@ -919,7 +919,7 @@ C-c d f → Open specific movie
 ```
 C-c d n
 Title: Sci-Fi Movies Collection
-Subdirectory: permanent-notes/
+Subdirectory: permanent-2_denote/
 Keywords: permanent, movies, sci-fi
 
 Content:
@@ -952,11 +952,11 @@ Content:
 
 2. During meeting:
    - Fill in attendees
-   - Take notes in Discussion section
+   - Take denote in Discussion section
    - Add action items with TODO keywords
 
 3. After meeting:
-   - Link to related notes: `C-c d l`
+   - Link to related denote: `C-c d l`
    - Export action items to org-agenda
 
 4. Follow-up:
@@ -971,12 +971,12 @@ Content:
 
 **Keybinding:** `C-c d R`
 
-Safely rename notes while updating all links.
+Safely rename denote while updating all links.
 
 **Features:**
 - Updates filename
 - Updates title in content
-- Updates all links across notes
+- Updates all links across denote
 - Preserves signature and keywords
 
 ---
@@ -985,7 +985,7 @@ Safely rename notes while updating all links.
 
 **Dired Integration:**
 
-Open notes directory in Dired, then:
+Open denote directory in Dired, then:
 - Mark files: `m`
 - Add signature to marked: Custom function
 - Rename bulk: `denote-dired-rename-files`
@@ -1025,7 +1025,7 @@ personal
 - Clients: `==client-acme`
 
 **Benefits:**
-- Group related notes
+- Group related denote
 - Easy filtering
 - Sortable in file browsers
 - Clear organization
@@ -1037,7 +1037,7 @@ personal
 Denote can coexist with Org-Roam:
 
 **Approach:**
-- Use Denote for structured notes (projects, meetings)
+- Use Denote for structured denote (projects, meetings)
 - Use Org-Roam for knowledge graph (concepts, ideas)
 - Link between systems using file links
 
@@ -1090,12 +1090,12 @@ More links = better discovery. When in doubt, link it.
 
 ### 3. Use Descriptive Titles
 
-Titles should be clear 6 months from now. Avoid vague titles like "thoughts" or "notes".
+Titles should be clear 6 months from now. Avoid vague titles like "thoughts" or "denote".
 
 ### 4. Review Regularly
 
-- **Daily:** Process fleeting notes
-- **Weekly:** Review and link recent notes
+- **Daily:** Process fleeting denote
+- **Weekly:** Review and link recent denote
 - **Monthly:** Explore network, find orphans
 
 ### 5. Keywords: Quality Over Quantity
@@ -1106,17 +1106,17 @@ Use 2-4 meaningful keywords rather than 10 vague ones.
 
 Starting a tutorial series or project? Use a signature from the beginning.
 
-### 7. Create Index Notes
+### 7. Create Index denote
 
-For large topics, create an index note that links to all related notes.
+For large topics, create an index note that links to all related denote.
 
 ### 8. Use Templates Consistently
 
-Templates ensure completeness and make notes easier to process later.
+Templates ensure completeness and make denote easier to process later.
 
 ### 9. Don't Fear Orphans
 
-Orphan notes (no links) are okay temporarily. Use `C-c x S` to find them during reviews.
+Orphan denote (no links) are okay temporarily. Use `C-c x S` to find them during reviews.
 
 ### 10. Backlinks Are Gold
 
@@ -1128,17 +1128,17 @@ Regularly check backlinks (`C-c d b`) to discover unexpected connections.
 
 ### Weekly Maintenance (15 minutes)
 
-1. Process fleeting notes into permanent notes
-2. Check for orphan notes: `C-c x d` → Sort ascending
-3. Review backlinks on recent notes
+1. Process fleeting denote into permanent denote
+2. Check for orphan denote: `C-c x d` → Sort ascending
+3. Review backlinks on recent denote
 4. Add missing links: `C-c x S`
 
 ### Monthly Maintenance (30 minutes)
 
 1. Review keyword consistency
 2. Explore network: `C-c x n`
-3. Create index notes for emerging themes
-4. Archive completed project notes
+3. Create index denote for emerging themes
+4. Archive completed project denote
 5. Update project signatures
 
 ### Quarterly Maintenance (1 hour)
@@ -1146,7 +1146,7 @@ Regularly check backlinks (`C-c d b`) to discover unexpected connections.
 1. Full-text search for common topics
 2. Refactor note structure if needed
 3. Review and clean up keywords
-4. Create meta notes (notes about notes)
+4. Create meta denote (denote about denote)
 5. Visualize and document your knowledge graph
 
 ---
@@ -1160,7 +1160,7 @@ Regularly check backlinks (`C-c d b`) to discover unexpected connections.
 - Verify target note exists
 - Rebuild cache if using denote-explore
 
-### Issue: Can't find notes
+### Issue: Can't find denote
 
 **Solution:**
 - Check `denote-directory` path

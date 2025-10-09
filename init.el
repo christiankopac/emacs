@@ -130,8 +130,8 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (use-package standard-themes :ensure t :defer t)
 (use-package everforest
   :ensure (:host github 
-           :repo "Theory-of-Everything/everforest-emacs"
-           :files ("*.el"))
+                 :repo "Theory-of-Everything/everforest-emacs"
+                 :files ("*.el"))
   :defer t)
 
 
@@ -345,7 +345,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (use-package consult-denote :ensure t :after denote)
 (use-package denote-markdown :ensure t :after denote)
 (use-package denote-menu :ensure t :after denote)
-(use-package denote-explore :ensure t :after denote)
+(use-package denote-explore :ensure t :after (denote denote-regexp))
 (use-package denote-sequence :ensure t :after denote)
 (use-package denote-journal :ensure t :after denote)
 

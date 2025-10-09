@@ -186,7 +186,7 @@
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
 
-(setq org-directory "~/Sync/org/"
+(setq org-directory "~/Sync/org/denote/"
       org-startup-indented t                     ; Indent according to heading level
       org-startup-folded 'content                ; Show only top-level headings on open
       org-hide-emphasis-markers t                ; Hide markup characters (*bold*, /italic/, etc.)
@@ -241,7 +241,7 @@
                                         ; (setq org-refile-targets
                                         ;       '((nil :maxlevel . 3)        ; Current file up to 3 levels
                                         ;         (agenda :maxlevel . 3)     ; Agenda files up to 2 levels
-                                        ;         (notes :maxlevel . 2)      ; Notes files up to 2 levels
+                                        ;         (denote :maxlevel . 2)      ; denote files up to 2 levels
                                         ;         (gtd :maxlevel . 2)        ; GTD files up to 2 levels
                                         ;         (archive :maxlevel . 2)))  ; Archive files up to 2 levels
 

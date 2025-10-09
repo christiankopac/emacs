@@ -41,7 +41,7 @@
     "C-c c" "Capture"
     "C-c a" "Agenda"
     "C-c w d" "Daily Workflow"
-    "C-c s s" "Search All Notes"
+    "C-c s s" "Search All denote"
     "C-c x c" "Extract Concept"
     "C-c d" "Denote"))
 

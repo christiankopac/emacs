@@ -205,13 +205,13 @@
 
 ;; Org GTD - Getting Things Done workflow
 (defun my/org-gtd-archive-location ()
-  "Archive to ~/Sync/org/archive/org instead of org-gtd-directory."
+  "Archive to ~/Sync/org/archive/gtd instead of org-gtd-directory."
   (let* ((year (number-to-string (caddr (calendar-current-date))))
          (filename (format org-gtd-archive-file-format year))
-         (filepath (f-join "~/Sync/org/archive/" filename)))
+         (filepath (f-join "~/Sync/org/archive/gtd" filename)))
     (string-join `(,filepath "::" "datetree/"))))
 
-(setq org-gtd-directory (expand-file-name "gtd/" org-directory)
+(setq org-gtd-directory "~/Sync/org/gtd"
       org-gtd-default-file-name "inbox"
       org-gtd-areas-of-focus '("Finance" "Health" "Relationships" "Career"
                                "Creative" "Learning" "Growth" "Home")
@@ -453,7 +453,7 @@
 
 ;; Ox-Tufte - Tufte CSS export backend for Org mode
 ;; (with-eval-after-load 'ox-tufte
-;;   (setq org-tufte-include-footnotes-at-bottom t) ;; Include footnotes at bottom for better mobile compatibility
+;;   (setq org-tufte-include-footdenote-at-bottom t) ;; Include footdenote at bottom for better mobile compatibility
 ;;   (setq org-tufte-margin-note-symbol "⊕")    ;; Custom margin note symbol (default is ⊕)
 ;;   (add-to-list 'org-export-backends 'tufte-html) ;; Enable Tufte export backend
 
@@ -469,10 +469,10 @@
   (setq org-modern-timestamp t
         org-modern-priority '((?A . "🔥") (?B . "🌶️") (?C . "🫑"))
         org-modern-priority-align '(t . t)                       ; Align priority symbols
-        org-modern-keyword '(("date" . "\uf455")                 ; Date symbol
-                             ("filetags" . "\uea66")             ; File tags symbol
-                             ("identifier" . "\ueb11")           ; Identifier symbol
-                             (t . "▶"))                          ; Default keyword symbol
+        org-modern-keyword '((t . "▶"))
+        ;; ("date" . "\uf455")                 ; Date symbol
+        ;; ("filetags" . "\uea66")             ; File tags symbol
+        ;; ("identifier" . "\ueb11")           ; Identifier symbol
         ;; Heading stars - use invisible stars for clean appearance
         org-modern-star '("" "" "" "" "" "")
         ;; Fold indicators (collapsed/expanded)

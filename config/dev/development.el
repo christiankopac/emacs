@@ -105,7 +105,7 @@
         ("DEBUG"  . "#9D4EDD")   ; Purple - debug statements
         ("GOTCHA" . "#FF8500")   ; Orange - tricky code
         ("STUB"   . "#06FFA5")   ; Cyan - placeholder code
-        ("NOTE"   . "#4CC9F0")   ; Blue - important notes
+        ("NOTE"   . "#4CC9F0")   ; Blue - important denote
         ("HACK"   . "#E0AAFF"))) ; Pink - temporary solutions
 
 ;; ============================================================================

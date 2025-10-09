@@ -59,7 +59,7 @@
   "C-c c b" "👥 BBDB Contacts"
   
   ;; Org Extensions
-  "C-c n" "📝 Org Notes"
+  "C-c n" "📝 Org denote"
   "C-c n h" "📊 Habit Stats"
   "C-c n u" "🔗 Cliplink"
   "C-c n p" "⏰ Pomodoro"

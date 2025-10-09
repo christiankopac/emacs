@@ -6,13 +6,13 @@ This guide covers the new features added to your Emacs configuration.
 
 ---
 
-## 1. Denote Fleeting Notes
+## 1. Denote Fleeting denote
 
 ### Overview
-Quickly create fleeting notes (temporary thoughts/ideas) in a dedicated subdirectory.
+Quickly create fleeting denote (temporary thoughts/ideas) in a dedicated subdirectory.
 
 ### Location
-All fleeting notes are stored in: `~/Sync/org/notes/fleeting-notes/`
+All fleeting denote are stored in: `~/Sync/2_denote/2_denote/fleeting-2_denote/`
 
 ### Usage
 
@@ -21,14 +21,14 @@ All fleeting notes are stored in: `~/Sync/org/notes/fleeting-notes/`
 C-c d F
 → Prompts for title
 → Automatically adds "fleeting" keyword
-→ Saves to fleeting-notes subdirectory
+→ Saves to fleeting-denote subdirectory
 ```
 
 **Example:**
 ```
 C-c d F
 Title: Interesting idea about productivity
-→ Creates: ~/Sync/org/notes/fleeting-notes/20250930T120000--interesting-idea-about-productivity__fleeting.org
+→ Creates: ~/Sync/2_denote/2_denote/fleeting-2_denote/20250930T120000--interesting-idea-about-productivity__fleeting.org
 ```
 
 ### Workflow
@@ -37,15 +37,15 @@ Title: Interesting idea about productivity
 
 1. **Capture** fleeting thoughts quickly with `C-c d F`
 2. **Process** them regularly (daily/weekly review)
-3. **Promote** to permanent notes:
-   - `C-c d R` (rename/move to permanent-notes)
+3. **Promote** to permanent denote:
+   - `C-c d R` (rename/move to permanent-denote)
    - Or create new permanent note and link back
 
 **Best Practices:**
-- Use fleeting notes for quick captures during the day
+- Use fleeting denote for quick captures during the day
 - Keep inbox at zero by processing them regularly
-- Extract valuable insights into permanent notes
-- Delete or archive processed fleeting notes
+- Extract valuable insights into permanent denote
+- Delete or archive processed fleeting denote
 
 ---
 
@@ -86,7 +86,7 @@ The journal file organizes entries like this:
 ** 2025-W40
 *** 2025-09-30 Monday
 **** 14:23 Had a great meeting with team
-Notes about the meeting...
+denote about the meeting...
 
 **** 16:45 Finished project milestone
 Description of accomplishment...
@@ -145,10 +145,10 @@ Description of accomplishment...
 ## 3. Movie Tracking with Denote
 
 ### Overview
-Structured movie notes with pre-filled metadata template.
+Structured movie denote with pre-filled metadata template.
 
 ### Location
-All movie notes in: `~/Sync/org/notes/movies/`
+All movie denote in: `~/Sync/2_denote/2_denote/movies/`
 
 ### Usage
 
@@ -184,7 +184,7 @@ Creates a note with this structure:
 
 [Your summary here]
 
-* Notes
+* denote
 
 [Your thoughts and observations]
 
@@ -231,7 +231,7 @@ Use denote links in "Related Movies" section:
 **Finding Movies:**
 ```
 C-c x k  → Browse by genre/rating/year keywords
-C-c s d  → Search movie notes
+C-c s d  → Search movie denote
 C-c d f  → Find specific movie
 ```
 
@@ -256,17 +256,17 @@ Edit the template in `config/org/denote.el`:
 ## 4. Updated Denote Directory Structure
 
 ### Overview
-Organized subdirectories for different types of notes.
+Organized subdirectories for different types of denote.
 
 ### Structure
 
 ```
-~/Sync/org/notes/
-├── fleeting-notes/        # Quick captures, temporary thoughts
-├── permanent-notes/       # Processed, evergreen notes
-├── literature-notes/      # Book/article summaries
-├── movies/                # Movie tracking notes
-└── [other files]          # General notes in root
+~/Sync/2_denote/2_denote/
+├── fleeting-2_denote/        # Quick captures, temporary thoughts
+├── permanent-2_denote/       # Processed, evergreen denote
+├── literature-2_denote/      # Book/article summaries
+├── movies/                # Movie tracking denote
+└── [other files]          # General denote in root
 ```
 
 ### Using Subdirectories
@@ -287,7 +287,7 @@ C-c d N  → Prompts for subdirectory
 C-c d n
 Title: My Note
 Keywords: permanent
-Subdirectory: permanent-notes/  ← Choose here
+Subdirectory: permanent-2_denote/  ← Choose here
 ```
 
 ### Configuration
@@ -295,9 +295,9 @@ Subdirectory: permanent-notes/  ← Choose here
 **Available Subdirectories:**
 ```elisp
 denote-subdirectories:
-  - fleeting-notes
-  - permanent-notes
-  - literature-notes
+  - fleeting-denote
+  - permanent-denote
+  - literature-denote
   - movies
 ```
 
@@ -316,9 +316,9 @@ denote-known-keywords:
 
 In `config/org/denote.el`:
 ```elisp
-(setq denote-subdirectories '("fleeting-notes" 
-                              "permanent-notes" 
-                              "literature-notes" 
+(setq denote-subdirectories '("fleeting-denote" 
+                              "permanent-denote" 
+                              "literature-denote" 
                               "movies"
                               "recipes"))  ; Add your own
 ```
@@ -327,7 +327,7 @@ In `config/org/denote.el`:
 
 ## Complete Keybindings Reference
 
-### Denote Notes
+### Denote denote
 
 | Keybinding | Command | Description |
 |------------|---------|-------------|
@@ -354,7 +354,7 @@ In `config/org/denote.el`:
 
 ## Workflows
 
-### Workflow 1: Zettelkasten with Fleeting Notes
+### Workflow 1: Zettelkasten with Fleeting denote
 
 **Goal:** Build knowledge base using slip-box method.
 
@@ -368,26 +368,26 @@ In `config/org/denote.el`:
 
 2. **Daily Processing:**
    ```
-   Open ~/Sync/org/notes/fleeting-notes/
+   Open ~/Sync/2_denote/2_denote/fleeting-2_denote/
    Review each note:
      - Trivial? Delete it
      - Valuable? Create permanent note
    ```
 
-3. **Create Permanent Notes:**
+3. **Create Permanent denote:**
    ```
    C-c d n
    Title: [Concept in your own words]
    Keywords: permanent [topic]
-   Subdirectory: permanent-notes/
+   Subdirectory: permanent-2_denote/
    
    Write:
    - One idea per note
    - In your own words
-   - Link to related notes
+   - Link to related denote
    ```
 
-4. **Link Notes:**
+4. **Link denote:**
    ```
    C-c d i → Link related concepts
    C-c x n → Visualize network
@@ -425,7 +425,7 @@ C-c c J → Quick journal entries
    - What didn't?
    - What did I learn?
 
-2. Process fleeting notes from journal
+2. Process fleeting denote from journal
    - Extract tasks → C-c c t
    - Extract ideas → C-c d n
 ```
@@ -434,7 +434,7 @@ C-c c J → Quick journal entries
 
 ### Workflow 3: Movie/Book Tracking
 
-**Goal:** Build personal media library with notes.
+**Goal:** Build personal media library with denote.
 
 **After Watching Movie:**
 ```
@@ -480,11 +480,11 @@ Link by:
 
 ## Tips
 
-### Fleeting Notes
+### Fleeting denote
 
 1. **Capture Fast:** Don't overthink, just capture
 2. **Process Daily:** Review and delete/promote every day
-3. **Set Limit:** Keep max 20-30 fleeting notes at a time
+3. **Set Limit:** Keep max 20-30 fleeting denote at a time
 4. **Use Tags:** Add context with keywords
 
 ### Journal

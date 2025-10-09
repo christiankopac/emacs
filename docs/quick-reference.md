@@ -135,7 +135,7 @@ Quick reference for the most common tasks and keybindings in your Emacs configur
 
 ---
 
-## Denote (Notes)
+## Denote (denote)
 
 | Keybinding | Action |
 |------------|--------|
