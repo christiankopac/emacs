@@ -5,9 +5,9 @@
 ;; ============================================================================
 
 (which-key-add-key-based-replacements
-  "C-c a" "📅 Agenda"
+  "C-c a" "📅 Org Agenda"
   "C-c b" "📋 Consult Buffer"
-  "C-c c" "✏️ Capture"
+  "C-c c" "✏️ Org Capture"
   "C-c d" "📝 Denote"
   ;; C-c f f is a non-prefix key, so C-c f cannot be a prefix
   ;; "C-c f" "🔍 Consult Find"
@@ -66,7 +66,7 @@
   
   ;; Org GTD
   "C-c g" "✅ GTD"
-  "C-c g c" "✏️ Capture"
+  "C-c g c" "✏️ GTD Capture (Quick)"
   "C-c g p" "📥 Process Inbox"
   "C-c g e" "🎯 Engage"
   "C-c g n" "⏭️ Next Actions"

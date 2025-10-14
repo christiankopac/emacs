@@ -118,13 +118,19 @@ Quick reference for the most common tasks and keybindings in your Emacs configur
 
 ## Org Mode
 
-| Keybinding | Action |
-|------------|--------|
-| `C-c c` | Capture menu |
-| `C-c c i` | Capture to inbox |
-| `C-c c t` | Capture task |
-| `C-c c j` | Journal entry (prompted) |
-| `C-c c J` | Quick journal |
+| Keybinding | Action | Destination |
+|------------|--------|-------------|
+| `C-c c` | Org Capture menu (with templates) | - |
+| `C-c c i` | 📥 Inbox - Quick capture | `→ gtd/inbox.org` |
+| `C-c c t` | ✅ Task - TODO with schedule | `→ gtd/inbox.org` |
+| `C-c c p` | 📁 Project - With subtasks | `→ gtd/inbox.org` |
+| `C-c c j` | 📖 Journal - Weekly datetree | `→ journal/journal.org` |
+| `C-c c J` | 📝 Quick Journal - Fast entry | `→ journal/journal.org` |
+| `C-c c m` | 💼 Meeting - With action items | `→ gtd/inbox.org` |
+| `C-c c s` | 💭 Someday/Maybe - Future ideas | `→ gtd/inbox.org` |
+| `C-c c r` | 📚 Reference - Material/notes | `→ gtd/inbox.org` |
+| `C-c c l` | 🔗 Link - Web bookmark | `→ gtd/inbox.org` |
+| `C-c c h` | 🔄 Habit - Recurring | `→ gtd/tasks.org` |
 | `C-c a` | Agenda |
 | `C-c l` | Store link |
 | `C-c C-c` | Execute/toggle |
@@ -132,6 +138,19 @@ Quick reference for the most common tasks and keybindings in your Emacs configur
 | `C-c C-s` | Schedule |
 | `C-c C-d` | Deadline |
 | `C-c C-w` | Refile |
+
+### Org GTD
+
+| Keybinding | Action |
+|------------|--------|
+| `C-c g c` | ⚡ GTD Capture (quick, no template) |
+| `C-c g p` | 📥 Process Inbox |
+| `C-c g e` | 🎯 Engage with tasks |
+| `C-c g n` | ⏭️ Show all next actions |
+| `C-c g s` | 🔄 Switch to clarify buffer |
+| `C-c g a` | 📅 Clarify agenda item |
+| `C-c g i` | 📝 Clarify item |
+| `C-c g g` | 🎯 Engage grouped by context |
 
 ---
 

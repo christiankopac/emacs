@@ -206,25 +206,37 @@ Use the journal system: `C-c j m`
 
 | Keybinding | Command | Description |
 |------------|---------|-------------|
-| `C-c d c` | org-gtd-capture | Capture new item |
-| `C-c d p` | org-gtd-process-inbox | Process inbox |
-| `C-c d e` | org-gtd-engage | Engage with tasks |
-| `C-c d n` | org-gtd-show-all-next | Show all next actions |
-| `C-c d s` | org-gtd-clarify-switch-to-buffer | Switch to clarify buffer |
-| `C-c d a` | org-gtd-clarify-agenda-item | Clarify agenda item |
-| `C-c d i` | org-gtd-clarify-item | Clarify item |
-| `C-c d g` | org-gtd-engage-grouped-by-context | Engage grouped by context |
+| `C-c g c` | org-gtd-capture | Capture new item (quick) |
+| `C-c g p` | org-gtd-process-inbox | Process inbox |
+| `C-c g e` | org-gtd-engage | Engage with tasks |
+| `C-c g n` | org-gtd-show-all-next | Show all next actions |
+| `C-c g s` | org-gtd-clarify-switch-to-buffer | Switch to clarify buffer |
+| `C-c g a` | org-gtd-clarify-agenda-item | Clarify agenda item |
+| `C-c g i` | org-gtd-clarify-item | Clarify item |
+| `C-c g g` | org-gtd-engage-grouped-by-context | Engage grouped by context |
 
-### Org Capture
+### Org Capture (Integrated with GTD)
 
-| Keybinding | Template | Description |
-|------------|----------|-------------|
-| `C-c c` | - | Open capture menu |
-| `C-c c i` | Inbox | Quick inbox capture |
-| `C-c c t` | Task | TODO task |
-| `C-c c p` | Project | Project with sub-tasks |
-| `C-c c j` | Journal Entry | Journal with prompt |
-| `C-c c J` | Journal (simple) | Quick journal entry |
+**Two Capture Workflows:**
+1. **org-capture (`C-c c`)** - Template-based capture with rich options
+   - Best for: Most captures, journaling, structured input
+2. **org-gtd-capture (`C-c g c`)** - Direct inbox capture, no prompts
+   - Best for: Ultra-quick brain dump, minimal friction
+
+| Keybinding | Template | Description | Destination |
+|------------|----------|-------------|-------------|
+| `C-c c` | - | Open capture menu | - |
+| `C-c c i` | [GTD] Inbox | Quick inbox capture | `→ inbox.org` |
+| `C-c c t` | [GTD] Task | TODO task with schedule | `→ inbox.org` |
+| `C-c c p` | [GTD] Project | Project with sub-tasks | `→ inbox.org` |
+| `C-c c j` | [Journal] Entry | Weekly journal with prompt | `→ journal.org` |
+| `C-c c J` | [Journal] Quick | Fast journal entry | `→ journal.org` |
+| `C-c c m` | [GTD] Meeting | Meeting with attendees & action items | `→ inbox.org` |
+| `C-c c s` | [GTD] Someday/Maybe | Future ideas/incubation | `→ inbox.org` |
+| `C-c c r` | [GTD] Reference | Reference material | `→ inbox.org` |
+| `C-c c l` | [GTD] Link | Web link or bookmark | `→ inbox.org` |
+| `C-c c h` | [GTD→Tasks] Habit | Recurring habit with properties | `→ tasks.org` |
+| `C-c g c` | GTD Capture | Direct to inbox (no template) | `→ inbox.org` |
 
 ### Org Agenda
 

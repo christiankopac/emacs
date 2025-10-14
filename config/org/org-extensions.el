@@ -219,6 +219,93 @@
       org-gtd-mode t
       )
 
+;; ============================================================================
+;; Org Capture Templates - Integrated with Org GTD
+;; ============================================================================
+;; Configure org-capture to work seamlessly with org-gtd
+;;
+;; TWO CAPTURE WORKFLOWS:
+;; 1. org-capture (C-c c) - Standard Org capture with template selection
+;;    - Captures to inbox.org or journal.org
+;;    - Process items later with org-gtd-process-inbox (C-c g p)
+;;    - Best for: Quick capture, journaling, complex templates
+;;
+;; 2. org-gtd-capture (C-c g c) - Direct GTD inbox capture
+;;    - Minimal friction, directly to GTD inbox
+;;    - No template selection prompt
+;;    - Best for: Ultra-quick inbox capture during workflow
+;;
+;; RECOMMENDED WORKFLOW:
+;; - Use C-c c for most captures (with templates)
+;; - Use C-c g c for rapid-fire inbox dumping
+;; - Process everything with C-c g p (org-gtd-process-inbox)
+;;
+(setq org-capture-templates
+      '(
+        ;; GTD Inbox - Quick capture to inbox
+        ("i" "[GTD] Inbox - Quick capture" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* %?\n%U\n%a\n"
+         :empty-lines 1)
+
+        ;; Quick Task - Capture task with basic info
+        ("t" "[GTD] Task - TODO with schedule" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* TODO %?\nSCHEDULED: %t\n%a\n"
+         :empty-lines 1)
+
+        ;; Project - Capture project with subtasks
+        ("p" "[GTD] Project - With subtasks" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* TODO %? [/]\n%U\n** TODO First step\n** TODO Second step\n"
+         :empty-lines 1)
+
+        ;; Journal Entry - Prompted journal capture
+        ("j" "[Journal] Entry - Weekly datetree" entry
+         (file+olp+datetree "~/Sync/org/journal/journal.org")
+         "* %?\n%U\n"
+         :empty-lines 1
+         :tree-type week)
+
+        ;; Quick Journal - Fast journal entry with timestamp
+        ("J" "[Journal] Quick - Fast entry" entry
+         (file+olp+datetree "~/Sync/org/journal/journal.org")
+         "* %U\n%?\n"
+         :empty-lines 1
+         :tree-type week
+         :jump-to-captured t)
+
+        ;; Meeting Notes - Capture meeting with attendees
+        ("m" "[GTD] Meeting - With action items" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* TODO Meeting: %?\n%U\n** Attendees\n- \n** Notes\n\n** Action Items\n- [ ] \n"
+         :empty-lines 1)
+
+        ;; Idea/Someday - Capture for incubation
+        ("s" "[GTD] Someday/Maybe - Future ideas" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* SOMEDAY %?\n%U\n"
+         :empty-lines 1)
+
+        ;; Reference - Quick reference capture
+        ("r" "[GTD] Reference - Material/notes" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* %? :reference:\n%U\n%a\n"
+         :empty-lines 1)
+
+        ;; Link - Capture web link or reference
+        ("l" "[GTD] Link - Web bookmark" entry
+         (file "~/Sync/org/gtd/inbox.org")
+         "* %? :link:\n%U\n%a\n"
+         :empty-lines 1)
+
+        ;; Habit - Create recurring habit
+        ("h" "[GTD→Tasks] Habit - Recurring" entry
+         (file "~/Sync/org/gtd/tasks.org")
+         "* TODO %?\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:END:\n"
+         :empty-lines 1)
+        ))
+
 ;; Org GTD keybindings (use C-c g prefix to avoid conflicts with denote C-c d)
 (global-set-key (kbd "C-c g c") 'org-gtd-capture)                      ; Capture to GTD inbox
 (global-set-key (kbd "C-c g p") 'org-gtd-process-inbox)                ; Process inbox items
