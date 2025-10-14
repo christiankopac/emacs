@@ -186,7 +186,7 @@
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
 
-(setq org-directory "~/Sync/org/denote/"
+(setq org-directory "~/Sync/org/"
       org-startup-indented t                     ; Indent according to heading level
       org-startup-folded 'content                ; Show only top-level headings on open
       org-hide-emphasis-markers t                ; Hide markup characters (*bold*, /italic/, etc.)
@@ -231,7 +231,7 @@
   ;;                                                     ; interactive commands
   ;;      org-babel-shell-command "bash"                 ; Use bash for shell commands
   ;;      org-babel-shell-prompt "\\$ "                  ; Shell prompt pattern
-  ;;      org-babel-shell-results-default-format "output")) ; Show output by default
+  ;;      org-babel-shell-results-default-format "output") ; Show output by default
 
   ;; Archive settings
   (setq org-archive-save-context-info '(time category itags)  ; Save when, where, and tags
@@ -247,11 +247,11 @@
 
   ;; destination for refile any agenda file 3 levels deep
   (setq org-refile-targets '(
-                             ("~/Sync/org/gtd/inbox.org" :maxlevel . 1)
-                             ("~/Sync/org/gtd/tasks.org" :maxlevel . 1)
-                             ("~/Sync/org/gtd/areas.org" :maxlevel . 1)
-                             ("~/Sync/org/gtd/vision.org" :maxlevel . 1)
-                             ("~/Sync/org/gtd/horizons.org" :maxlevel . 1)
+                             ("~/Sync/org/gtd/inbox.org" :maxlevel . 2)
+                             ("~/Sync/org/gtd/tasks.org" :maxlevel . 2)
+                             ("~/Sync/org/gtd/areas.org" :maxlevel . 2)
+                             ("~/Sync/org/gtd/vision.org" :maxlevel . 2)
+                             ("~/Sync/org/gtd/horizons.org" :maxlevel . 2)
                              ))
 
   ;; generate refile tarets and show them at once

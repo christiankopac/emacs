@@ -43,15 +43,7 @@
 
 (with-eval-after-load 'project
   (setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))
-
-
-
-  ;; Add directories to project list (non-recursive - 1 level only)
-  (project-remember-projects-under "~/src/github.com/christiankopac" nil)
-  (project-remember-projects-under "~/src/projects" nil)
-  (project-remember-projects-under "~/src/projects-cli" nil)
-  (project-remember-projects-under "~/src/projects-music" nil)
-  (project-remember-projects-under "~/src/cv/ck-cv-and-cover-typst" nil))
+  (project-remember-projects-under "~/src/" nil))
 
 
 (global-set-key (kbd "C-c p f") 'project-find-file)      ; Find file in project
@@ -160,9 +152,7 @@
 
 (global-set-key (kbd "C-x g") 'magit-status)  ; Open magit status buffer
 (with-eval-after-load 'magit
-  (setq magit-repository-directories '(("~/src/projects" . 1)    ; Search for repos in projects (depth 1)
-                                        ("~/src/lab" . 1)         ; Search in lab (depth 1)
-                                        ("~/src/github.com/christiankopac" . 2))))  ; Search in github.com (depth 2)
+  (setq magit-repository-directories '(("~/src/" . 2))))  ; Search in github.com (depth 2)
 
 ;; ============================================================================
 ;; Diff-hl Configuration - Show git changes in fringe

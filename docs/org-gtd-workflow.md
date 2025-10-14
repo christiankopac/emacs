@@ -514,7 +514,7 @@ Shows:
 Include content from other org files:
 
 ```org
-#+transclude: [[file:~/Sync/2_denote/2_denote/project.org::*Goals]]
+#+transclude: [[file:~/Sync/org/gtd/areas.org::*Goals]]
 ```
 
 ---

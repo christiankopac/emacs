@@ -46,9 +46,15 @@
   "C-x v" "🌿 Version Control"
   "C-x v t" "⏰ Git Timemachine"
   "C-x v p" "💬 Git Messenger"
-  "C-c t" "💻 Terminal"
-  "C-c t e" "💻 Open Terminal"
-  "C-c t E" "💻 Terminal Other Window"
+  
+  ;; Themes
+  "C-c t" "🎨 Themes"
+  "C-c t t" "🔄 Toggle Theme"
+  "C-c t d" "🏠 Default Theme"
+  "C-c t g" "🖥️ GUI Theme"
+  "C-c t SPC" "⚡ Toggle Default/Custom"
+  "C-c t r" "🔄 Reset All Themes"
+  "C-c t f" "🔧 Fix Theme Issues"
   
   ;; Writing
   "C-c w s d" "📚 Dictionary Lookup"

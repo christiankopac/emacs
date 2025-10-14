@@ -2,6 +2,7 @@
 ;; ----------------------------------------------------------------------------
 ;; Prefer ripgrep, then ugrep, otherwise use grep
 ;; Prefer ripgrep, then ugrep, and fall back to regular grep.
+
 (setq xref-search-program
       (cond
        ((or (executable-find "ripgrep")
@@ -14,12 +15,19 @@
 
 ;; Define manual silos
 (setq my-denote-silos
-      '(("denote" . "~/Sync/org/denote/")
-        ("journal" . "~/Sync/org/journal/")
-        ("gtd" . "~/Sync/org/gtd/")))
+      `(("denote" . ,(expand-file-name "~/Sync/org/denote/"))
+        ("journal" . ,(expand-file-name "~/Sync/org/journal/"))
+        ("gtd" . ,(expand-file-name "~/Sync/org/gtd/"))))
 
 ;; Set denote-dired-directories to the list of directories from my-denote-silos
 (setq denote-dired-directories (mapcar #'cdr my-denote-silos))
+
+;; Ensure all silo directories exist
+(dolist (silo my-denote-silos)
+  (let ((dir (cdr silo)))
+    (unless (file-directory-p dir)
+      (make-directory dir t)
+      (message "Created denote directory: %s" dir))))
 
 ;; Core Denote settings
 (setq denote-rename-buffer-mode 1)
@@ -180,6 +188,10 @@
 ;; IMPORTANT: Set the main denote-directory to the default silo
 ;; This is required for consult-denote and other denote functions to work
 (setq denote-directory (cdr (assoc denote-silo-default my-denote-silos)))
+
+;; Verify denote-directory is set correctly
+(unless (and denote-directory (file-directory-p denote-directory))
+  (error "Denote directory not found or not accessible: %s" denote-directory))
 
 ;; Silo switching function
 (defun my/denote-switch-silo ()

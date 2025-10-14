@@ -97,9 +97,15 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 
 ;; Basic UI settings
 (show-paren-mode t)
-(scroll-bar-mode -1)  ; Disable with -1, not nil
-(menu-bar-mode -1)    ; Also fixed: use -1 instead of nil
-(tool-bar-mode -1)    ; Also fixed: use -1 instead of nil
+;; Only disable scroll bars in GUI environments
+(when (and (display-graphic-p) (fboundp 'scroll-bar-mode))
+  (condition-case nil
+      (scroll-bar-mode -1)
+    (error nil)))
+(when (fboundp 'menu-bar-mode)
+  (menu-bar-mode -1))    ; Also fixed: use -1 instead of nil
+(when (fboundp 'tool-bar-mode)
+  (tool-bar-mode -1))    ; Also fixed: use -1 instead of nil
 (setq inhibit-startup-screen 1)
 
 ;; Add config subdirectories to load-path
@@ -260,7 +266,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (with-eval-after-load 'dirvish
   (load-file (expand-file-name "config/ui/file-associations.el" user-emacs-directory)))
 
-;; Context-menu
+;; Context-menu (GUI only)
 (when (display-graphic-p)
   (context-menu-mode))
 
@@ -461,6 +467,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (setq term-file-prefix nil)
 (add-to-list 'term-file-aliases `(,"ghostty" . ,"xterm-256color"))
 
+;; Terminal-specific settings (only in terminal mode)
 (unless (display-graphic-p)
   (setq xterm-extra-capabilities '(setSelection getSelection))
   (xterm-mouse-mode 1)
@@ -483,6 +490,21 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c c") 'org-capture)
+
+;; Theme keybindings
+(global-set-key (kbd "C-c t t") 'my/toggle-theme)
+(global-set-key (kbd "C-c t d") 'my/use-default-theme)
+(global-set-key (kbd "C-c t g") 'my/load-gui-theme)
+(global-set-key (kbd "C-c t SPC") 'my/toggle-default-theme)
+(global-set-key (kbd "C-c t r") 'my/reset-all-themes)
+(global-set-key (kbd "C-c t f") 'my/fix-poet-theme-issues)
+
+;; Transparency keybindings (GUI only)
+(when (display-graphic-p)
+  (global-set-key (kbd "C-c t T") 'my/toggle-transparency))
+
+;; Display info keybinding
+(global-set-key (kbd "C-c t i") 'my/display-info)
 
 ;; ----------------------------------------------------------------------------
 ;; Final Optimizations
@@ -519,11 +541,13 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
               (set-frame-parameter frame 'horizontal-scroll-bars nil))))
 
 ;; ============================================================================
-;; Load Theme - Everforest Hard Dark
+;; Load Theme - Conditional based on display type
 ;; ============================================================================
 (add-hook 'elpaca-after-init-hook
           (lambda ()
-            (load-theme 'everforest-hard-dark t)))
+            ;; Only load custom theme in GUI, use default theme in terminal
+            (when (display-graphic-p)
+              (load-theme 'everforest-hard-dark t))))
 
 (provide 'init)
 ;;; init.el ends here

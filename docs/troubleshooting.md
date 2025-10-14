@@ -563,8 +563,7 @@ M-x all-the-icons-install-fonts
 
 2. **Set correct paths:**
    ```elisp
-   (setq org-agenda-files '("~/Sync/2_denote/agenda" 
-                            "~/Sync/org/gtd/"))
+   (setq org-agenda-files '("~/Sync/org/denote/" "~/Sync/org/gtd/"))
    ```
 
 3. **Rebuild agenda:**

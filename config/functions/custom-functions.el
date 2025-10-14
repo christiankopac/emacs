@@ -8,7 +8,6 @@
                         misterioso
                         tango-dark
                         leuven
-                        poet
                         adwaita)
   "List of themes to toggle through.")
 
@@ -27,6 +26,74 @@
       (disable-theme (nth (% (1- my/current-theme-index) theme-count) my/theme-list))
       (load-theme new-theme t)
       (message "Switched to theme: %s" new-theme))))
+
+(defun my/use-default-theme ()
+  "Disable all custom themes and use Emacs default theme."
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (message "Using default Emacs theme"))
+
+(defun my/load-gui-theme ()
+  "Load the preferred GUI theme (everforest-hard-dark)."
+  (interactive)
+  (mapc #'disable-theme custom-enabled-themes)
+  (load-theme 'everforest-hard-dark t)
+  (message "Loaded everforest-hard-dark theme"))
+
+(defun my/toggle-default-theme ()
+  "Toggle between default theme and custom theme."
+  (interactive)
+  (if custom-enabled-themes
+      (my/use-default-theme)
+    (if (display-graphic-p)
+        (my/load-gui-theme)
+      (message "In terminal - using default theme"))))
+
+(defun my/reset-all-themes ()
+  "Completely reset all themes and face customizations."
+  (interactive)
+  ;; Disable all custom themes
+  (mapc #'disable-theme custom-enabled-themes)
+  ;; Reset theme toggle index
+  (setq my/current-theme-index 0)
+  ;; Force a complete face reset (this reloads default faces)
+  (when (fboundp 'face-spec-recalc)
+    (mapc #'face-spec-recalc (face-list)))
+  (message "All themes reset to default"))
+
+(defun my/fix-poet-theme-issues ()
+  "Fix any issues caused by poet theme and ensure clean state."
+  (interactive)
+  ;; First, disable all themes
+  (my/reset-all-themes)
+  ;; Remove poet from enabled themes if somehow active
+  (when (memq 'poet custom-enabled-themes)
+    (disable-theme 'poet))
+  ;; Reload the appropriate theme based on display type
+  (if (display-graphic-p)
+      (my/load-gui-theme)
+    (message "Using default theme in terminal")))
+
+;; ----------------------------------------------------------------------------
+;; Display Detection Functions
+;; ----------------------------------------------------------------------------
+
+(defun my/display-info ()
+  "Display information about the current display type and settings."
+  (interactive)
+  (let ((display-type (if (display-graphic-p) "GUI" "Terminal"))
+        (terminal-type (getenv "TERM"))
+        (emacs-version emacs-version)
+        (frame-params (frame-parameters)))
+    (message "Display Type: %s" display-type)
+    (message "Terminal: %s" (or terminal-type "Not set"))
+    (message "Emacs Version: %s" emacs-version)
+    (when (display-graphic-p)
+      (let ((alpha (frame-parameter nil 'alpha-background)))
+        (message "Transparency: %s" (if alpha (format "%d%%" alpha) "100% (opaque)"))))
+    (message "Current theme: %s" (if custom-enabled-themes 
+                                    (mapconcat 'symbol-name custom-enabled-themes ", ")
+                                  "default"))))
 
 ;; ----------------------------------------------------------------------------
 ;; Transparency Functions
