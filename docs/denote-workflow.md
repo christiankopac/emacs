@@ -40,17 +40,19 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 ### Directory Structure
 
 ```
-~/Sync/2_denote/2_denote/          # Main denote directory
-  ├── fleeting-2_denote/      # Quick captures, temporary thoughts
-  │   └── 20250930T120000--quick-idea__fleeting.org
-  ├── permanent-2_denote/     # Processed, evergreen denote
-  │   └── 20250930T130000--concept-note__permanent.org
-  ├── literature-2_denote/    # Book and article summaries
-  │   └── 20250930T140000--book-summary__literature.org
-  ├── movies/              # Movie tracking and reviews
-  │   └── 20250930T150000--the-matrix__movie.org
-  └── [root level]         # General denote
-      └── 20250930T160000--meeting-denote__work_project.org
+~/notes/archive              # archives
+~/notes/export               # exports form md/org notes
+~/notes/org/attachments      # attachments for md/org files
+
+~/notes/org/gtd              # org-gtd
+
+~/notes/org/denote/
+~/notes/org/denote/fleeting 
+~/notes/org/denote/permanent
+~/notes/org/denote/projects
+~/notes/org/denote/resources
+~/notes/org/journal         
+
 ```
 
 ---
@@ -547,7 +549,7 @@ Org-capture style quick entry for today's journal log. Perfect for capturing tho
 - Only shows the entry you're typing (like org-capture)
 - Automatically creates journal if needed
 - Timestamps each entry
-- Saved to: `~/Sync/org/journal/`
+- Saved to: `~/notes/org/journal/`
 
 ---
 

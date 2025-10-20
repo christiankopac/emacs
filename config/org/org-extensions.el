@@ -205,19 +205,22 @@
 
 ;; Org GTD - Getting Things Done workflow
 (defun my/org-gtd-archive-location ()
-  "Archive to ~/Sync/org/archive/gtd instead of org-gtd-directory."
+  "Archive to ~/notes/archive/gtd instead of org-gtd-directory."
   (let* ((year (number-to-string (caddr (calendar-current-date))))
          (filename (format org-gtd-archive-file-format year))
-         (filepath (f-join "~/Sync/org/archive/gtd" filename)))
+         (filepath (f-join "~/notes/archive/gtd" filename)))
     (string-join `(,filepath "::" "datetree/"))))
 
-(setq org-gtd-directory "~/Sync/org/gtd"
+(setq org-gtd-directory "~/notes/org/gtd"
       org-gtd-default-file-name "inbox"
       org-gtd-areas-of-focus '("Finance" "Health" "Relationships" "Career"
                                "Creative" "Learning" "Growth" "Home")
       org-gtd-archive-location #'my/org-gtd-archive-location
       org-gtd-mode t
       )
+
+;; Define org-gtd-inbox for capture templates
+(setq org-gtd-inbox (expand-file-name (concat org-gtd-default-file-name ".org") org-gtd-directory))
 
 ;; ============================================================================
 ;; Org Capture Templates - Integrated with Org GTD
@@ -241,69 +244,54 @@
 ;; - Process everything with C-c g p (org-gtd-process-inbox)
 ;;
 (setq org-capture-templates
-      '(
-        ;; GTD Inbox - Quick capture to inbox
-        ("i" "[GTD] Inbox - Quick capture" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* %?\n%U\n%a\n"
+      `(
+        ;; GTD Inbox - Standard org-gtd capture template
+        ("g" "GTD Capture" entry
+         (file ,org-gtd-inbox)
+         "* %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; Quick Task - Capture task with basic info
-        ("t" "[GTD] Task - TODO with schedule" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* TODO %?\nSCHEDULED: %t\n%a\n"
+        ;; GTD Task - TODO item for inbox
+        ("t" "GTD Task" entry
+         (file ,org-gtd-inbox)
+         "* TODO %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; Project - Capture project with subtasks
-        ("p" "[GTD] Project - With subtasks" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* TODO %? [/]\n%U\n** TODO First step\n** TODO Second step\n"
+        ;; GTD Project - Project with subtasks
+        ("p" "GTD Project" entry
+         (file ,org-gtd-inbox)
+         "* TODO %? [/]\n%U\n%a\n%i\n** TODO First step\n** TODO Second step"
          :empty-lines 1)
 
-        ;; Journal Entry - Prompted journal capture
-        ("j" "[Journal] Entry - Weekly datetree" entry
-         (file+olp+datetree "~/Sync/org/journal/journal.org")
-         "* %?\n%U\n"
-         :empty-lines 1
-         :tree-type week)
-
-        ;; Quick Journal - Fast journal entry with timestamp
-        ("J" "[Journal] Quick - Fast entry" entry
-         (file+olp+datetree "~/Sync/org/journal/journal.org")
-         "* %U\n%?\n"
-         :empty-lines 1
-         :tree-type week
-         :jump-to-captured t)
-
-        ;; Meeting Notes - Capture meeting with attendees
-        ("m" "[GTD] Meeting - With action items" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* TODO Meeting: %?\n%U\n** Attendees\n- \n** Notes\n\n** Action Items\n- [ ] \n"
+        ;; GTD Someday/Maybe - Future ideas
+        ("s" "GTD Someday/Maybe" entry
+         (file ,org-gtd-inbox)
+         "* SOMEDAY %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; Idea/Someday - Capture for incubation
-        ("s" "[GTD] Someday/Maybe - Future ideas" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* SOMEDAY %?\n%U\n"
+        ;; GTD Reference - Reference material
+        ("r" "GTD Reference" entry
+         (file ,org-gtd-inbox)
+         "* %? :reference:\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; Reference - Quick reference capture
-        ("r" "[GTD] Reference - Material/notes" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* %? :reference:\n%U\n%a\n"
-         :empty-lines 1)
+        ;; Denote Entry - Create new denote entry
+        ("d" "Denote Open or Create" plain
+         (function denote)
+         ""
+         :immediate-finish nil)
 
-        ;; Link - Capture web link or reference
-        ("l" "[GTD] Link - Web bookmark" entry
-         (file "~/Sync/org/gtd/inbox.org")
-         "* %? :link:\n%U\n%a\n"
-         :empty-lines 1)
+        ;; Denote Journal New
+        ("j" "Journal New Entry" plain
+         (function denote-journal-new-entry)
+         ""
+         :immediate-finish t)
 
-        ;; Habit - Create recurring habit
-        ("h" "[GTD→Tasks] Habit - Recurring" entry
-         (file "~/Sync/org/gtd/tasks.org")
-         "* TODO %?\nSCHEDULED: %t .+1d/3d\n:PROPERTIES:\n:STYLE: habit\n:END:\n"
-         :empty-lines 1)
+        ;; Denote Journal Entry - Create new journal entry with denote-journal
+        ("J" "Journal New or Existing Entry" plain
+         (function denote-journal-new-or-existing-entry)
+         ""
+         :immediate-finish t)
         ))
 
 ;; Org GTD keybindings (use C-c g prefix to avoid conflicts with denote C-c d)
@@ -318,25 +306,6 @@
 
 (with-eval-after-load 'org-gtd
   (define-key org-gtd-clarify-map (kbd "C-c c") #'org-gtd-organize))  ; Organize during clarify
-
-;; ============================================================================
-;; Org-journal Configuration
-;; ============================================================================
-
-;; (setq org-journal-dir "~/Sync/org/journal/"
-;;       org-journal-file-type 'daily
-;;       org-journal-file-format "%Y-%m-%d.org"
-;;       org-journal-enable-agenda-integration t
-;;       org-journal-carryover-items "TODO=\"TODO\"|TODO=\"NEXT\""
-;;       org-journal-file-header "#+TITLE: %Y-%m-%d (%A)\n#+FILETAGS: :journal:\n#+STARTUP: showall\n\n" ;; Blank template with no tags
-;;       org-journal-time-prefix "* "
-;;       org-journal-time-format "%H:%M - "
-;;       )
-
-;; ;; Keybindings
-;; (with-eval-after-load 'org-journal
-;;   (global-set-key (kbd "C-c j j") 'org-journal-new-entry)
-;;   (global-set-key (kbd "C-c j s") 'org-journal-search))
 
 ;; ============================================================================
 ;; Org Appear Configuration - Show hidden markup when cursor is on element

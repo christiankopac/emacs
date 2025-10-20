@@ -15,13 +15,12 @@
 
 ;; Define manual silos
 (setq my-denote-silos
-      `(("denote" . ,(expand-file-name "~/Sync/org/denote/"))
-        ("journal" . ,(expand-file-name "~/Sync/org/journal/"))
-        ("gtd" . ,(expand-file-name "~/Sync/org/gtd/"))))
+      `(("denote" . ,(expand-file-name "~/notes/org/denote/"))
+        ("journal" . ,(expand-file-name "~/notes/org/journal/"))
+        ("gtd" . ,(expand-file-name "~/notes/org/gtd/"))))
 
 ;; Set denote-dired-directories to the list of directories from my-denote-silos
 (setq denote-dired-directories (mapcar #'cdr my-denote-silos))
-
 ;; Ensure all silo directories exist
 (dolist (silo my-denote-silos)
   (let ((dir (cdr silo)))
@@ -91,12 +90,15 @@
 ;; Denote Journal Configuration
 ;; ============================================================================
 ;; Configure denote-journal (if available)
-(when (require 'denote-journal nil t)
-  (setq denote-journal-directory (expand-file-name "~/Sync/org/journal/"))
+(when (and (require 'denote nil t)
+           (require 'denote-journal nil t))
+  (setq denote-journal-extras-file-type 'org)
+  (setq denote-journal-directory (expand-file-name "~/notes/org/journal/"))
   (setq denote-journal-title-format 'day-date-month-year)
-  (setq denote-journal-keywords '("journal"))
+  (setq denote-journal-keyword "journal")
   (global-set-key (kbd "C-c n j") 'denote-journal-new-entry)
   (global-set-key (kbd "C-c n J") 'denote-journal-open-today))
+
 ;; ============================================================================
 ;; Denote hooks
 ;; ============================================================================
@@ -155,13 +157,6 @@
 (setq denote-menu-keywords-column-width 30)
 (setq denote-menu-sort-files 'denote-menu-sort-by-modification-date)
 (global-set-key (kbd "C-c d m") 'denote-menu)
-;; ============================================================================
-;; Denote Markdown Support
-;; ============================================================================
-;; Markdown support is already configured in init.el
-;; Enable markdown file type if denote-file-types is available
-(when (boundp 'denote-file-types)
-  (add-to-list 'denote-file-types 'markdown))
 
 ;; ============================================================================
 ;; Denote Org Support
@@ -180,15 +175,12 @@
 ;; ============================================================================
 ;; Configure silo directories using the existing my-denote-silos variable
 (setq denote-silo-directories (mapcar #'cdr my-denote-silos))
-
 ;; Set default silo name (not the path)
 (setq denote-silo-default "denote")
 (setq denote-silo-current "denote")
-
 ;; IMPORTANT: Set the main denote-directory to the default silo
 ;; This is required for consult-denote and other denote functions to work
 (setq denote-directory (cdr (assoc denote-silo-default my-denote-silos)))
-
 ;; Verify denote-directory is set correctly
 (unless (and denote-directory (file-directory-p denote-directory))
   (error "Denote directory not found or not accessible: %s" denote-directory))
@@ -228,12 +220,12 @@
     (setq denote-directory original-directory)
     (setq denote-silo-current original-silo)))
 
+
 ;; Keybindings
 (global-set-key (kbd "C-c d s") 'my/denote-switch-silo)
 (global-set-key (kbd "C-c d L") 'my/denote-list-silos)
 (global-set-key (kbd "C-c d c") 'my/denote-create-in-silo)
 
-;; Additional silo keybindings using denote-silo functions
 (global-set-key (kbd "C-c d S") 'denote-silo-create-note)
 (global-set-key (kbd "C-c d O") 'denote-silo-open-or-create)
 (global-set-key (kbd "C-c d F") 'denote-silo-dired)
@@ -495,17 +487,17 @@ Handles complete metadata, partial metadata, and no metadata cases."
   (concat
    "#+title: %^{Title}\n"
    "#+date: " (format-time-string "[%Y-%m-%d %a %H:%M]") "\n"
-   "#+filetags: :daily:\n\n"
+   "#+filetags: :journal:\n\n"
    "* Morning\n"
-   "- \n\n"
+   "%?\n\n"
    "* Afternoon\n"
-   "- \n\n"
+   "%?\n\n"
    "* Evening\n"
-   "- \n\n"
-   "* denote\n"
-   "- \n\n"
+   "%?\n\n"
+   "* Notes\n"
+   "%?\n\n"
    "* Tomorrow\n"
-   "- \n"))
+   "%?\n"))
 
 ;; Project note template
 (defun my/denote-project-note-template ()

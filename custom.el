@@ -8,11 +8,11 @@
    '("2d035eb93f92384d11f18ed00930e5cc9964281915689fa035719cab71766a15" default))
  '(denote-dired-directories-include-subdirectories t)
  '(org-agenda-files
-   '("/home/christian/Sync/org/org/gtd/inbox.org"
-     "/home/christian/Sync/org/org/gtd/tasks.org"
-     "/home/christian/Sync/org/org/gtd/areas.org"
-     "/home/christian/Sync/org/org/gtd/horizons.org"
-     "/home/christian/Sync/org/org/gtd/vision.org"))
+   '("/home/christian/notes/org/gtd/inbox.org"
+     "/home/christian/notes/org/gtd/tasks.org"
+     "/home/christian/notes/org/gtd/areas.org"
+     "/home/christian/notes/org/gtd/horizons.org"
+     "/home/christian/notes/org/gtd/vision.org"))
  '(package-selected-packages '(copilot everforest-theme))
  '(package-vc-selected-packages
    '((copilot :url "https://github.com/copilot-emacs/copilot.el" :branch "main")

@@ -24,7 +24,6 @@
 
   ;; Set custom heading sizes (subtle scale - variable-pitch is already large)
   ;; Headings inherit from variable-pitch, so they're already bigger than monospace
-  ;; -
   (dolist (level (number-sequence 1 6))
     (let ((height (nth (- level 1) '(1.35 1.25 1.15 1.08 1.04 1.00)))
           (face (intern (format "org-level-%d" level))))
@@ -186,7 +185,7 @@
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
 
-(setq org-directory "~/Sync/org/"
+(setq org-directory "~/notes/org/"
       org-startup-indented t                     ; Indent according to heading level
       org-startup-folded 'content                ; Show only top-level headings on open
       org-hide-emphasis-markers t                ; Hide markup characters (*bold*, /italic/, etc.)
@@ -201,7 +200,7 @@
       org-src-preserve-indentation nil           ; Don't preserve leading whitespace
       org-log-done 'time                         ; Log completion time for tasks
       org-deadline-warning-days 14               ; Warn 14 days before deadline
-      org-agenda-files '("~/Sync/org/journal" "~/Sync/org/gtd/")  ; Directories for agenda
+      org-agenda-files '("~/notes/org/journal" "~/notes/org/gtd")  ; Directories for agenda
       ;; org-modern settings
       org-auto-align-tags nil
       org-tags-column 0
@@ -231,27 +230,27 @@
   ;;                                                     ; interactive commands
   ;;      org-babel-shell-command "bash"                 ; Use bash for shell commands
   ;;      org-babel-shell-prompt "\\$ "                  ; Shell prompt pattern
-  ;;      org-babel-shell-results-default-format "output") ; Show output by default
+  ;;      org-babel-shell-results-default-format "output")) ; Show output by default
 
   ;; Archive settings
   (setq org-archive-save-context-info '(time category itags)  ; Save when, where, and tags
-        org-archive-location "~/Sync/org/archive/org/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
+        org-archive-location "~/notes/archive/org/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
 
   ;; Refile targets - where to move/copy headings
                                         ; (setq org-refile-targets
                                         ;       '((nil :maxlevel . 3)        ; Current file up to 3 levels
                                         ;         (agenda :maxlevel . 3)     ; Agenda files up to 2 levels
-                                        ;         (denote :maxlevel . 2)      ; denote files up to 2 levels
+                                        ;         (notes :maxlevel . 2)      ; Notes files up to 2 levels
                                         ;         (gtd :maxlevel . 2)        ; GTD files up to 2 levels
                                         ;         (archive :maxlevel . 2)))  ; Archive files up to 2 levels
 
   ;; destination for refile any agenda file 3 levels deep
   (setq org-refile-targets '(
-                             ("~/Sync/org/gtd/inbox.org" :maxlevel . 2)
-                             ("~/Sync/org/gtd/tasks.org" :maxlevel . 2)
-                             ("~/Sync/org/gtd/areas.org" :maxlevel . 2)
-                             ("~/Sync/org/gtd/vision.org" :maxlevel . 2)
-                             ("~/Sync/org/gtd/horizons.org" :maxlevel . 2)
+                             ("~/notes/org/gtd/inbox.org" :maxlevel . 1)
+                             ("~/notes/org/gtd/tasks.org" :maxlevel . 1)
+                             ("~/notes/org/gtd/areas.org" :maxlevel . 1)
+                             ("~/notes/org/gtd/vision.org" :maxlevel . 1)
+                             ("~/notes/org/gtd/horizons.org" :maxlevel . 1)
                              ))
 
   ;; generate refile tarets and show them at once
@@ -261,5 +260,16 @@
 
   ;; Modules - additional org features
   (setq org-modules '(org-habit))    ; Enable habit tracking
+
+  ;; ----------------------------------------------------------------------------
+  ;; Org Capture Templates - DISABLED
+  ;; ----------------------------------------------------------------------------
+
+  ;; Org capture templates are disabled - not using log.org
+  ;; (setq org-capture-templates
+  ;;       `(("l" "Log entry" entry
+  ;;          (file+datetree ,(expand-file-name "log.org" org-directory))
+  ;;          "* %?\n%U"
+  ;;          :empty-lines 1)))
 
   (provide 'org-core)

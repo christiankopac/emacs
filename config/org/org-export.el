@@ -51,29 +51,31 @@
 ;; Ensure export directory exists
 ;; ============================================================================
 
-;; (unless (file-directory-p org-export-directory)
-  ;; (make-directory org-export-directory t))
+(setq org-export-directory "~/notes/export/")
+
+(unless (file-directory-p org-export-directory)
+  (make-directory org-export-directory t))
 
 ;; ============================================================================
 ;; Custom export function to save in export directory
 ;; ============================================================================
 
-;; (defun my/org-export-to-directory (backend)
-;;   "Export current org file to specified BACKEND in export directory."
-;;   (let ((org-export-output-directory org-export-directory))
-;;     (org-export-to-file backend (concat org-export-directory
-;;                                         (file-name-sans-extension
-;;                                          (file-name-nondirectory buffer-file-name))
-;;                                         (pcase backend
-;;                                           ('html ".html")
-;;                                           ('md ".md")
-;;                                           (_ ".export"))))))
+(defun my/org-export-to-directory (backend)
+  "Export current org file to specified BACKEND in export directory."
+  (let ((org-export-output-directory org-export-directory))
+    (org-export-to-file backend (concat org-export-directory
+                                        (file-name-sans-extension
+                                         (file-name-nondirectory buffer-file-name))
+                                        (pcase backend
+                                          ('html ".html")
+                                          ('md ".md")
+                                          (_ ".export"))))))
 
 ;; ============================================================================
 ;; Additional export settings
 ;; ============================================================================
 
-;; (setq org-export-date-timestamp-format "%e %B %Y")  ; Date format: "1 January 2024"
+(setq org-export-date-timestamp-format "%e %B %Y")  ; Date format: "1 January 2024"
 
 ;; ============================================================================
 ;; Export keybindings

@@ -115,6 +115,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (add-to-list 'load-path (expand-file-name "config/email" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "config/dev" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "config/writing" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "config/media" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "config/functions" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
@@ -441,6 +442,19 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (load-file (expand-file-name "config/writing/writing.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
+;; Media & Music
+;; ----------------------------------------------------------------------------
+
+(use-package emms :ensure t :defer t)
+(use-package listen :ensure t :defer t)
+
+;; Load media configuration
+(with-eval-after-load 'emms
+  (load-file (expand-file-name "config/media/music.el" user-emacs-directory)))
+(with-eval-after-load 'listen
+  (load-file (expand-file-name "config/media/music.el" user-emacs-directory)))
+
+;; ----------------------------------------------------------------------------
 ;; E-Mail & Contacts
 ;; ----------------------------------------------------------------------------
 
@@ -546,6 +560,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (add-hook 'elpaca-after-init-hook
           (lambda ()
             ;; Only load custom theme in GUI, use default theme in terminal
+            (load-theme 'doric-water t)
             (when (display-graphic-p)
               (load-theme 'everforest-hard-dark t))))
 

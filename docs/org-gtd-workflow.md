@@ -268,13 +268,13 @@ Use the journal system: `C-c j m`
 ### Agenda Files
 
 Your agenda searches these directories:
-- `~/Sync/2_denote/agenda/`
-- `~/Sync/org/gtd/`
+- `~/notes/org/journal/`
+- `~/notes/org/gtd/`
 
 ### Archive
 
 Completed tasks are archived to:
-- `~/Sync/2_denote/archive/[filename]_archive`
+- `~/notes/archive/org/[filename]_archive`
 
 **Archive Command:** `C-c C-x C-a`
 
@@ -304,7 +304,7 @@ Your journal system includes both denote-based daily journals and org-capture-ba
 - `C-c c J` - Quick journal (no prompt)
 
 **Features:**
-- All entries in single file: `~/Sync/org/journal.org`
+- All entries in single file: `~/notes/org/journal.org`
 - Week-based datetree structure
 - Automatic timestamps
 - Easy to search and review
@@ -361,7 +361,7 @@ Creates/opens separate daily journal files with:
 - Automatic agenda integration
 - Linking between daily denote
 
-**File Location:** `~/Sync/org/journal/YYYY-MM-DD.org`
+**File Location:** `~/notes/org/journal/YYYY-MM-DD.org`
 
 ---
 
@@ -385,7 +385,7 @@ Creates weekly journal with GTD planning sections:
    - Insights & Adjustments
    - Process Inbox (checklist)
 
-**File Location:** `~/Sync/org/journal/weekly/YYYY-WNN.org`
+**File Location:** `~/notes/org/journal/weekly/YYYY-WNN.org`
 
 ---
 
@@ -412,7 +412,7 @@ Creates monthly journal with strategic planning:
    - GTD System Health Check
    - Carry Forward to Next Month
 
-**File Location:** `~/Sync/org/journal/monthly/YYYY-MM.org`
+**File Location:** `~/notes/org/journal/monthly/YYYY-MM.org`
 
 ---
 
@@ -442,7 +442,7 @@ Creates yearly journal for vision and annual planning:
    - Lessons Learned
    - Gratitude
 
-**File Location:** `~/Sync/org/journal/yearly/YYYY.org`
+**File Location:** `~/notes/org/journal/yearly/YYYY.org`
 
 ---
 
@@ -514,7 +514,7 @@ Shows:
 Include content from other org files:
 
 ```org
-#+transclude: [[file:~/Sync/org/gtd/areas.org::*Goals]]
+#+transclude: [[file:~/notes/org/gtd/areas.org::*Goals]]
 ```
 
 ---
