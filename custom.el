@@ -26,14 +26,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "JuliaMono Nerd Font Mono"))))
+ '(default ((t (:family "MonoLisa Nerd Font Mono"))))
  '(denote-faces-link ((t (:foreground "#8be9fd" :underline t))))
- '(fixed-pitch ((t (:family "JuliaMono Nerd Font Mono"))))
+ '(fixed-pitch ((t (:family "MonoLisa Nerd Font Mono"))))
  '(jinx-misspelled ((t (:underline t :foreground nil))))
  '(org-document-info-keyword ((t (:underline nil))))
  '(org-modern-date-inactive ((t (:inherit org-modern-label :background "gray20" :foreground "gray70" :family "MonoLisa Nerd Font"))))
  '(outline-1 ((t (:weight bold :height 1.1))))
- '(variable-pitch ((t (:family "ETBookOT"))))
+ '(variable-pitch ((t (:family "Literata"))))
  '(xref-line-number ((t (:inherit line-number))))
  '(xref-match ((t (:inherit isearch)))))
 

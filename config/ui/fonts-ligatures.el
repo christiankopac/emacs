@@ -6,10 +6,11 @@
 
 ;; Define font variables if not already defined
 (unless (boundp 'my/font-serif)
-  (defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text."))
+  (defvar my/font-serif "Literata" "Default serif font for variable pitch text."))
+  ;;(defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text."))
 
 (unless (boundp 'my/font-monospace)
-  (defvar my/font-monospace "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text."))
+  (defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text."))
 
 ;; ============================================================================
 ;; Fontaine Configuration - Font configuration

@@ -133,8 +133,9 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (use-package modus-themes :defer t :ensure t)
 (use-package poet-theme :ensure t :defer t)
 (use-package doric-themes :ensure t :defer t)
-;; (use-package ef-themes :ensure t :defer t)
-(use-package standard-themes :ensure t :defer t)
+(use-package ef-themes :ensure t :defer t)
+(use-package leuven-theme :ensure t :defer t)
+;; (use-package standard-themes :ensure t :defer t)
 (use-package everforest
   :ensure (:host github 
                  :repo "Theory-of-Everything/everforest-emacs"
@@ -266,6 +267,10 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; Load dirvish config after package is ready
 (with-eval-after-load 'dirvish
   (load-file (expand-file-name "config/ui/file-associations.el" user-emacs-directory)))
+
+(use-package clipetty
+  :ensure t
+  :hook (after-init . global-clipetty-mode))
 
 ;; Context-menu (GUI only)
 (when (display-graphic-p)
@@ -512,6 +517,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (global-set-key (kbd "C-c t SPC") 'my/toggle-default-theme)
 (global-set-key (kbd "C-c t r") 'my/reset-all-themes)
 (global-set-key (kbd "C-c t f") 'my/fix-poet-theme-issues)
+(global-set-key (kbd "C-c t b") 'my/load-theme-for-current-buffer)
 
 ;; Transparency keybindings (GUI only)
 (when (display-graphic-p)
@@ -555,7 +561,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
               (set-frame-parameter frame 'horizontal-scroll-bars nil))))
 
 ;; ============================================================================
-;; Load Theme - Conditional based on display type
+;; Load Theme - File-type-specific theme system
 ;; ============================================================================
 (add-hook 'elpaca-after-init-hook
           (lambda ()

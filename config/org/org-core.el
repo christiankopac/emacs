@@ -1,3 +1,15 @@
+;; ----------------------------------------------------------------------------
+;; Fixed-pitch font for Org blocks (code, quote, comment, etc.)
+;; ----------------------------------------------------------------------------
+(with-eval-after-load 'org
+  (defface org-block-fixed-pitch
+    '((t (:inherit fixed-pitch)))
+    "Face for Org blocks using fixed-pitch font.")
+
+  (dolist (face '(org-block org-block-begin-line org-block-end-line org-quote org-comment))
+    (when (facep face)
+      (set-face-attribute face nil :inherit 'org-block-fixed-pitch)))
+)
 ;;; org-core.el --- Core Org mode configuration
 
 ;; Custom setup function for org-mode buffers
@@ -13,6 +25,25 @@
 
   ;; Configure mixed-pitch to preserve font sizes
   (setq-local mixed-pitch-set-height t)  ; Let mixed-pitch use face heights
+
+  ;; Configure which faces should remain fixed-pitch
+  (setq-local mixed-pitch-fixed-pitch-faces
+              '(org-block
+                org-block-begin-line
+                org-block-end-line
+                org-code
+                org-comment
+                org-quote
+                org-table
+                org-verbatim
+                org-drawer
+                org-property-value
+                org-meta-line
+                org-document-info-keyword
+                org-special-keyword
+                org-sexp-date
+                line-number
+                line-number-current-line))
 
   ;; Enable mixed-pitch-mode (variable-pitch for prose, fixed-pitch for code/tables)
   (mixed-pitch-mode 1)
@@ -80,7 +111,11 @@
   ;; Ensure fixed-pitch font for code and technical elements
   ;; These should always use monospace, regardless of theme
   (dolist (face '(org-block
+                  org-block-begin-line
+                  org-block-end-line
                   org-code
+                  org-comment
+                  org-quote
                   org-document-info
                   org-document-info-keyword
                   org-meta-line
@@ -90,6 +125,7 @@
                   org-verbatim))
     (when (facep face)
       (set-face-attribute face nil
+                          :family my/font-monospace
                           :inherit 'fixed-pitch
                           :foreground 'unspecified  ; Let theme handle colors
                           :background 'unspecified)))
@@ -126,7 +162,7 @@
   "Apply org-drawer face with fixed-pitch font."
   (when (facep 'org-drawer)
     (set-face-attribute 'org-drawer nil
-                        :family "MonoLisa Nerd Font"
+                        :family my/font-monospace
                         :height 90
                         :inherit nil
                         :foreground (face-attribute 'font-lock-comment-face :foreground))))

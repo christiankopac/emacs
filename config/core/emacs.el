@@ -74,7 +74,6 @@
 ;; Replace selected text when typing
 (delete-selection-mode t)
 
-
 ;; ----------------------------------------------------------------------------
 ;; Reload and Restart Emacs
 ;; ----------------------------------------------------------------------------
@@ -105,16 +104,9 @@
 
 ;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 
-(defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text.")
-;; (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
+;; (defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text.")
+(defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
 
-;; (defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
-(defvar my/font-monospace "JuliaMono Nerd Font Mono" "Default monospace font for fixed pitch text.")
-
-
-(when (display-graphic-p)
-  (set-face-attribute 'default nil :family my/font-monospace)
-  (set-face-attribute 'variable-pitch nil :family my/font-serif)
-  (set-face-attribute 'fixed-pitch nil :family my/font-monospace))
-
+(defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
+;;(defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
 (provide 'emacs-config)

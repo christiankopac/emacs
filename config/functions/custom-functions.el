@@ -4,6 +4,49 @@
 ;; Theme Functions
 ;; ----------------------------------------------------------------------------
 
+;; File-type-specific theme configuration
+(defvar my/file-type-themes
+  '((org-mode . doric-water)
+    (markdown-mode . poet)
+    (default . misterioso))
+  "Alist mapping major modes to their preferred themes.")
+
+(defun my/load-theme-for-mode (mode)
+  "Load the appropriate theme for MODE.
+If MODE is not found in my/file-type-themes, use the default theme."
+  (let ((theme (or (cdr (assq mode my/file-type-themes))
+                   (cdr (assq 'default my/file-type-themes)))))
+    (when theme
+      ;; Disable all current themes
+      (mapc #'disable-theme custom-enabled-themes)
+      ;; Load the new theme
+      (load-theme theme t)
+      (message "Loaded theme %s for %s" theme mode))))
+
+(defun my/load-theme-for-current-buffer ()
+  "Load the appropriate theme for the current buffer's major mode."
+  (my/load-theme-for-mode major-mode))
+
+(defun my/setup-file-type-themes ()
+  "Set up hooks to automatically load themes based on file type."
+  ;; Hook for org-mode
+  (add-hook 'org-mode-hook
+            (lambda () (my/load-theme-for-mode 'org-mode)))
+  
+  ;; Hook for markdown-mode
+  (add-hook 'markdown-mode-hook
+            (lambda () (my/load-theme-for-mode 'markdown-mode)))
+  
+  ;; Hook for other modes (fallback to default)
+  (add-hook 'after-change-major-mode-hook
+            (lambda ()
+              (unless (memq major-mode '(org-mode markdown-mode))
+                (my/load-theme-for-mode 'default)))))
+
+;; ----------------------------------------------------------------------------
+;; Original Theme Functions
+;; ----------------------------------------------------------------------------
+
 (defvar my/theme-list '(modus-vivendi-tinted
                         misterioso
                         tango-dark
@@ -34,11 +77,11 @@
   (message "Using default Emacs theme"))
 
 (defun my/load-gui-theme ()
-  "Load the preferred GUI theme (everforest-hard-dark)."
+  "Load the preferred GUI theme (leuven)."
   (interactive)
   (mapc #'disable-theme custom-enabled-themes)
-  (load-theme 'everforest-hard-dark t)
-  (message "Loaded everforest-hard-dark theme"))
+  (load-theme ' t)
+  (message "Loaded leuven theme"))
 
 (defun my/toggle-default-theme ()
   "Toggle between default theme and custom theme."
