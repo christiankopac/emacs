@@ -9,7 +9,7 @@
   (dolist (face '(org-block org-block-begin-line org-block-end-line org-quote org-comment))
     (when (facep face)
       (set-face-attribute face nil :inherit 'org-block-fixed-pitch)))
-)
+  )
 ;;; org-core.el --- Core Org mode configuration
 
 ;; Custom setup function for org-mode buffers
@@ -62,7 +62,7 @@
         (set-face-attribute face nil
                             :weight 'regular
                             :height height
-                            :family 'unspecified  ; Inherit from variable-pitch
+                            :family my/font-serif  ; Inherit from variable-pitch
                             :foreground 'unspecified))))  ; Don't override theme colors
 
   (set-face-attribute 'org-sexp-date nil
@@ -74,39 +74,11 @@
                         :weight 'bold
                         :height 1.1     ; Prominent but not overwhelming
                         :underline nil
-                        :family 'unspecified
+                        :family my/font-monospace
                         :foreground 'unspecified))
 
   ;; Fix org-drawer face to use fixed-pitch font
   (my/apply-org-drawer-face)
-
-  ;; Define tag hierarchy and shortcuts
-  (setq org-tag-alist
-        '(;; Life areas (grouped)
-          (:startgrouptag)
-          ("area"          . ?a)
-          (:grouptags)
-          ("finance"       . ?f)  ;; sleep, meditation, journaling
-          ("health"        . ?h)  ;; budgeting, investing, debt
-          ("relationships" . ?r)  ;; friends, family, partner
-          ("career"        . ?c)  ;; job, promotion, side hustle
-          ("learning"      . ?l)  ;; reading, courses, podcasts
-          ("creative"      . ?C)  ;; art, writing, music
-          ("growth"        . ?g)  ;; journaling, self-reflection, personal development
-          ("home"          . ?o)  ;; cleaning, organizing, cooking
-          (:endgrouptag)
-          ;; Contexts
-          ("@home"         . ?h)  ;; personal, home, family
-          ("@errands"      . ?e)  ;; errands, shopping, running
-          ("@waiting"      . ?W)  ;; waiting, delegated, blocked
-          ;; Energy levels
-          ("@quick"         . ?q)  ;; FAST TASKS: low-energy, short tasks (<15 min)
-          ("@focus"         . ?z)  ;; DEEP WORK: high-energy, deep work (>30 min)
-          ("@low"           . ?L)  ;; WHEN TIRED: low-energy, long tasks (>60 min)
-          ))
-
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "NEXT(n)" "ACTIVE(a)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))  ; Habit states
 
   ;; Ensure fixed-pitch font for code and technical elements
   ;; These should always use monospace, regardless of theme
@@ -236,8 +208,19 @@
       org-src-preserve-indentation nil           ; Don't preserve leading whitespace
       org-log-done 'time                         ; Log completion time for tasks
       org-deadline-warning-days 14               ; Warn 14 days before deadline
-      org-agenda-files '("~/notes/org/journal" "~/notes/org/gtd")  ; Directories for agenda
-      ;; org-modern settings
+
+      org-agenda-files '("~/notes/org/journal" "~/notes/org/gtd/")  ; Directories for agenda
+      
+      ;; Attachment settings
+      org-attach-id-dir "~/notes/org/attachments"        ; Directory for ID-based attachments
+      org-attach-dir-relative t                          ; Use relative paths for portability
+      org-attach-use-inheritance t                       ; Inherit attachments from parent headings
+      org-attach-method 'mv                              ; Move files (avoid duplication)
+      org-attach-preferred-new-method 'dir               ; Use DIR property (simpler than ID)
+      org-attach-auto-tag "attach"                       ; Auto-tag headings with attachments
+      org-attach-store-link-p 'attached                  ; Store link to attachment location
+      org-attach-archive-delete 'query                   ; Ask before deleting attachments on archive
+      
       org-auto-align-tags nil
       org-tags-column 0
       org-catch-invisible-edits 'show-and-error
@@ -245,7 +228,38 @@
       org-insert-heading-respect-content t
       org-agenda-tags-column 0
       org-hide-leading-stars t
-      )
+      org-todo-keywords '((sequence "NEXT(n)" "TODO(t)" "WAIT(w@)" "SOMEDAY(s)" "|" "DONE(d)" "CNCL(c@)"))
+      org-tag-alist '(
+                      ;; ===== CONTEXTS =====
+                      (:startgrouptag)
+                      ("context" . ?x)
+                      (:grouptags)
+                      ;; DEVICES
+                      ("@computer"     . ?c)    ;; Any computer
+                      ("@desktop"      . ?d)    ;; Geekom A8 specifically
+                      ("@laptop"       . ?l)    ;; Lenovo X1 specifically  
+                      ("@nas"          . ?n)    ;; NAS specifically
+                      ("@phone"        . ?p)    ;; Calls, messages
+                      ;; WHERE
+                      ("@errands"      . ?e)    ;; Outside tasks
+                      ("@home"         . ?h)    ;; Home (non-computer)
+                      ("@music"        . ?m)    ;; With instrument/studio
+                      ("@reading"      . ?r)    ;; Reading (ereader/books)
+                      ("@anywhere"     . ?a)    ;; Can do anywhere
+                      (:endgrouptag)
+                      ;; ===== ENERGY & TIME =====
+                      (:startgrouptag)
+                      ("energy" . ?E)
+                      (:grouptags)
+                      ("@quick"        . ?q)    ;; <15 min, low energy
+                      ("@focus"        . ?f)    ;; >30 min, high energy  
+                      ("@low"          . ?w)    ;; >60 min, low energy (using ?w for "when tired")
+                      (:endgrouptag)
+                      
+                      ;; ===== SPECIAL =====
+                      ("@idea"         . ?i)    ;; Future ideas
+                )
+)
 
 ;; Babel - Execute code in source blocks (wrapped to load after Org)
 ;; (with-eval-after-load 'org
@@ -261,51 +275,46 @@
 ;;         org-babel-shell-results-default-format "output" ; Show output by default
 ;;         org-confirm-babel-evaluate nil))                ; Don't confirm before execution
 
-  ;; Terminal/EAT settings
-  ;;(setq org-babel-terminal-command "eat"               ; Use eat terminal forV
-  ;;                                                     ; interactive commands
-  ;;      org-babel-shell-command "bash"                 ; Use bash for shell commands
-  ;;      org-babel-shell-prompt "\\$ "                  ; Shell prompt pattern
-  ;;      org-babel-shell-results-default-format "output")) ; Show output by default
+;; Terminal/EAT settings
+;;(setq org-babel-terminal-command "eat"               ; Use eat terminal forV
+;;                                                     ; interactive commands
+;;      org-babel-shell-command "bash"                 ; Use bash for shell commands
+;;      org-babel-shell-prompt "\\$ "                  ; Shell prompt pattern
+;;      org-babel-shell-results-default-format "output")) ; Show output by default
 
-  ;; Archive settings
-  (setq org-archive-save-context-info '(time category itags)  ; Save when, where, and tags
-        org-archive-location "~/notes/archive/org/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
+;; Archive settings
+(setq org-archive-save-context-info '(time category itags)  ; Save when, where, and tags
+      org-archive-location "~/notes/org/~archive/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
 
-  ;; Refile targets - where to move/copy headings
-                                        ; (setq org-refile-targets
-                                        ;       '((nil :maxlevel . 3)        ; Current file up to 3 levels
-                                        ;         (agenda :maxlevel . 3)     ; Agenda files up to 2 levels
-                                        ;         (notes :maxlevel . 2)      ; Notes files up to 2 levels
-                                        ;         (gtd :maxlevel . 2)        ; GTD files up to 2 levels
-                                        ;         (archive :maxlevel . 2)))  ; Archive files up to 2 levels
+;; Refile targets - where to move/copy headings
+;; (setq org-refile-targets
+;;       '((nil :maxlevel . 3)        ; Current file up to 3 levels
+;;         (agenda :maxlevel . 3)     ; Agenda files up to 2 levels
+;;         (notes :maxlevel . 2)      ; Notes files up to 2 levels
+;;         (gtd :maxlevel . 2)        ; GTD files up to 2 levels
+;;         (archive :maxlevel . 2)))  ; Archive files up to 2 levels
 
-  ;; destination for refile any agenda file 3 levels deep
-  (setq org-refile-targets '(
-                             ("~/notes/org/gtd/inbox.org" :maxlevel . 1)
-                             ("~/notes/org/gtd/tasks.org" :maxlevel . 1)
-                             ("~/notes/org/gtd/areas.org" :maxlevel . 1)
-                             ("~/notes/org/gtd/vision.org" :maxlevel . 1)
-                             ("~/notes/org/gtd/horizons.org" :maxlevel . 1)
-                             ))
+;; Refile to any agenda file at most 2 levels deep
+(setq org-refile-targets '((nil :maxlevel . 2)              ; Current file
+                           (org-agenda-files :maxlevel . 2))) ; All agenda files
 
-  ;; generate refile tarets and show them at once
-  (setq org-outline-path-complete-in-steps nil)
-  ;; ask to confirm creating parent nodes
-  (setq org-refile-allow-creating-parent-nodes 'confirm)
+;; generate refile tarets and show them at once
+(setq org-outline-path-complete-in-steps nil)
+;; ask to confirm creating parent nodes
+(setq org-refile-allow-creating-parent-nodes 'confirm)
 
-  ;; Modules - additional org features
-  (setq org-modules '(org-habit))    ; Enable habit tracking
+;; Modules - additional org features
+(setq org-modules '(org-habit))    ; Enable habit tracking
 
-  ;; ----------------------------------------------------------------------------
-  ;; Org Capture Templates - DISABLED
-  ;; ----------------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+;; Org Capture Templates - DISABLED
+;; ----------------------------------------------------------------------------
 
-  ;; Org capture templates are disabled - not using log.org
-  ;; (setq org-capture-templates
-  ;;       `(("l" "Log entry" entry
-  ;;          (file+datetree ,(expand-file-name "log.org" org-directory))
-  ;;          "* %?\n%U"
-  ;;          :empty-lines 1)))
+;; Org capture templates are disabled - not using log.org
+;; (setq org-capture-templates
+;;       `(("l" "Log entry" entry
+;;          (file+datetree ,(expand-file-name "log.org" org-directory))
+;;          "* %?\n%U"
+;;          :empty-lines 1)))
 
-  (provide 'org-core)
+(provide 'org-core)

@@ -1,6 +1,6 @@
 ;;; org-extensions.el --- Org mode extensions configuration
 
-; ----------------------------------------------------------------------------
+                                        ; ----------------------------------------------------------------------------
 ;; Org Agenda Configuration
 ;; ----------------------------------------------------------------------------
 
@@ -97,7 +97,7 @@
           (tags "area+LEVEL=2"
                 ((org-agenda-overriding-header "Life Areas")))))
 
-       ;; GTD horizons of focus
+        ;; GTD horizons of focus
         ("h" "Horizons Review"                     
          ((tags "LEVEL=1+vision"
                 ((org-agenda-overriding-header "󰍉 Vision (3-5 Years)")))
@@ -121,7 +121,7 @@
   (org-super-agenda-mode)                            ; Enable super agenda mode
   (setq org-super-agenda-groups
         '(;; Today's items first
-            (:name "󰅐 Today"                         
+          (:name "󰅐 Today"                         
                  :time-grid t
                  :scheduled today
                  :order 1)
@@ -205,22 +205,55 @@
 
 ;; Org GTD - Getting Things Done workflow
 (defun my/org-gtd-archive-location ()
-  "Archive to ~/notes/archive/gtd instead of org-gtd-directory."
+  "Archive to ~/notes/org/~archive instead of org-gtd-directory."
   (let* ((year (number-to-string (caddr (calendar-current-date))))
          (filename (format org-gtd-archive-file-format year))
-         (filepath (f-join "~/notes/archive/gtd" filename)))
+         (filepath (f-join "~/notes/org/~archive" filename)))
     (string-join `(,filepath "::" "datetree/"))))
 
 (setq org-gtd-directory "~/notes/org/gtd"
       org-gtd-default-file-name "inbox"
-      org-gtd-areas-of-focus '("Finance" "Health" "Relationships" "Career"
-                               "Creative" "Learning" "Growth" "Home")
+      org-gtd-areas-of-focus '("Health"         ;; Physical and Mental Well-being
+                               "Finance"        ;; Financial Management
+                               "Social"         ;; Friends and Relationships
+                               "Career"         ;; Professional Development
+                               "Music"          ;; Musical Pursuits
+                               "Creative"       ;; Artistic and Creative Activities
+                               "Learning"       ;; Education and Skill Development
+                               "Growth"         ;; Personal Growth and Self-Improvement
+                               "Work"           ;; Professional and Job-Related
+                               "Admin"          ;; Administrative Tasks
+                               "Home"           ;; Household Management
+                               "Recreation"     ;; Leisure and Hobbies
+                               "Travel"         ;; Travel and Exploration
+                               ) 
       org-gtd-archive-location #'my/org-gtd-archive-location
       org-gtd-mode t
-      )
+      org-gtd-inbox (expand-file-name (concat org-gtd-default-file-name ".org") org-gtd-directory))
 
-;; Define org-gtd-inbox for capture templates
-(setq org-gtd-inbox (expand-file-name (concat org-gtd-default-file-name ".org") org-gtd-directory))
+(defun org-gtd-set-area-of-focus ()
+  "Use as a hook when decorating items after clarifying them.
+
+This function requires that the user input find a match among the options.
+If a new re of focus pops-up that is not in the list, it will not be set."
+  (unless (org-gtd-organize-type-member-p '(project-task trash knowledge quick-action))
+    (org-gtd-area-of-focus-set-on-item-at-point)))
+
+;; (setq org-gtd-organize-hooks '(org-gtd-set-area-of-focus))
+
+;; (org-gtd-organize-type-member-p LIST)
+;; Valid HOOK members for org-gtd-organize-hooks:
+;; 'quick-action (done in less than 2 minutes)
+;; 'single-action (do when possible)
+;; 'calendar (do at a given time)
+;; 'delegted (done by someone else)
+;; 'habit (a recurring action)
+;; 'incubated (remind me later)
+;; 'knowledge (stored as reference)
+;; 'trash
+;; 'project-heading (top-level project heading, e.g. area of focus)
+;; 'project-task (task specific info, similiar to single-action)
+;; 'everything (if this is in the list, it will always 
 
 ;; ============================================================================
 ;; Org Capture Templates - Integrated with Org GTD
