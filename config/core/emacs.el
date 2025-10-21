@@ -107,6 +107,6 @@
 ;; (defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text.")
 (defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
 
-(defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
-;;(defvar my/font-monospace "MonoLisa Nerd Font Mono" "Default monospace font for fixed pitch text.")
+(defvar my/font-monospace "MonoLisa Nerd Font" "Default monospace font for fixed pitch text.")
+;;(defvar my/font-monospace "MonoLisa Nerd Font" "Default monospace font for fixed pitch text.")
 (provide 'emacs-config)

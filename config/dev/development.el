@@ -95,7 +95,7 @@
       '(("TODO"   . "#FFCC02")   ; Yellow - tasks to do
         ("FIXME"  . "#FF3838")   ; Red - bugs to fix
         ("DEBUG"  . "#9D4EDD")   ; Purple - debug statements
-        ("GOTCHA" . "#FF8500")   ; Orange - tricky code
+        ("REVIEW" . "#FF8500")   ; Orange - tricky code
         ("STUB"   . "#06FFA5")   ; Cyan - placeholder code
         ("NOTE"   . "#4CC9F0")   ; Blue - important denote
         ("HACK"   . "#E0AAFF"))) ; Pink - temporary solutions

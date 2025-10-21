@@ -6,8 +6,8 @@
 
 ;; File-type-specific theme configuration
 (defvar my/file-type-themes
-  '((org-mode . doric-water)
-    (markdown-mode . poet)
+  '((org-mode . poet-dark)
+    (markdown-mode . poet-dark)
     (default . misterioso))
   "Alist mapping major modes to their preferred themes.")
 
@@ -50,6 +50,7 @@ If MODE is not found in my/file-type-themes, use the default theme."
 (defvar my/theme-list '(modus-vivendi-tinted
                         misterioso
                         tango-dark
+                        poet-dark
                         leuven
                         adwaita)
   "List of themes to toggle through.")

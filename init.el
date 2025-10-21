@@ -566,9 +566,10 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (add-hook 'elpaca-after-init-hook
           (lambda ()
             ;; Only load custom theme in GUI, use default theme in terminal
-            (load-theme 'doric-water t)
+            (load-theme 'poet-dark t)
             (when (display-graphic-p)
-              (load-theme 'everforest-hard-dark t))))
+              ; (load-theme 'everforest-hard-dark t))))
+              (load-theme 'poet-dark t))))
 
 (provide 'init)
 ;;; init.el ends here
