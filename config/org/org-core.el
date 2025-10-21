@@ -149,6 +149,23 @@
 ;; Apply setup function to all org-mode buffers
 (add-hook 'org-mode-hook 'my/setup-org-mode)
 
+;; Enable file path completion in org-mode
+(defun my/org-mode-setup-completion ()
+  "Setup completion-at-point for org-mode with file path completion."
+  ;; Enable pcomplete for org-mode (handles #+include:, #+setupfile:, etc.)
+  (require 'pcomplete)
+  
+  ;; Add cape-file for file path completion (requires cape package)
+  (when (fboundp 'cape-file)
+    ;; Add cape-file to completion-at-point functions
+    (add-hook 'completion-at-point-functions #'cape-file -10 t))
+  
+  ;; Ensure Corfu works in org-mode if enabled
+  (when (fboundp 'corfu-mode)
+    (corfu-mode 1)))
+
+(add-hook 'org-mode-hook 'my/org-mode-setup-completion)
+
 ;; Ensure fonts are applied immediately for existing org buffers
 (defun my/apply-org-fonts-to-existing-buffers ()
   "Apply font settings to all existing \='org-mode\=' buffers."

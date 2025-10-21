@@ -15,8 +15,22 @@
 ;; ============================================================================
 
 (with-eval-after-load 'corfu
+  (global-corfu-mode 1)               ; Enable corfu globally
   (setq corfu-auto t                  ; Enable automatic completion
-        corfu-cycle t))               ; Cycle through candidates
+        corfu-auto-delay 0.2          ; Delay before showing completion (seconds)
+        corfu-auto-prefix 2           ; Minimum prefix length for auto completion
+        corfu-cycle t                 ; Cycle through candidates
+        corfu-preselect 'prompt))     ; Preselect the prompt
+
+;; ============================================================================
+;; Cape Configuration - Completion At Point Extensions
+;; ============================================================================
+
+(with-eval-after-load 'cape
+  ;; Add useful cape backends globally
+  ;; Note: Specific modes may add additional backends via their hooks
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)  ; Dynamic abbreviations
+  (add-to-list 'completion-at-point-functions #'cape-file))    ; File paths
 
 ;; ============================================================================
 ;; Orderless Configuration - Flexible completion style
