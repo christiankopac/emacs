@@ -17,7 +17,15 @@
 (setq my-denote-silos
       `(("denote" . ,(expand-file-name "~/notes/org/denote/"))
         ("journal" . ,(expand-file-name "~/notes/org/journal/"))
-        ("gtd" . ,(expand-file-name "~/notes/org/gtd/"))))
+        ;; GTD silos
+        ("gtd" . ,(expand-file-name "~/notes/org/gtd/"))
+        ("projects" . ,(expand-file-name "~/notes/org/projects/"))
+        ;; markdown silos
+        ("nb" . ,(expand-file-name "~/notes/org/nb/"))
+        ("zk" . ,(expand-file-name "~/notes/zk/"))
+        ;;("obsidian" . ,(expand-file-name "~/notes/obs/"))
+        ;; org archive
+        ("archive" . ,(expand-file-name "~/notes/org/archive/"))))
 
 ;; Set denote-dired-directories to the list of directories from my-denote-silos
 (setq denote-dired-directories (mapcar #'cdr my-denote-silos))
@@ -230,7 +238,7 @@
 (global-set-key (kbd "C-c d O") 'denote-silo-open-or-create)
 (global-set-key (kbd "C-c d F") 'denote-silo-dired)
 (global-set-key (kbd "C-c d C") 'denote-silo-select-silo-then-command)
-  
+
 ;; ============================================================================
 ;; Journal Migration Functions
 ;; ============================================================================
@@ -550,9 +558,9 @@ Handles complete metadata, partial metadata, and no metadata cases."
   (interactive "nNumber of recent denote: ")
   (let ((denote (denote-directory-files)))
     (setq denote (sort denote (lambda (a b)
-                              (time-less-p
-                               (nth 5 (file-attributes b))
-                               (nth 5 (file-attributes a))))))
+                                (time-less-p
+                                 (nth 5 (file-attributes b))
+                                 (nth 5 (file-attributes a))))))
     (dolist (note (seq-take denote n))
       (find-file note))))
 
