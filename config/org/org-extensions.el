@@ -45,9 +45,7 @@
                                  (tags . " %i %-12:c")
                                  (search . " %i %-12:c")))
 
-;; TODO Change the category icons
-;; Only set icons if all-the-icons is loaded
-;; (when (fboundp 'all-the-icons-faicon)
+;; TODO Setup org-agenda category icons
 ;;   (setq org-agenda-category-icon-alist
 ;;         `(("Family.s", (list (all-the-icons-faicon "home" :v-adjust 0.005)) nil nil :ascent center)
 ;;           ("Work.s", (list (all-the-icons-faicon "briefcase" :v-adjust 0.005)) nil nil :ascent center)
@@ -213,20 +211,21 @@
 
 (setq org-gtd-directory "~/notes/org/gtd"
       org-gtd-default-file-name "inbox"
-      org-gtd-areas-of-focus '("Health"         ;; Physical and Mental Well-being
-                               "Finance"        ;; Financial Management
-                               "Social"         ;; Friends and Relationships
-                               "Career"         ;; Professional Development
-                               "Music"          ;; Musical Pursuits
-                               "Creative"       ;; Artistic and Creative Activities
-                               "Learning"       ;; Education and Skill Development
-                               "Growth"         ;; Personal Growth and Self-Improvement
-                               "Work"           ;; Professional and Job-Related
-                               "Admin"          ;; Administrative Tasks
-                               "Home"           ;; Household Management
-                               "Recreation"     ;; Leisure and Hobbies
-                               "Travel"         ;; Travel and Exploration
-                               ) 
+      org-gtd-areas-of-focus '(
+            "Health"         ;; Physical and Mental Well-being
+            "Finance"        ;; Financial Management
+            "Home"           ;; Household Management
+            ;; --- Personal ---
+            "Relationships"  ;; Friends and Relationships
+            "Growth"         ;; Personal Growth and Self-Improvement - Admin/System stuff
+            "Legal"          ;; Anything 
+            ;; --- Professional ---
+            "Programming"   
+            "Work"           ;; Professional and Job-Related
+            ;; --- Creative/Leisure
+            "Music"          ;; Musical Pursuits
+            "Recreation"     ;; Travel, Leisure and Hobbies
+      ) 
       org-gtd-archive-location #'my/org-gtd-archive-location
       org-gtd-mode t
       org-gtd-inbox (expand-file-name (concat org-gtd-default-file-name ".org") org-gtd-directory))

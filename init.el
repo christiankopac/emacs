@@ -361,10 +361,21 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (use-package denote-sequence :ensure t :after denote)
 (use-package denote-journal :ensure t :after denote)
 
+;; ----------------------------------------------------------------------------
+;; Xeft Package - Fast note search and creation
+;; ----------------------------------------------------------------------------
+
+(use-package xeft :ensure t)
+
 ;; Load denote configuration after Elpaca initialization
 (add-hook 'elpaca-after-init-hook
           (lambda ()
             (load-file (expand-file-name "config/org/denote.el" user-emacs-directory))))
+
+;; Load xeft configuration after Elpaca initialization
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (load-file (expand-file-name "config/org/xeft.el" user-emacs-directory))))
 
 ;; ----------------------------------------------------------------------------
 ;; Language Specific Packages

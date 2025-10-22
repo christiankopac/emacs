@@ -12,6 +12,7 @@
   ;; C-c f f is a non-prefix key, so C-c f cannot be a prefix
   ;; "C-c f" "🔍 Consult Find"
   "C-c l" "🔗 Store Link"
+  "C-c z" "🔍 Xeft Search"
   
   ;; Helpful key bindings
   "C-h f" "❓ Helpful Function"
@@ -86,6 +87,12 @@
   "C-c j j" "📝 New Entry"
   "C-c j s" "🔍 Search"
   "C-c j d" "📝 Denote Journal"
+  
+  ;; Xeft Search
+  "C-c z f" "🔍 Xeft Search"
+  "C-c z n" "📝 New Note"
+  "C-c z s" "🔍 Search Notes"
+  "C-c z w" "🔍 Search Word"
   
   ;; Org QL
   "C-c q" "🔍 Org QL"
