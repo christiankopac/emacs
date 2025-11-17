@@ -168,7 +168,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; (use-package all-the-icons-dired :ensure t)
 (use-package nerd-icons :ensure t)
 
-(load-file (expand-file-name "config/ui/icons.el" user-emacs-directory))
+(load-file (expand-file-name "config/ui/ui-icons.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; UI: Fonts & Ligatures
