@@ -313,16 +313,11 @@ If a new re of focus pops-up that is not in the list, it will not be set."
          ""
          :immediate-finish nil)
 
-        ;; Denote Journal New
-        ("j" "Journal New Entry" plain
-         (function denote-journal-new-entry)
+        ;; Journal - Open today's journal (ONE per day, no duplicates)
+        ("j" "Journal - Today" plain
+         (function my/open-todays-journal)
          ""
-         :immediate-finish t)
-
-        ;; Denote Journal Entry - Create new journal entry with denote-journal
-        ("J" "Journal New or Existing Entry" plain
-         (function denote-journal-new-or-existing-entry)
-         ""
+         :jump-to-captured t
          :immediate-finish t)
         ))
 

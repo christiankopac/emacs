@@ -152,7 +152,8 @@
 
 (global-set-key (kbd "C-x g") 'magit-status)  ; Open magit status buffer
 (with-eval-after-load 'magit
-  (setq magit-repository-directories '(("~/src/" . 2))))  ; Search in github.com (depth 2)
+  (setq magit-repository-directories '(("~/src/" . 2)
+                                       ("~/notes/" . 2))))
 
 ;; ============================================================================
 ;; Diff-hl Configuration - Show git changes in fringe

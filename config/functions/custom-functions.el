@@ -330,4 +330,32 @@ Replaces the original content with the converted org."
     "C-c k c r o" "󰏧 Convert Markdown Region to Org"
     "C-c k f c" "󰏧 Convert File Format in Dired"))
 
+;; ----------------------------------------------------------------------------
+;; Package Management Functions
+;; ----------------------------------------------------------------------------
+
+(defun my/update-copilot ()
+  "Force update copilot package to the latest version.
+This rebuilds copilot from the latest source in the repository."
+  (interactive)
+  (if (fboundp 'elpaca-rebuild)
+      (progn
+        (message "Rebuilding copilot from latest source...")
+        (elpaca-rebuild 'copilot)
+        (message "Copilot rebuild initiated. Restart Emacs after Elpaca finishes processing."))
+    (if (fboundp 'elpaca-delete)
+        (progn
+          (message "Deleting old copilot build...")
+          (elpaca-delete 'copilot)
+          (message "Copilot deleted. Restart Emacs to reinstall from latest source."))
+      (message "Elpaca not available. Please run: M-x elpaca-rebuild RET copilot")))
+  
+  ;; Alternative: manually update the repo and rebuild
+  (let ((repo-dir (expand-file-name "elpaca/repos/copilot" user-emacs-directory)))
+    (when (file-exists-p repo-dir)
+      (message "Updating copilot repository...")
+      (with-temp-buffer
+        (let ((default-directory repo-dir))
+          (call-process "git" nil t nil "pull" "origin" "main"))))))
+
 (provide 'custom-functions)

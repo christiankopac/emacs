@@ -237,7 +237,7 @@
       org-attach-auto-tag "attach"                       ; Auto-tag headings with attachments
       org-attach-store-link-p 'attached                  ; Store link to attachment location
       org-attach-archive-delete 'query                   ; Ask before deleting attachments on archive
-      
+      org-log-into-drawer t
       org-auto-align-tags nil
       org-tags-column 0
       org-catch-invisible-edits 'show-and-error
@@ -324,14 +324,87 @@
 (setq org-modules '(org-habit))    ; Enable habit tracking
 
 ;; ----------------------------------------------------------------------------
-;; Org Capture Templates - DISABLED
+;; Org Capture Templates
 ;; ----------------------------------------------------------------------------
 
-;; Org capture templates are disabled - not using log.org
-;; (setq org-capture-templates
-;;       `(("l" "Log entry" entry
-;;          (file+datetree ,(expand-file-name "log.org" org-directory))
-;;          "* %?\n%U"
-;;          :empty-lines 1)))
+;; Helper function to open journal for a specific date
+(defun my/open-journal-for-date (date-string)
+  "Open journal file for DATE-STRING (YYYYMMDD format).
+Creates it if needed. Ensures ONE file per day."
+  (let* ((journal-dir (expand-file-name "~/notes/org/journal/"))
+         ;; Ensure journal directory exists
+         (_ (unless (file-directory-p journal-dir)
+              (make-directory journal-dir t)))
+         ;; Look for existing journal file for this date
+         (existing-file (car (directory-files 
+                              journal-dir 
+                              t 
+                              (concat "^" date-string "T.*__journal\\.org$")))))
+    (if existing-file
+        ;; File exists - open it and go to the end
+        (progn
+          (find-file existing-file)
+          (goto-char (point-max))
+          (message "Opened journal for %s" date-string))
+      ;; File doesn't exist - create it
+      (let* ((time (org-parse-time-string (concat date-string "T000000")))
+             (title (format-time-string "%A, %d %B %Y" (encode-time time)))
+             (slug (downcase (replace-regexp-in-string "[^a-zA-Z0-9-]" "-" title)))
+             (filename (format "%sT000000--%s__journal.org" date-string slug))
+             (filepath (expand-file-name filename journal-dir)))
+        (find-file filepath)
+        (insert (format "#+title: %s\n" title))
+        (insert (format "#+date: %s\n" 
+                        (format-time-string "[%Y-%m-%d %a]" (encode-time time))))
+        (insert "#+filetags: :journal:\n")
+        (insert (format "#+identifier: %sT000000\n\n" date-string))
+        (insert "* Morning\n\n\n* Afternoon\n\n\n* Evening\n\n\n* Notes\n\n\n* Tomorrow\n\n\n")
+        (goto-char (point-max))
+        (save-buffer)
+        (message "Created journal for %s" date-string)))))
+
+;; Helper function to get or create today's journal entry and OPEN IT
+(defun my/open-todays-journal ()
+  "Open today's journal file, creating it if needed.
+Ensures ONE file per day - no duplicates.
+Always opens the file directly for editing."
+  (interactive)
+  (my/open-journal-for-date (format-time-string "%Y%m%d")))
+
+;; Function to open journal from calendar
+(defun my/open-journal-from-calendar ()
+  "Open journal for the date at point in calendar."
+  (interactive)
+  (let* ((date (calendar-cursor-to-date))
+         (date-string (format "%04d%02d%02d" 
+                              (nth 2 date)  ; year
+                              (nth 0 date)  ; month
+                              (nth 1 date)))) ; day
+    (my/open-journal-for-date date-string)))
+
+;; Add keybinding to calendar mode
+(with-eval-after-load 'calendar
+  (define-key calendar-mode-map (kbd "j") 'my/open-journal-from-calendar))
+
+;; Note: org-capture-templates are defined in org-extensions.el
+;; This file only provides the helper functions used by those templates
+
+;; Configure capture to use full window (no split)
+(setq org-capture-window-setup 'current-window)
+
+;; Alternative: use display-buffer-alist for more control
+(add-to-list 'display-buffer-alist
+             '("\\*Org Select\\*"
+               (display-buffer-in-side-window)
+               (side . bottom)
+               (window-height . 0.3)))
+
+;; ----------------------------------------------------------------------------
+;; Capture Keybindings
+;; ----------------------------------------------------------------------------
+
+;; Global capture shortcuts
+(global-set-key (kbd "C-c c") 'org-capture)  ; Opens capture menu: j=journal, d=denote
+(global-set-key (kbd "C-c j") 'my/open-todays-journal)  ; Quick access to today's journal
 
 (provide 'org-core)

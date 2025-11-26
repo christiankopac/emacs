@@ -104,8 +104,9 @@
   (setq denote-journal-directory (expand-file-name "~/notes/org/journal/"))
   (setq denote-journal-title-format 'day-date-month-year)
   (setq denote-journal-keyword "journal")
-  (global-set-key (kbd "C-c n j") 'denote-journal-new-entry)
-  (global-set-key (kbd "C-c n J") 'denote-journal-open-today))
+  ;; Journal keybindings are handled in org-core.el
+  ;; Use C-c c j (capture menu) or C-c j (direct) to open today's journal
+  )
 
 ;; ============================================================================
 ;; Denote hooks

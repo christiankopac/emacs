@@ -83,6 +83,19 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (elpaca-wait)
 
 ;; ----------------------------------------------------------------------------
+;; Early Stub Functions - Prevent errors during package loading
+;; ----------------------------------------------------------------------------
+
+;; Stub function to prevent errors if icons--register is called before icons are loaded
+;; This prevents "void function icons--register" errors during startup
+;; Must be defined BEFORE any config files are loaded
+(when (not (fboundp 'icons--register))
+  (defun icons--register (&rest _args)
+    "Stub function for icons--register to prevent errors during initialization.
+This will be replaced by the actual function when icon packages are loaded."
+    nil))
+
+;; ----------------------------------------------------------------------------
 ;; Core Settings and Optimizations
 ;; ----------------------------------------------------------------------------
 
@@ -196,7 +209,11 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; ----------------------------------------------------------------------------
 
 (use-package transient :ensure t)
-(use-package dashboard :ensure t)
+(use-package dashboard :ensure t :after (nerd-icons)
+  :config
+  ;; Ensure nerd-icons is loaded before dashboard initializes
+  (unless (featurep 'nerd-icons)
+    (require 'nerd-icons nil t)))
 (use-package spacious-padding :ensure t)
 (use-package mixed-pitch :ensure t)
 (use-package helpful :ensure t)
@@ -258,8 +275,11 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
               (load-file (expand-file-name "config/ui/file-associations.el" user-emacs-directory)))))
 
 ;; Load UI configuration files (after Elpaca loads packages)
+;; Load dashboard.el after dashboard package is available
 (with-eval-after-load 'dashboard
-  (load-file (expand-file-name "config/ui/dashboard.el" user-emacs-directory)))
+  (condition-case err
+      (load-file (expand-file-name "config/ui/dashboard.el" user-emacs-directory))
+    (error (message "Warning: Could not load dashboard.el - %s" (error-message-string err)))))
 (load-file (expand-file-name "config/ui/ui-enhancements.el" user-emacs-directory))
 (load-file (expand-file-name "config/ui/navigation.el" user-emacs-directory))
 (load-file (expand-file-name "config/ui/editing.el" user-emacs-directory))
@@ -333,6 +353,10 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; Load org export configuration
 (with-eval-after-load 'org
   (load-file (expand-file-name "config/org/org-export.el" user-emacs-directory)))
+
+;; Load ox-hugo configuration for Hugo website workflow
+(with-eval-after-load 'ox-hugo
+  (load-file (expand-file-name "config/org/ox-hugo.el" user-emacs-directory)))
 
 
 ;; ----------------------------------------------------------------------------
@@ -425,8 +449,8 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (use-package copilot
   :ensure t
   :vc (:url "https://github.com/copilot-emacs/copilot.el"
-            :rev :newest
-            :branch "main")
+            :branch "main"
+            :rev :newest)
   :hook (prog-mode . copilot-mode))
 
 ;; Load AI tools configuration
