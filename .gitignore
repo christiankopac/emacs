@@ -41,3 +41,6 @@ projects
 bookmarks
 thumbnails
 bookmarks
+
+# Auto-generated custom file (contains personal paths)
+custom.el

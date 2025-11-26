@@ -1,6 +1,21 @@
 ;;; email.el --- Email configuration (mu4e, message, smtpmail, bbdb, consult-mu)
 
 ;; ============================================================================
+;; Email Configuration Variables
+;; ============================================================================
+;; These variables should be set in custom.el (not tracked in git)
+;; Default values are provided as placeholders
+
+(defvar my/gmail-address "your.email@gmail.com"
+  "Gmail email address. Set in custom.el")
+(defvar my/gmail-name "Your Name"
+  "Full name for Gmail account. Set in custom.el")
+(defvar my/fastmail-address "your.email@example.com"
+  "Fastmail email address. Set in custom.el")
+(defvar my/fastmail-name "Your Name"
+  "Full name for Fastmail account. Set in custom.el")
+
+;; ============================================================================
 ;; Mu4e Configuration - Email client
 ;; ============================================================================
 
@@ -40,8 +55,8 @@
           :match-func (lambda (msg)
                         (when msg
                           (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address . "christian.kopac@gmail.com")
-                  (user-full-name . "Christian Kopac")
+          :vars `((user-mail-address . ,my/gmail-address)
+                  (user-full-name . ,my/gmail-name)
                   (mu4e-drafts-folder . "/Gmail/[Gmail].Drafts")
                   (mu4e-sent-folder . "/Gmail/[Gmail].Sent Mail")
                   (mu4e-trash-folder . "/Gmail/[Gmail].Trash")
@@ -50,15 +65,15 @@
                   (smtpmail-smtp-server . "smtp.gmail.com")
                   (smtpmail-smtp-service . 587)
                   (smtpmail-stream-type . starttls)
-                  (smtpmail-smtp-user . "christian.kopac@gmail.com")))
+                  (smtpmail-smtp-user . ,my/gmail-address)))
 
         ,(make-mu4e-context
           :name "Fastmail"
           :match-func (lambda (msg)
                         (when msg
                           (string-prefix-p "/Fastmail" (mu4e-message-field msg :maildir))))
-          :vars '((user-mail-address . "hello@christiankopac.com")
-                  (user-full-name . "Christian Kopac")
+          :vars `((user-mail-address . ,my/fastmail-address)
+                  (user-full-name . ,my/fastmail-name)
                   (mu4e-drafts-folder . "/Fastmail/Drafts")
                   (mu4e-sent-folder . "/Fastmail/Sent")
                   (mu4e-trash-folder . "/Fastmail/Trash")
@@ -67,7 +82,7 @@
                   (smtpmail-smtp-server . "smtp.fastmail.com")
                   (smtpmail-smtp-service . 465)
                   (smtpmail-stream-type . ssl)
-                  (smtpmail-smtp-user . "hello@christiankopac.com"))))
+                  (smtpmail-smtp-user . ,my/fastmail-address))))
 
       ;; default context
       mu4e-context-policy 'pick-first
@@ -166,9 +181,9 @@
 ;; ============================================================================
 
 (setq smtpmail-auth-credentials
-      `(("smtp.gmail.com" 587 "christian.kopac@gmail.com"
+      `(("smtp.gmail.com" 587 ,my/gmail-address
          ,(lambda () (string-trim (shell-command-to-string "pass show email/gmail"))))
-        ("smtp.fastmail.com" 465 "hello@christiankopac.com"
+        ("smtp.fastmail.com" 465 ,my/fastmail-address
          ,(lambda () (string-trim (shell-command-to-string "pass show email/fastmail"))))))
 
 ;; ============================================================================
