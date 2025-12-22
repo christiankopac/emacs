@@ -203,13 +203,19 @@
 
 ;; Org GTD - Getting Things Done workflow
 (defun my/org-gtd-archive-location ()
-  "Archive to ~/notes/org/~archive instead of org-gtd-directory."
+  "Archive to ~/org/gtd/archive instead of org-gtd-directory."
   (let* ((year (number-to-string (caddr (calendar-current-date))))
          (filename (format org-gtd-archive-file-format year))
-         (filepath (f-join "~/notes/org/~archive" filename)))
+         (filepath (f-join "~/org/gtd/archive" filename)))
     (string-join `(,filepath "::" "datetree/"))))
 
-(setq org-gtd-directory "~/notes/org/gtd"
+;; Simplified GTD structure:
+;; - ~/org/journal.org (single journal file)
+;; - ~/org/gtd/inbox.org (capture everything here)
+;; - ~/org/gtd/tasks.org (processed tasks)
+;; - ~/org/gtd/work.org (work-related items)
+;; - ~/org/gtd/personal.org (personal items)
+(setq org-gtd-directory "~/org/gtd"
       org-gtd-default-file-name "inbox"
       org-gtd-areas-of-focus '(
             "Health"         ;; Physical and Mental Well-being
@@ -255,70 +261,80 @@ If a new re of focus pops-up that is not in the list, it will not be set."
 ;; 'everything (if this is in the list, it will always 
 
 ;; ============================================================================
-;; Org Capture Templates - Integrated with Org GTD
+;; Org Capture Templates - Simplified GTD Workflow
+;; Helper function for denote capture - opens full screen
+(defun my/denote-capture-fullscreen ()
+  "Create a new denote note and maximize the window."
+  (call-interactively 'denote)
+  (delete-other-windows))
+
 ;; ============================================================================
-;; Configure org-capture to work seamlessly with org-gtd
+;; SIMPLIFIED CAPTURE WORKFLOW:
+;; All captures go to inbox.org - no distinction between "task" and "capture entry"
+;; Process everything later with org-gtd-process-inbox (C-c g p)
 ;;
-;; TWO CAPTURE WORKFLOWS:
-;; 1. org-capture (C-c c) - Standard Org capture with template selection
-;;    - Captures to inbox.org or journal.org
-;;    - Process items later with org-gtd-process-inbox (C-c g p)
-;;    - Best for: Quick capture, journaling, complex templates
+;; CAPTURE OPTIONS:
+;; - C-c c i  → Inbox item (general capture, no TODO)
+;; - C-c c t  → Task (with TODO keyword)
+;; - C-c c p  → Project (with subtasks)
+;; - C-c c s  → Someday/Maybe (future ideas)
+;; - C-c c r  → Reference (reference material)
+;; - C-c c j  → Journal entry (opens today's journal)
+;; - C-c c d  → Denote entry (create new denote note)
 ;;
-;; 2. org-gtd-capture (C-c g c) - Direct GTD inbox capture
-;;    - Minimal friction, directly to GTD inbox
-;;    - No template selection prompt
-;;    - Best for: Ultra-quick inbox capture during workflow
-;;
-;; RECOMMENDED WORKFLOW:
-;; - Use C-c c for most captures (with templates)
-;; - Use C-c g c for rapid-fire inbox dumping
-;; - Process everything with C-c g p (org-gtd-process-inbox)
+;; ALTERNATIVE: C-c g c → Direct GTD inbox capture (no template selection)
 ;;
 (setq org-capture-templates
       `(
-        ;; GTD Inbox - Standard org-gtd capture template
-        ("g" "GTD Capture" entry
+        ;; Inbox - General capture (no TODO, just a note)
+        ("i" "Inbox" entry
          (file ,org-gtd-inbox)
          "* %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; GTD Task - TODO item for inbox
-        ("t" "GTD Task" entry
+        ;; Task - Actionable item with TODO
+        ("t" "Task" entry
          (file ,org-gtd-inbox)
          "* TODO %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; GTD Project - Project with subtasks
-        ("p" "GTD Project" entry
+        ;; Project - Multi-step project with initial subtasks
+        ("p" "Project" entry
          (file ,org-gtd-inbox)
          "* TODO %? [/]\n%U\n%a\n%i\n** TODO First step\n** TODO Second step"
          :empty-lines 1)
 
-        ;; GTD Someday/Maybe - Future ideas
-        ("s" "GTD Someday/Maybe" entry
+        ;; Someday/Maybe - Future ideas and incubation
+        ("s" "Someday/Maybe" entry
          (file ,org-gtd-inbox)
          "* SOMEDAY %?\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; GTD Reference - Reference material
-        ("r" "GTD Reference" entry
+        ;; Reference - Reference material (no action needed)
+        ("r" "Reference" entry
          (file ,org-gtd-inbox)
          "* %? :reference:\n%U\n%a\n%i"
          :empty-lines 1)
 
-        ;; Denote Entry - Create new denote entry
-        ("d" "Denote Open or Create" plain
-         (function denote)
-         ""
-         :immediate-finish nil)
-
-        ;; Journal - Open today's journal (ONE per day, no duplicates)
-        ("j" "Journal - Today" plain
-         (function my/open-todays-journal)
+        ;; Journal - Personal journal
+        ("j" "Journal - Personal" plain
+         (function my/open-todays-personal-journal)
          ""
          :jump-to-captured t
          :immediate-finish t)
+
+        ;; Journal - Work journal
+        ("J" "Journal - Work" plain
+         (function my/open-todays-work-journal)
+         ""
+         :jump-to-captured t
+         :immediate-finish t)
+
+        ;; Denote - Create new denote entry (opens full screen)
+        ("d" "Denote" plain
+         (function my/denote-capture-fullscreen)
+         ""
+         :immediate-finish nil)
         ))
 
 ;; Org GTD keybindings (use C-c g prefix to avoid conflicts with denote C-c d)

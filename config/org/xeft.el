@@ -6,7 +6,7 @@
 
 ;; Set the directory where xeft will search for notes
 ;; This should match your denote directory or notes directory
-(setq xeft-directory (expand-file-name "~/notes/org/denote"))
+(setq xeft-directory (expand-file-name "~/org/denote"))
 
 ;; Enable recursive search in subdirectories
 (setq xeft-recursive t)

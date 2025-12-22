@@ -533,6 +533,7 @@ This will be replaced by the actual function when icon packages are loaded."
 ;; ----------------------------------------------------------------------------
 
 (load-file (expand-file-name "config/functions/custom-functions.el" user-emacs-directory))
+(load-file (expand-file-name "config/functions/maintenance.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Global Keybindings

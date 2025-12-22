@@ -15,17 +15,17 @@
 
 ;; Define manual silos
 (setq my-denote-silos
-      `(("denote" . ,(expand-file-name "~/notes/org/denote/"))
-        ("journal" . ,(expand-file-name "~/notes/org/journal/"))
+      `(("denote" . ,(expand-file-name "~/org/denote/"))
+        ("journal" . ,(expand-file-name "~/org/journal/"))
         ;; GTD silos
-        ("gtd" . ,(expand-file-name "~/notes/org/gtd/"))
-        ("projects" . ,(expand-file-name "~/notes/org/projects/"))
+        ("gtd" . ,(expand-file-name "~/org/gtd/"))
+        ("projects" . ,(expand-file-name "~/org/gtd/projects/"))
         ;; markdown silos
-        ("nb" . ,(expand-file-name "~/notes/org/nb/"))
-        ("zk" . ,(expand-file-name "~/notes/zk/"))
+        ("nb" . ,(expand-file-name "~/org/nb/"))
+        ("zk" . ,(expand-file-name "~/org/nb/zk/"))
         ;;("obsidian" . ,(expand-file-name "~/notes/obs/"))
         ;; org archive
-        ("archive" . ,(expand-file-name "~/notes/org/archive/"))))
+        ("archive" . ,(expand-file-name "~/org/archive/"))))
 
 ;; Set denote-dired-directories to the list of directories from my-denote-silos
 (setq denote-dired-directories (mapcar #'cdr my-denote-silos))
@@ -95,18 +95,11 @@
                          (journal . "* Morning\n\n\n* Afternoon\n\n\n* Evening\n\n\n* denote\n\n\n* Tomorrow\n\n\n")))
 
 ;; ============================================================================
-;; Denote Journal Configuration
+;; Denote Journal - DISABLED (using simplified single-file journal)
 ;; ============================================================================
-;; Configure denote-journal (if available)
-(when (and (require 'denote nil t)
-           (require 'denote-journal nil t))
-  (setq denote-journal-extras-file-type 'org)
-  (setq denote-journal-directory (expand-file-name "~/notes/org/journal/"))
-  (setq denote-journal-title-format 'day-date-month-year)
-  (setq denote-journal-keyword "journal")
-  ;; Journal keybindings are handled in org-core.el
-  ;; Use C-c c j (capture menu) or C-c j (direct) to open today's journal
-  )
+;; Journal now uses ~/org/journal.org with simple date headings
+;; See my/open-todays-journal in org-core.el
+;; Keybindings: C-c c j (capture) or C-c j (direct)
 
 ;; ============================================================================
 ;; Denote hooks

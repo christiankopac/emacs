@@ -210,7 +210,7 @@
   (set-face-foreground face (face-attribute 'default :background)))
 (set-face-background 'fringe (face-attribute 'default :background))
 
-(setq org-directory "~/notes/org/"
+(setq org-directory "~/org/"
       org-startup-indented t                     ; Indent according to heading level
       org-startup-folded 'content                ; Show only top-level headings on open
       org-hide-emphasis-markers t                ; Hide markup characters (*bold*, /italic/, etc.)
@@ -226,10 +226,16 @@
       org-log-done 'time                         ; Log completion time for tasks
       org-deadline-warning-days 14               ; Warn 14 days before deadline
 
-      org-agenda-files '("~/notes/org/journal" "~/notes/org/gtd/")  ; Directories for agenda
+      org-agenda-files '("~/org/journal/personal.org"
+                         "~/org/journal/work.org"
+                         "~/org/gtd/inbox.org"
+                         "~/org/gtd/tasks.org"
+                         "~/org/gtd/work.org"
+                         "~/org/gtd/personal.org"
+                         "~/org/gtd/routines.org")  ; Files for agenda (routines for time-bound recurring tasks)
       
       ;; Attachment settings
-      org-attach-id-dir "~/notes/org/attachments"        ; Directory for ID-based attachments
+      org-attach-id-dir "~/org/attachments"        ; Directory for ID-based attachments
       org-attach-dir-relative t                          ; Use relative paths for portability
       org-attach-use-inheritance t                       ; Inherit attachments from parent headings
       org-attach-method 'mv                              ; Move files (avoid duplication)
@@ -301,7 +307,7 @@
 
 ;; Archive settings
 (setq org-archive-save-context-info '(time category itags)  ; Save when, where, and tags
-      org-archive-location "~/notes/org/~archive/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
+      org-archive-location "~/org/archive/%s_archive.org::* Archived from %s\n")  ; Archive location pattern
 
 ;; Refile targets - where to move/copy headings
 ;; (setq org-refile-targets
@@ -327,60 +333,96 @@
 ;; Org Capture Templates
 ;; ----------------------------------------------------------------------------
 
-;; Helper function to open journal for a specific date
+;; Simple journal: single file ~/org/journal.org with date headings
 (defun my/open-journal-for-date (date-string)
-  "Open journal file for DATE-STRING (YYYYMMDD format).
-Creates it if needed. Ensures ONE file per day."
-  (let* ((journal-dir (expand-file-name "~/notes/org/journal/"))
-         ;; Ensure journal directory exists
-         (_ (unless (file-directory-p journal-dir)
-              (make-directory journal-dir t)))
-         ;; Look for existing journal file for this date
-         (existing-file (car (directory-files 
-                              journal-dir 
-                              t 
-                              (concat "^" date-string "T.*__journal\\.org$")))))
-    (if existing-file
-        ;; File exists - open it and go to the end
+  "Open journal.org and navigate to DATE-STRING entry (YYYYMMDD format).
+Creates the date entry if needed. Simple structure: just date headings."
+  (let* ((journal-file (expand-file-name "~/org/journal.org"))
+         (year (string-to-number (substring date-string 0 4)))
+         (month (string-to-number (substring date-string 4 6)))
+         (day (string-to-number (substring date-string 6 8)))
+         (date-obj (encode-time 0 0 0 day month year))
+         (date-heading (format-time-string "%Y-%m-%d %A" date-obj)))
+    ;; Create file if needed
+    (unless (file-exists-p journal-file)
+      (with-temp-file journal-file
+        (insert "#+title: Journal\n#+filetags: :journal:\n\n")))
+    ;; Open and navigate
+    (find-file journal-file)
+    (goto-char (point-min))
+    (if (re-search-forward (concat "^\\* " (regexp-quote date-heading)) nil t)
+        ;; Found - go to end of entry
         (progn
-          (find-file existing-file)
-          (goto-char (point-max))
-          (message "Opened journal for %s" date-string))
-      ;; File doesn't exist - create it
-      (let* ((time (org-parse-time-string (concat date-string "T000000")))
-             (title (format-time-string "%A, %d %B %Y" (encode-time time)))
-             (slug (downcase (replace-regexp-in-string "[^a-zA-Z0-9-]" "-" title)))
-             (filename (format "%sT000000--%s__journal.org" date-string slug))
-             (filepath (expand-file-name filename journal-dir)))
-        (find-file filepath)
-        (insert (format "#+title: %s\n" title))
-        (insert (format "#+date: %s\n" 
-                        (format-time-string "[%Y-%m-%d %a]" (encode-time time))))
-        (insert "#+filetags: :journal:\n")
-        (insert (format "#+identifier: %sT000000\n\n" date-string))
-        (insert "* Morning\n\n\n* Afternoon\n\n\n* Evening\n\n\n* Notes\n\n\n* Tomorrow\n\n\n")
-        (goto-char (point-max))
-        (save-buffer)
-        (message "Created journal for %s" date-string)))))
+          (org-end-of-subtree)
+          (unless (bolp) (insert "\n")))
+      ;; Not found - create at end
+      (goto-char (point-max))
+      (unless (bolp) (insert "\n"))
+      (insert (format "* %s\n\n" date-heading)))
+    (message "Journal: %s" date-heading)))
 
 ;; Helper function to get or create today's journal entry and OPEN IT
 (defun my/open-todays-journal ()
-  "Open today's journal file, creating it if needed.
-Ensures ONE file per day - no duplicates.
+  "Open journal.org file and navigate to today's entry.
+Uses a single journal.org file with datetree structure.
 Always opens the file directly for editing."
   (interactive)
   (my/open-journal-for-date (format-time-string "%Y%m%d")))
 
-;; Function to open journal from calendar
+;; Helper functions for personal and work journals
+(defun my/open-journal-for-date-and-type (date-string journal-type)
+  "Open journal file (personal.org or work.org) and navigate to DATE-STRING entry.
+JOURNAL-TYPE should be 'personal' or 'work'."
+  (let* ((journal-file (expand-file-name (format "~/org/journal/%s.org" journal-type)))
+         (year (string-to-number (substring date-string 0 4)))
+         (month (string-to-number (substring date-string 4 6)))
+         (day (string-to-number (substring date-string 6 8)))
+         (date-obj (encode-time 0 0 0 day month year))
+         (date-heading (format-time-string "%Y-%m-%d %A" date-obj)))
+    ;; Create directory if needed
+    (unless (file-directory-p (file-name-directory journal-file))
+      (make-directory (file-name-directory journal-file) t))
+    ;; Create file if needed
+    (unless (file-exists-p journal-file)
+      (with-temp-file journal-file
+        (insert (format "#+title: %s Journal\n#+filetags: :journal:%s:\n\n" 
+                        (capitalize journal-type) journal-type))))
+    ;; Open and navigate
+    (find-file journal-file)
+    (goto-char (point-min))
+    (if (re-search-forward (concat "^\\* " (regexp-quote date-heading)) nil t)
+        ;; Found - go to end of entry
+        (progn
+          (org-end-of-subtree)
+          (unless (bolp) (insert "\n")))
+      ;; Not found - create at end
+      (goto-char (point-max))
+      (unless (bolp) (insert "\n"))
+      (insert (format "* %s\n\n" date-heading)))
+    (message "%s Journal: %s" (capitalize journal-type) date-heading)))
+
+(defun my/open-todays-personal-journal ()
+  "Open personal journal file and navigate to today's entry."
+  (interactive)
+  (my/open-journal-for-date-and-type (format-time-string "%Y%m%d") "personal"))
+
+(defun my/open-todays-work-journal ()
+  "Open work journal file and navigate to today's entry."
+  (interactive)
+  (my/open-journal-for-date-and-type (format-time-string "%Y%m%d") "work"))
+
+;; Function to open journal from calendar (prompts for personal or work)
 (defun my/open-journal-from-calendar ()
-  "Open journal for the date at point in calendar."
+  "Open journal for the date at point in calendar.
+Prompts to choose between personal or work journal."
   (interactive)
   (let* ((date (calendar-cursor-to-date))
          (date-string (format "%04d%02d%02d" 
                               (nth 2 date)  ; year
                               (nth 0 date)  ; month
-                              (nth 1 date)))) ; day
-    (my/open-journal-for-date date-string)))
+                              (nth 1 date))) ; day
+         (journal-type (completing-read "Journal type: " '("personal" "work") nil t)))
+    (my/open-journal-for-date-and-type date-string journal-type)))
 
 ;; Add keybinding to calendar mode
 (with-eval-after-load 'calendar
@@ -404,7 +446,8 @@ Always opens the file directly for editing."
 ;; ----------------------------------------------------------------------------
 
 ;; Global capture shortcuts
-(global-set-key (kbd "C-c c") 'org-capture)  ; Opens capture menu: j=journal, d=denote
-(global-set-key (kbd "C-c j") 'my/open-todays-journal)  ; Quick access to today's journal
+(global-set-key (kbd "C-c c") 'org-capture)  ; Opens capture menu: j=personal journal, J=work journal, d=denote
+(global-set-key (kbd "C-c j") 'my/open-todays-personal-journal)  ; Quick access to today's personal journal
+(global-set-key (kbd "C-c J") 'my/open-todays-work-journal)  ; Quick access to today's work journal
 
 (provide 'org-core)

@@ -12,7 +12,7 @@
 
 ;; Set directory where org source files are stored
 ;; Customize this path to point to your org notes directory
-(setq my/hugo-org-dir (expand-file-name "~/notes/org/kopac_ch/"))
+(setq my/hugo-org-dir (expand-file-name "~/org/blog/"))
 
 ;; Default frontmatter format (TOML for your site)
 (setq org-hugo-front-matter-format "toml")
@@ -138,7 +138,7 @@
   (dired my/hugo-org-dir))
 
 (defun my/hugo-publish ()
-  "Export all org files in ~/notes/org/kopac_ch/ to Hugo markdown."
+  "Export all org files in ~/org/blog/ to Hugo markdown."
   (interactive)
   (let ((org-files (directory-files-recursively my/hugo-org-dir "\\.org$")))
     (if (null org-files)
@@ -169,7 +169,7 @@
 ;; Auto-export on save (optional - uncomment to enable)
 ;; ============================================================================
 
-;; Automatically export to Hugo markdown when saving org files in ~/notes/org/kopac_ch/
+;; Automatically export to Hugo markdown when saving org files in ~/org/blog/
 ;; (defun my/hugo-auto-export ()
 ;;   "Auto-export to Hugo if file is in Hugo org directory."
 ;;   (when (and (eq major-mode 'org-mode)
