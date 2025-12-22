@@ -1,0 +1,30 @@
+# Music Grouping Categories
+# One group per line - used for tagging music files
+# You can edit this file to add/remove groups
+
+ambient
+background
+chill
+classical
+dance
+downtempo
+dub
+focus
+house
+inspiration
+listening
+lounge
+party
+rave
+relax
+road-trip
+rock
+sleep
+study
+techno
+trance
+trip
+world
+workout
+yoga
+
