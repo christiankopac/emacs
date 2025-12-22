@@ -1,10 +1,12 @@
-;;; email.el --- Email configuration (mu4e, message, smtpmail, bbdb, consult-mu)
+;;; email.el --- Email configuration (mu4e, message, smtpmail, bbdb, consult-mu)  -*- lexical-binding: t; -*-
 
 ;; ============================================================================
 ;; Email Configuration Variables
 ;; ============================================================================
 ;; These variables should be set in custom.el (not tracked in git)
 ;; Default values are provided as placeholders
+
+(require 'subr-x)
 
 (defvar my/gmail-address "your.email@gmail.com"
   "Gmail email address. Set in custom.el")
@@ -19,154 +21,136 @@
 ;; Mu4e Configuration - Email client
 ;; ============================================================================
 
-(when (file-exists-p "/usr/local/bin/mu")
-  (setq mu4e-mu-binary "/usr/local/bin/mu"))
+;; Safe wrappers so keybindings don't explode if mu4e isn't installed yet.
+(defun my/mu4e--maybe-add-load-path ()
+  "Try to add common system mu4e paths to `load-path`."
+  (dolist (dir '("/usr/share/emacs/site-lisp/mu4e"
+                 "/usr/local/share/emacs/site-lisp/mu4e"
+                 "/usr/share/emacs/site-lisp"
+                 "/usr/local/share/emacs/site-lisp"))
+    (when (file-directory-p dir)
+      (add-to-list 'load-path dir))))
 
-;; Mu4e keybindings
-(global-set-key (kbd "C-c m") 'mu4e)
-(global-set-key (kbd "C-c M") 'mu4e-compose-new)
+(defun my/mu4e--ensure-loaded ()
+  "Return non-nil if mu4e can be loaded."
+  (or (featurep 'mu4e)
+      (require 'mu4e nil t)
+      (progn
+        (my/mu4e--maybe-add-load-path)
+        (require 'mu4e nil t))))
 
-;; Mu4e which-key descriptions
+(defun my/mu4e ()
+  "Open mu4e, or show a helpful message if it's not installed."
+  (interactive)
+  (if (my/mu4e--ensure-loaded)
+      (call-interactively #'mu4e)
+    (user-error "mu4e not found. Install system package 'mu' (Arch: sudo pacman -S mu), then restart Emacs")))
+
+(defun my/mu4e-compose-new ()
+  "Compose a new email via mu4e, or show a helpful message if it's not installed."
+  (interactive)
+  (if (my/mu4e--ensure-loaded)
+      (call-interactively #'mu4e-compose-new)
+    (user-error "mu4e not found. Install system package 'mu' (Arch: sudo pacman -S mu), then restart Emacs")))
+
+;; Keybindings
+;;
+;; NOTE: `C-c m` is used as a prefix throughout this config (e.g. maintenance
+;; and search keybindings). So we keep it as a prefix map and put mail commands
+;; under it.
+(define-prefix-command 'my/mail-map)
+(global-set-key (kbd "C-c m") 'my/mail-map)
+(define-key my/mail-map (kbd "m") #'my/mu4e)
+(define-key my/mail-map (kbd "M") #'my/mu4e-compose-new)
+(define-key my/mail-map (kbd "b") #'bbdb)
+
+;; which-key descriptions
 (with-eval-after-load 'which-key
   (which-key-add-key-based-replacements
-    "C-c m" "󰇮 Mu4e Email"
-    "C-c M" "󰞌 Compose New Email"
-    "C-c c b" "󰀸 BBDB Contacts"))
+    "C-c m" "󰇮 Mail"
+    "C-c m m" "󰇮 Mu4e"
+    "C-c m M" "󰞌 Compose"
+    "C-c m b" "󰀸 BBDB"))
 
-;; Basic mu4e settings
-(setq mu4e-maildir "~/.mail"
-      mu4e-get-mail-command "offlineimap"
-      mu4e-update-interval 1800  ; 30 minutes
-      mu4e-view-show-images t
-      mu4e-view-show-addresses t
-      mu4e-compose-format-flowed t
-      mu4e-date-format "%Y-%m-%d"
-      mu4e-headers-date-format "%Y-%m-%d"
-      mu4e-change-filenames-when-moving t
-      mu4e-attachment-dir "~/Downloads"
-      ;; Force mu4e to handle composition and sending
-      mail-user-agent 'mu4e-user-agent
-      message-send-mail-function 'smtpmail-send-it
+(with-eval-after-load 'mu4e
+  ;; Find mu binary
+  (let ((mu-binary (executable-find "mu")))
+    (when mu-binary
+      (setq mu4e-mu-binary mu-binary)))
 
-      ;; Contexts for switching between accounts
-      mu4e-contexts
-      `(,(make-mu4e-context
-          :name "Gmail"
-          :match-func (lambda (msg)
-                        (when msg
-                          (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
-          :vars `((user-mail-address . ,my/gmail-address)
-                  (user-full-name . ,my/gmail-name)
-                  (mu4e-drafts-folder . "/Gmail/[Gmail].Drafts")
-                  (mu4e-sent-folder . "/Gmail/[Gmail].Sent Mail")
-                  (mu4e-trash-folder . "/Gmail/[Gmail].Trash")
-                  (mu4e-refile-folder . "/Gmail/[Gmail].All Mail")
-                  (mu4e-sent-messages-behavior . delete)
-                  (smtpmail-smtp-server . "smtp.gmail.com")
-                  (smtpmail-smtp-service . 587)
-                  (smtpmail-stream-type . starttls)
-                  (smtpmail-smtp-user . ,my/gmail-address)))
+  ;; Basic mu4e settings
+  (setq mu4e-maildir "~/.mail"
+        mu4e-get-mail-command "offlineimap"
+        mu4e-update-interval 1800  ; 30 minutes
+        mu4e-view-show-images t
+        mu4e-view-show-addresses t
+        mu4e-compose-format-flowed t
+        mu4e-date-format "%Y-%m-%d"
+        mu4e-headers-date-format "%Y-%m-%d"
+        mu4e-change-filenames-when-moving t
+        mu4e-attachment-dir "~/Downloads"
+        ;; Force mu4e to handle composition and sending
+        mail-user-agent 'mu4e-user-agent
+        message-send-mail-function 'smtpmail-send-it
 
-        ,(make-mu4e-context
-          :name "Fastmail"
-          :match-func (lambda (msg)
-                        (when msg
-                          (string-prefix-p "/Fastmail" (mu4e-message-field msg :maildir))))
-          :vars `((user-mail-address . ,my/fastmail-address)
-                  (user-full-name . ,my/fastmail-name)
-                  (mu4e-drafts-folder . "/Fastmail/Drafts")
-                  (mu4e-sent-folder . "/Fastmail/Sent")
-                  (mu4e-trash-folder . "/Fastmail/Trash")
-                  (mu4e-refile-folder . "/Fastmail/Archive")
-                  (mu4e-sent-messages-behavior . sent)
-                  (smtpmail-smtp-server . "smtp.fastmail.com")
-                  (smtpmail-smtp-service . 465)
-                  (smtpmail-stream-type . ssl)
-                  (smtpmail-smtp-user . ,my/fastmail-address))))
+        ;; Contexts for switching between accounts
+        mu4e-contexts
+        `(,(make-mu4e-context
+            :name "Gmail"
+            :match-func (lambda (msg)
+                          (when msg
+                            (string-prefix-p "/Gmail" (mu4e-message-field msg :maildir))))
+            :vars `((user-mail-address . ,my/gmail-address)
+                    (user-full-name . ,my/gmail-name)
+                    (mu4e-drafts-folder . "/Gmail/[Gmail].Drafts")
+                    (mu4e-sent-folder . "/Gmail/[Gmail].Sent Mail")
+                    (mu4e-trash-folder . "/Gmail/[Gmail].Trash")
+                    (mu4e-refile-folder . "/Gmail/[Gmail].All Mail")
+                    (mu4e-sent-messages-behavior . delete)
+                    (smtpmail-smtp-server . "smtp.gmail.com")
+                    (smtpmail-smtp-service . 587)
+                    (smtpmail-stream-type . starttls)
+                    (smtpmail-smtp-user . ,my/gmail-address)))
 
-      ;; default context
-      mu4e-context-policy 'pick-first
-      mu4e-compose-context-policy 'ask
+          ,(make-mu4e-context
+            :name "Fastmail"
+            :match-func (lambda (msg)
+                          (when msg
+                            (string-prefix-p "/Fastmail" (mu4e-message-field msg :maildir))))
+            :vars `((user-mail-address . ,my/fastmail-address)
+                    (user-full-name . ,my/fastmail-name)
+                    (mu4e-drafts-folder . "/Fastmail/Drafts")
+                    (mu4e-sent-folder . "/Fastmail/Sent")
+                    (mu4e-trash-folder . "/Fastmail/Trash")
+                    (mu4e-refile-folder . "/Fastmail/Archive")
+                    (mu4e-sent-messages-behavior . sent)
+                    (smtpmail-smtp-server . "smtp.fastmail.com")
+                    (smtpmail-smtp-service . 465)
+                    (smtpmail-stream-type . ssl)
+                    (smtpmail-smtp-user . ,my/fastmail-address))))
 
-      ;; bookmarks for quick access
-      mu4e-bookmarks
-      '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
-        ("maildir:/Gmail/INBOX" "Gmail Inbox" ?g)
-        ("maildir:/Fastmail/INBOX" "Fastmail Inbox" ?f)
-        ("date:today..now" "Today's messages" ?t)
-        ("date:7d..now" "Last 7 days" ?w)
-        ("mime:image/*" "Messages with images" ?p)))
+        ;; default context
+        mu4e-context-policy 'pick-first
+        mu4e-compose-context-policy 'ask
 
-;; Enable mu4e menu
-(mu4e t)
+        ;; bookmarks for quick access
+        mu4e-bookmarks
+        '(("flag:unread AND NOT flag:trashed" "Unread messages" ?u)
+          ("maildir:/Gmail/INBOX" "Gmail Inbox" ?g)
+          ("maildir:/Fastmail/INBOX" "Fastmail Inbox" ?f)
+          ("date:today..now" "Today's messages" ?t)
+          ("date:7d..now" "Last 7 days" ?w)
+          ("mime:image/*" "Messages with images" ?p)))
 
-;; Mu4e to global menu bar
-(define-key global-map [menu-bar tools mu4e]
-            (cons "Mu4e" (make-sparse-keymap "Mu4e")))
-
-(define-key global-map [menu-bar tools mu4e mu4e-main]
-            '("Mu4e Main" . mu4e))
-(define-key global-map [menu-bar tools mu4e mu4e-compose]
-            '("Compose New" . mu4e-compose-new))
-(define-key global-map [menu-bar tools mu4e separator1]
-            '("--" . nil))
-
-;; Consult-mu to global menu
-(when (file-exists-p "~/.config/emacs/elpa/consult-mu")
-  (define-key global-map [menu-bar tools mu4e consult-mu]
-              (cons "Consult-Mu" (make-sparse-keymap "Consult-Mu")))
-
-  (define-key global-map [menu-bar tools mu4e consult-mu search-everywhere]
-              '("Search Everywhere" . consult-mu-search-everywhere))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-dynamic]
-              '("Dynamic Search" . consult-mu-dynamic))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-async]
-              '("Async Search" . consult-mu-async))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-contacts]
-              '("Search Contacts" . consult-mu-contacts))
-  (define-key global-map [menu-bar tools mu4e consult-mu separator1]
-              '("--" . nil))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-unread]
-              '("Search Unread" . consult-mu-search-unread))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-today]
-              '("Search Today" . consult-mu-search-today))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-week]
-              '("Search This Week" . consult-mu-search-this-week))
-  (define-key global-map [menu-bar tools mu4e consult-mu separator2]
-              '("--" . nil))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-gmail]
-              '("Search Gmail" . consult-mu-search-gmail))
-  (define-key global-map [menu-bar tools mu4e consult-mu search-fastmail]
-              '("Search Fastmail" . consult-mu-search-fastmail)))
-
-;; Add custom menu items for consult-mu
-(when (file-exists-p "~/.config/emacs/elpa/consult-mu")
-  (with-eval-after-load 'mu4e
-    (define-key mu4e-main-mode-map [menu-bar consult-mu]
-                (cons "Consult-Mu" (make-sparse-keymap "Consult-Mu")))
-
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-everywhere]
-                '("Search Everywhere" . consult-mu-search-everywhere))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-dynamic]
-                '("Dynamic Search" . consult-mu-dynamic))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-async]
-                '("Async Search" . consult-mu-async))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-contacts]
-                '("Search Contacts" . consult-mu-contacts))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu separator1]
-                '("--" . nil))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-unread]
-                '("Search Unread" . consult-mu-search-unread))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-today]
-                '("Search Today" . consult-mu-search-today))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-week]
-                '("Search This Week" . consult-mu-search-this-week))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu separator2]
-                '("--" . nil))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-gmail]
-                '("Search Gmail" . consult-mu-search-gmail))
-    (define-key mu4e-main-mode-map [menu-bar consult-mu search-fastmail]
-                '("Search Fastmail" . consult-mu-search-fastmail))))
+  ;; Mu4e to global menu bar
+  (define-key global-map [menu-bar tools mu4e]
+              (cons "Mu4e" (make-sparse-keymap "Mu4e")))
+  (define-key global-map [menu-bar tools mu4e mu4e-main]
+              '("Mu4e Main" . mu4e))
+  (define-key global-map [menu-bar tools mu4e mu4e-compose]
+              '("Compose New" . mu4e-compose-new))
+  (define-key global-map [menu-bar tools mu4e separator1]
+              '("--" . nil)))
 
 ;; ============================================================================
 ;; Message mode configuration
@@ -190,19 +174,24 @@
 ;; BBDB configuration - Address book
 ;; ============================================================================
 
-(setq bbdb-file "~/.bbdb"
-      bbdb-offer-save 1
-      bbdb-use-pop-up nil
-      bbdb-electric-p t
-      bbdb-popup-target-lines 1
-      bbdb-complete-mail-allow-cycling t)
-
-(global-set-key (kbd "C-c c b") 'bbdb)
 (with-eval-after-load 'bbdb
-  (add-hook 'mu4e-view-mode-hook 'bbdb-mua-auto-update))
+  (setq bbdb-file "~/.bbdb"
+        bbdb-offer-save 1
+        bbdb-use-pop-up nil
+        bbdb-electric-p t
+        bbdb-popup-target-lines 1
+        bbdb-complete-mail-allow-cycling t)
+  nil)
+
+(with-eval-after-load 'mu4e
+  (with-eval-after-load 'bbdb
+    ;; Ensure the mu4e integration is available.
+    (require 'bbdb-mua nil t)
+    (when (fboundp 'bbdb-mua-auto-update)
+      (add-hook 'mu4e-view-mode-hook #'bbdb-mua-auto-update))))
 
 ;; Consult-mu configuration
-(when (and (require 'consult-mu nil t) (file-exists-p "~/.config/emacs/elpa/consult-mu"))
+(when (require 'consult-mu nil t)
   ;; Keybindings
   (global-set-key (kbd "C-c m s") 'consult-mu)
   (global-set-key (kbd "C-c m d") 'consult-mu-dynamic)
