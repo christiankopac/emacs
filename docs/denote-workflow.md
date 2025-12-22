@@ -42,16 +42,16 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 ```
 ~/notes/archive              # archives
 ~/notes/export               # exports form md/org notes
-~/notes/org/attachments      # attachments for md/org files
+~/org/attachments      # attachments for md/org files
 
-~/notes/org/gtd              # org-gtd
+~/org              # org-gtd
 
-~/notes/org/denote/
-~/notes/org/denote/fleeting 
-~/notes/org/denote/permanent
-~/notes/org/denote/projects
-~/notes/org/denote/resources
-~/notes/org/journal         
+~/org/denote/
+~/org/denote/fleeting 
+~/org/denote/permanent
+~/org/denote/projects
+~/org/denote/resources
+~/org/journal.org         
 
 ```
 
@@ -549,7 +549,7 @@ Org-capture style quick entry for today's journal log. Perfect for capturing tho
 - Only shows the entry you're typing (like org-capture)
 - Automatically creates journal if needed
 - Timestamps each entry
-- Saved to: `~/notes/org/journal/`
+- Saved to: `~/org/journal.org`
 
 ---
 

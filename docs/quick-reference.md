@@ -139,6 +139,17 @@ Quick reference for the most common tasks and keybindings in your Emacs configur
 | `C-c C-d` | Deadline |
 | `C-c C-w` | Refile |
 
+---
+
+## Email
+
+| Keybinding | Action |
+|------------|--------|
+| `C-c m m` | Open mu4e |
+| `C-c m M` | Compose email |
+| `C-c m b` | Open BBDB (contacts) |
+| `C-c m s` | Search mail (consult-mu) |
+
 ### Org GTD
 
 | Keybinding | Action |

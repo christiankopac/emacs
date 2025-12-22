@@ -268,8 +268,8 @@ Use the journal system: `C-c j m`
 ### Agenda Files
 
 Your agenda searches these directories:
-- `~/notes/org/journal/`
-- `~/notes/org/gtd/`
+- `~/org/journal.org`
+- `~/org/`
 
 ### Archive
 
@@ -304,7 +304,7 @@ Your journal system includes both denote-based daily journals and org-capture-ba
 - `C-c c J` - Quick journal (no prompt)
 
 **Features:**
-- All entries in single file: `~/notes/org/journal.org`
+- All entries in single file: `~/org/journal.org`
 - Week-based datetree structure
 - Automatic timestamps
 - Easy to search and review
@@ -361,7 +361,7 @@ Creates/opens separate daily journal files with:
 - Automatic agenda integration
 - Linking between daily denote
 
-**File Location:** `~/notes/org/journal/YYYY-MM-DD.org`
+**File Location:** `~/org/journal.org` (Note: This describes an old multi-file structure; current setup uses a single journal.org file)
 
 ---
 
@@ -385,7 +385,7 @@ Creates weekly journal with GTD planning sections:
    - Insights & Adjustments
    - Process Inbox (checklist)
 
-**File Location:** `~/notes/org/journal/weekly/YYYY-WNN.org`
+**File Location:** `~/org/journal.org` (Note: This describes an old multi-file structure; current setup uses a single journal.org file)
 
 ---
 
@@ -412,7 +412,7 @@ Creates monthly journal with strategic planning:
    - GTD System Health Check
    - Carry Forward to Next Month
 
-**File Location:** `~/notes/org/journal/monthly/YYYY-MM.org`
+**File Location:** `~/org/journal.org` (Note: This describes an old multi-file structure; current setup uses a single journal.org file)
 
 ---
 
@@ -442,7 +442,7 @@ Creates yearly journal for vision and annual planning:
    - Lessons Learned
    - Gratitude
 
-**File Location:** `~/notes/org/journal/yearly/YYYY.org`
+**File Location:** `~/org/journal.org` (Note: This describes an old multi-file structure; current setup uses a single journal.org file)
 
 ---
 
@@ -514,7 +514,7 @@ Shows:
 Include content from other org files:
 
 ```org
-#+transclude: [[file:~/notes/org/gtd/areas.org::*Goals]]
+#+transclude: [[file:~/org/gtd/areas.org::*Goals]]
 ```
 
 ---
