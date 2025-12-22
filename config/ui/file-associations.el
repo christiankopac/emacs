@@ -17,9 +17,9 @@
 
 ;; Quick directory jumps with icons
 (define-key my-quick-jump-map (kbd "g") 
-  (lambda () (interactive) (dired "~/notes/org/gtd/")))
+  (lambda () (interactive) (dired "~/org/gtd/")))
 (define-key my-quick-jump-map (kbd "j") 
-  (lambda () (interactive) (dired "~/notes/org/journal/")))
+  (lambda () (interactive) (dired "~/org/")))
 
 ;; Set better descriptions using which-key
 (with-eval-after-load 'which-key

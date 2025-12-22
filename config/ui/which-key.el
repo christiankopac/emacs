@@ -63,7 +63,7 @@
   "C-M-$" "🌐 Change Language"
   
   ;; Email
-  "C-c c b" "👥 BBDB Contacts"
+  "C-c m b" "👥 BBDB"
   
   ;; Org Extensions
   "C-c n" "📝 Org denote"
