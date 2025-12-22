@@ -498,15 +498,34 @@ This will be replaced by the actual function when icon packages are loaded."
 ;; E-Mail & Contacts
 ;; ----------------------------------------------------------------------------
 
-(use-package mu4e :ensure nil :defer t :commands (mu4e mu4e-compose-new mu4e-update-index))
+;; mu4e is installed system-wide with the mu package
+;; It's not available via elpaca/MELPA - install via system package manager:
+;;   Arch Linux: sudo pacman -S mu
+;;   Debian/Ubuntu: sudo apt install mu
+;;   macOS: brew install mu
+(use-package bbdb
+  :ensure t
+  :defer t
+  :commands (bbdb bbdb-search-name bbdb-complete-mail))
+(use-package mu4e
+  :ensure nil
+  :defer t
+  :commands (mu4e mu4e-compose-new mu4e-update-index)
+  :config
+  ;; Check if mu binary exists
+  (unless (executable-find "mu")
+    (warn "mu binary not found. Please install mu (e.g., 'sudo pacman -S mu' on Arch Linux)")))
 (use-package message :ensure nil :defer t)
 (use-package smtpmail :ensure nil :defer t)
-(use-package bbdb :ensure t :defer t :commands (bbdb bbdb-search-name bbdb-complete-mail))
-(use-package consult-mu :ensure nil :after (mu4e consult))
+(use-package consult-mu
+  ;; consult-mu isn't on GNU ELPA; install from source.
+  :ensure (:host github :repo "armindarvish/consult-mu" :files ("*.el"))
+  :defer t
+  :after consult
+  :commands (consult-mu consult-mu-dynamic consult-mu-async consult-mu-contacts))
 
-;; Load email configuration
-(with-eval-after-load 'mu4e
-  (load-file (expand-file-name "config/email/email.el" user-emacs-directory)))
+;; Load email configuration early (safe to load even when mu4e isn't installed).
+(load-file (expand-file-name "config/email/email.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Machine Specific Configuration

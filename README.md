@@ -38,6 +38,8 @@ A comprehensive, modular Emacs configuration optimized for note-taking, writing,
 - **BBDB**: Address book integration
 - **Consult-Mu**: Fast email search
 
+Docs: see `docs/email.md`.
+
 ### UI Enhancements
 - **Dashboard**: Customizable startup screen
 - **Dirvish**: Modern file manager with icons
