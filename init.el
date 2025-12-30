@@ -220,6 +220,7 @@ This will be replaced by the actual function when icon packages are loaded."
 (use-package smartparens :ensure t)
 (use-package expand-region :ensure t)
 (use-package which-key :ensure t)
+(use-package hyperbole :ensure t)
 (use-package beacon :ensure t)
 (use-package dirvish :ensure t)
 (use-package recentf :ensure nil)
@@ -283,6 +284,11 @@ This will be replaced by the actual function when icon packages are loaded."
 (load-file (expand-file-name "config/ui/ui-enhancements.el" user-emacs-directory))
 (load-file (expand-file-name "config/ui/navigation.el" user-emacs-directory))
 (load-file (expand-file-name "config/ui/editing.el" user-emacs-directory))
+
+;; Load Hyperbole configuration after Elpaca initialization (ensures package is installed).
+(add-hook 'elpaca-after-init-hook
+          (lambda ()
+            (load-file (expand-file-name "config/core/hyperbole-config.el" user-emacs-directory))))
 
 ;; Load dirvish config after package is ready
 (with-eval-after-load 'dirvish
