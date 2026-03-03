@@ -51,7 +51,7 @@
 ;; Ensure export directory exists
 ;; ============================================================================
 
-(setq org-export-directory "~/notes/export/")
+(setq org-export-directory "~/org/export/")
 
 (unless (file-directory-p org-export-directory)
   (make-directory org-export-directory t))

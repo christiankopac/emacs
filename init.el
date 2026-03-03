@@ -95,6 +95,20 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 This will be replaced by the actual function when icon packages are loaded."
     nil))
 
+;; Compatibility stub for org-with-undo-amalgamate
+;; This function was removed in newer versions of Org mode, but some code still calls it
+;; We provide a compatibility macro that just executes the body normally
+(when (not (fboundp 'org-with-undo-amalgamate))
+  (defmacro org-with-undo-amalgamate (&rest body)
+    "Compatibility stub for org-with-undo-amalgamate.
+This macro was removed in newer Org versions. It now just executes BODY normally."
+    `(progn ,@body)))
+
+;; Define org-gtd-inbox early so configs that reference it (hyperbole, org, etc.) don't error
+;; The real value is set in config/org/org-extensions.el; this ensures the symbol exists.
+(when (not (boundp 'org-gtd-inbox))
+  (defvar org-gtd-inbox nil "Path to GTD inbox file. Set in org-extensions.el."))
+
 ;; ----------------------------------------------------------------------------
 ;; Core Settings and Optimizations
 ;; ----------------------------------------------------------------------------
@@ -177,8 +191,13 @@ This will be replaced by the actual function when icon packages are loaded."
 ;; ----------------------------------------------------------------------------
 
 (use-package all-the-icons :ensure t :defer t)
-;; NOTE: all-the-icons-dired disabled - conflicts with dirvish icons
-;; (use-package all-the-icons-dired :ensure t)
+(use-package all-the-icons-dired
+  :ensure t
+  :commands (all-the-icons-dired-mode)
+  :hook (dired-mode . (lambda ()
+                        ;; Don't enable if `dirvish' is managing icons in dired buffers
+                        (unless (featurep 'dirvish)
+                          (all-the-icons-dired-mode 1)))))
 (use-package nerd-icons :ensure t)
 
 (load-file (expand-file-name "config/ui/ui-icons.el" user-emacs-directory))
@@ -222,7 +241,53 @@ This will be replaced by the actual function when icon packages are loaded."
 (use-package which-key :ensure t)
 (use-package hyperbole :ensure t)
 (use-package beacon :ensure t)
-(use-package dirvish :ensure t)
+
+(use-package dirvish
+  :ensure t
+  :config
+  ;; Replace vanilla dired with dirvish for an improved UX, if available
+  (when (fboundp 'dirvish-override-dired-mode)
+    (dirvish-override-dired-mode))
+  ;; NOTE: Do NOT enable `dirvish-peek-mode` globally.
+  ;; It previews while narrowing in the minibuffer (e.g. `find-file`) and can
+  ;; steal the main window away from Vertico.
+  ;; Useful quick-access bookmarks
+  (setq dirvish-quick-access-entries
+        '(("h" "~/" "Home")
+          ("e" "~/.config/emacs/" "Emacs config"))))
+
+(use-package dired
+  :ensure nil
+  :defer t
+  :init
+  (setq dired-recursive-copies 'always
+        dired-recursive-deletes 'always
+        delete-by-moving-to-trash t
+        ;; Show long ISO timestamps and human-readable sizes in listings
+        ;; Note: if your `ls` (e.g., eza) doesn't support --time-style this may be ignored.
+        dired-listing-switches "-Alh --time-style=long-iso"
+        dired-dwim-target t
+        dired-auto-revert-buffer #'dired-directory-changed-p
+        dired-make-directory-clickable t
+        dired-free-space nil
+        dired-mouse-drag-files t
+        dired-guess-shell-alist-user
+        '(("\\.\\(png\\|jpe?g\\|tiff\\)\\'" "feh" "xdg-open")
+          ("\\.\\(svg\\|gif\\)\\'" "xdg-open")
+          ("\\.\\(pdf\\|epub\\)\\'" "xdg-open")
+          ("\\.\\(mp[34]\\|m4a\\|ogg\\|flac\\|webm\\|mkv\\)\\'" "mpv" "xdg-open")
+          ("\\.\\(zip\\|tar\\.gz\\|tar\\.xz\\|tgz\\)\\'" "xdg-open")
+          ("\\.\\(docx?\\|xlsx?\\|pptx?\\)\\'" "xdg-open")
+          (".*" "xdg-open")))
+  :config
+  (add-hook 'dired-mode-hook #'dired-hide-details-mode)
+  (add-hook 'dired-mode-hook #'hl-line-mode)
+  ;; Keep Dired visually minimal in the *main buffer*.
+  ;; We still generate long `ls -l` output for Dired internals, but hide it by default.
+  (setq dired-hide-details-hide-symlink-targets nil
+        ;; Hide the leading “total …” line for extra minimalism.
+        dired-hide-details-hide-information-lines t))
+
 (use-package recentf :ensure nil)
 (use-package bookmark :ensure nil)
 (use-package vundo :ensure t)
@@ -266,6 +331,95 @@ This will be replaced by the actual function when icon packages are loaded."
                         :inherit 'mood-line-unimportant))
   ;; Enable mood-line
   (mood-line-mode 1))
+
+;; Minimal emoji mode-line enhancements (modern, minimal)
+(with-eval-after-load 'mood-line
+  ;; Prefer Noto Color Emoji if available for colorful emoji support
+  (when (member "Noto Color Emoji" (font-family-list))
+    (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji") nil 'prepend))
+
+  (defface my/mode-line-emoji-face
+    '((t :inherit mode-line :weight bold))
+    "Face for the emoji in the mode-line.")
+
+  (defvar my/mode-line-emoji-alist
+    '((emacs-lisp-mode . "λ")
+      (python-mode . "🐍")
+      (org-mode . "📝")
+      (org-agenda-mode . "📅")
+      (markdown-mode . "📰")
+      (js-mode . "✨")
+      (typescript-mode . "🟦")
+      (rust-mode . "🦀")
+      (go-mode . "🐹")
+      (sh-mode . "🐚")
+      (eshell-mode . "🐚")
+      (vterm-mode . "🖥️")
+      (term-mode . "🖥️")
+      (dired-mode . "📁")
+      (magit-status-mode . "🔀")
+      (help-mode . "❓")
+      (compilation-mode . "⚙️")
+      (sql-mode . "🗄️")
+      (default . "📄"))
+    "Alist mapping major-mode to an emoji.")
+
+  (defvar my/messages-unread-count 0
+    "Count of unread messages since the last view of the *Messages* buffer.")
+
+  (defun my/_increment-messages-unread (&rest _args)
+    "Increment the unread messages counter when `message' is called."
+    (setq my/messages-unread-count (1+ (or my/messages-unread-count 0))))
+
+  (defun my/reset-messages-unread (&rest _args)
+    "Reset messages unread counter (called when user views messages)."
+    (setq my/messages-unread-count 0))
+
+  ;; Hook into message generation and message viewing
+  (advice-add 'message :after #'my/_increment-messages-unread)
+  (advice-add 'view-echo-area-messages :after #'my/reset-messages-unread)
+  ;; Also reset when *Messages* is displayed
+  (defun my/reset-if-messages-buffer-showing (&rest args)
+    (let ((buf (if (bufferp (car args)) (car args) (get-buffer (car args)))))
+      (when (and buf (string= (buffer-name buf) "*Messages*"))
+        (my/reset-messages-unread))))
+  (advice-add 'switch-to-buffer :after #'my/reset-if-messages-buffer-showing)
+  (advice-add 'display-buffer :after (lambda (buf &rest _) (my/reset-if-messages-buffer-showing buf)))
+
+  (defun my/mode-line-emoji-for-mode ()
+    "Return an emoji for the current buffer.
+Checks for *Messages* / notification buffers first, then major mode (using derived-mode-p).")
+
+  (defun my/mode-line-emoji-for-mode ()
+    (cond
+     ;; Messages or notification buffers (show count when > 0)
+     ((or (> (or my/messages-unread-count 0) 0)
+          (string-match-p "\*Messages?\*\|\*Notifications?\*\|\*alerts?\*" (buffer-name)))
+      (let ((count (or my/messages-unread-count 0)))
+        (if (> count 0)
+            (format "🔔%d" count)
+          "🔔")))
+     ;; Match by derived major mode
+     (t
+      (let ((res (catch 'found
+                   (dolist (pair my/mode-line-emoji-alist)
+                     (when (and (symbolp (car pair)) (derived-mode-p (car pair)))
+                       (throw 'found (cdr pair))))
+                   nil)))
+        (or res (cdr (assoc 'default my/mode-line-emoji-alist)))))))
+
+  (defun my/mode-line-emoji ()
+    (let* ((emoji (my/mode-line-emoji-for-mode))
+           (state (cond (buffer-read-only "🔒")
+                        ((buffer-modified-p) "✏️")
+                        (t "✅"))))
+      (concat " " (propertize emoji 'face 'my/mode-line-emoji-face) " " state " ")))
+
+  ;; Only add once
+  (unless (member '(:eval (my/mode-line-emoji)) mode-line-format)
+    (setq-default mode-line-format
+                  (cons '(:eval (my/mode-line-emoji)) mode-line-format))))
+
 (use-package openwith 
   :ensure t
   :init
@@ -328,6 +482,7 @@ This will be replaced by the actual function when icon packages are loaded."
 (use-package org-edna :ensure t :after (org seq))
 
 (setq org-gtd-update-ack "3.0.0")
+(setq org-gtd-update-ack "4.0.0")
 (use-package org-gtd :ensure t :after (org transient))
 
 ;; (use-package org-journal :ensure t)
@@ -344,7 +499,8 @@ This will be replaced by the actual function when icon packages are loaded."
 (use-package org-pomodoro :ensure t)
 (use-package org-ql :ensure t :after org)
 (use-package org-web-tools :ensure t)
-(use-package org-modern :ensure t :hook (org-mode . org-modern-mode))
+(use-package org-modern :ensure t :defer t)
+;; org-modern is configured in config/org/org-extensions.el to only enable in GUI mode
 
 ;; Load org extensions configuration
 (with-eval-after-load 'org
@@ -458,14 +614,14 @@ This will be replaced by the actual function when icon packages are loaded."
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el"
-           :branch "main")
+                 :branch "main")
   :hook (prog-mode . copilot-mode))
 
 (use-package claudemacs
   :ensure (:host github 
-           :repo "cpoile/claudemacs" 
-           :branch "main"
-           :main "claudemacs.el"))
+                 :repo "cpoile/claudemacs" 
+                 :branch "main"
+                 :main "claudemacs.el"))
 
 ;; Load AI tools configuration
 (load-file (expand-file-name "config/ai/ai-tools.el" user-emacs-directory))
@@ -635,10 +791,59 @@ This will be replaced by the actual function when icon packages are loaded."
 (add-hook 'elpaca-after-init-hook
           (lambda ()
             ;; Only load custom theme in GUI, use default theme in terminal
-            (load-theme 'poet-dark t)
             (when (display-graphic-p)
-              ; (load-theme 'everforest-hard-dark t))))
               (load-theme 'poet-dark t))))
+
+;; ============================================================================
+;; Daemon Frame Initialization - Ensure daemon-created frames match regular frames
+;; ============================================================================
+(defun my/initialize-daemon-frame (frame)
+  "Initialize a frame created from daemon with all settings.
+This ensures daemon frames have the same appearance as regular frames."
+  (condition-case err
+      (when (and frame (frame-live-p frame) (display-graphic-p frame))
+        ;; Apply frame parameters
+        (set-frame-parameter frame 'vertical-scroll-bars nil)
+        (set-frame-parameter frame 'horizontal-scroll-bars nil)
+        (set-frame-parameter frame 'fullscreen 'maximized)
+        (set-frame-parameter frame 'internal-border-width 0)
+        (set-frame-parameter frame 'right-divider-width 0)
+        
+        ;; Load theme if not already loaded (only once globally)
+        (unless (member 'poet-dark custom-enabled-themes)
+          (load-theme 'poet-dark t))
+        
+        ;; Reapply fonts and fontaine preset (with frame selected)
+        (with-selected-frame frame
+          ;; Reapply fonts (function is always defined, but only works in GUI)
+          (condition-case err
+              (my/set-variable-fixed-pitch-faces)
+            (error (message "Warning: Could not set fonts: %s" (error-message-string err))))
+          
+          ;; Reapply fontaine preset if available
+          (when (and (boundp 'fontaine-current-preset) 
+                     fontaine-current-preset
+                     (fboundp 'fontaine-set-preset))
+            (condition-case err
+                (fontaine-set-preset fontaine-current-preset)
+              (error (message "Warning: Could not set fontaine preset: %s" (error-message-string err)))))))
+    (error (message "Error initializing daemon frame: %s" (error-message-string err)))))
+
+;; Apply initialization to all frames created from daemon
+;; Keep it simple to avoid crashes - just run once after a small delay
+(add-hook 'after-make-frame-functions 
+          (lambda (new-frame)
+            (when (and new-frame (frame-live-p new-frame))
+              ;; Capture frame in closure to avoid void variable error
+              (let ((frame-to-init new-frame))
+                ;; Delay slightly to ensure packages are loaded
+                (run-with-timer 0.3 nil
+                               (lambda ()
+                                 (condition-case err
+                                     (when (and frame-to-init (frame-live-p frame-to-init))
+                                       (my/initialize-daemon-frame frame-to-init))
+                                   (error (message "Warning: Could not initialize daemon frame: %s" 
+                                                   (error-message-string err))))))))))
 
 (provide 'init)
 ;;; init.el ends here

@@ -5,10 +5,15 @@
 ;; ----------------------------------------------------------------------------
 
 ;; File-type-specific theme configuration
+;; In terminal mode, use modus-vivendi for org-mode; in GUI, use poet-dark
 (defvar my/file-type-themes
-  '((org-mode . poet-dark)
-    (markdown-mode . poet-dark)
-    (default . misterioso))
+  (if (display-graphic-p)
+      '((org-mode . poet-dark)
+        (markdown-mode . poet-dark)
+        (default . misterioso))
+    '((org-mode . modus-vivendi)
+      (markdown-mode . modus-vivendi)
+      (default . modus-vivendi)))
   "Alist mapping major modes to their preferred themes.")
 
 (defun my/load-theme-for-mode (mode)

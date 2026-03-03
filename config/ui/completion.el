@@ -3,13 +3,20 @@
 ;; ============================================================================
 ;; Vertico Configuration - Vertical completion UI
 ;; ============================================================================
-
+;; Vertico is the vetical compeltion UI framework that provides a minimalistic
+;; interface for narrowing and selecting completion candidates.
 (with-eval-after-load 'vertico
   (vertico-mode)                      ; Enable vertico
   (setq vertico-cycle t               ; Cycle from bottom to top
         vertico-resize t              ; Resize minibuffer to fit candidates
-        vertico-count 20))            ; Show 25 candidates
-
+        vertico-count 5               ; Show 20 candidates by default
+        vertico-scroll-margin 0       ; No scroll margin
+        vertico-resize nil            ; FIXME: Don't resize vertically
+  )
+  ;; Tidy up directory listings
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
+)
+  
 ;; ============================================================================
 ;; Corfu Configuration - In-buffer completion popup
 ;; ============================================================================
@@ -65,9 +72,47 @@
 ;; ============================================================================
 ;; Marginalia Configuration - Rich annotations in minibuffer
 ;; ============================================================================
-
+;; Marginalia adds annotations to minibuffer completions, providing additional
+;; context about each candidate (e.g., file size, function signatures).
 (with-eval-after-load 'marginalia
   (marginalia-mode))                  ; Enable annotations for completions
+
+;; ==========================================================================
+;; Minimal file candidates (find-file / project-find-file)
+;; - Keep icons, drop the noisy file metadata annotations.
+;; ==========================================================================
+
+(use-package nerd-icons-completion
+  :ensure t
+  :after (marginalia nerd-icons)
+  :config
+  (nerd-icons-completion-mode 1)
+
+  ;; Enable icons in Marginalia annotations (Vertico shows them nicely in the margin).
+  (with-eval-after-load 'marginalia
+    (when (fboundp 'nerd-icons-completion-marginalia-setup)
+      (nerd-icons-completion-marginalia-setup))
+
+    (defun my/marginalia-annotate-file-icon (cand)
+      "Return a minimal annotation for file candidate CAND (icon only)."
+      (when-let* ((icon-fn (cond
+                            ((fboundp 'nerd-icons-completion-get-icon)
+                             #'nerd-icons-completion-get-icon)
+                            ((fboundp 'nerd-icons-completion--get-icon)
+                             #'nerd-icons-completion--get-icon)))
+                  (icon (condition-case _err
+                            ;; Newer `nerd-icons-completion' expects 2 args.
+                            (funcall icon-fn cand 'file)
+                          (wrong-number-of-arguments
+                           ;; Older variants sometimes take a single arg.
+                           (funcall icon-fn cand)))))
+        (concat " " icon)))
+
+    ;; Override Marginalia's file annotator list with a minimal one.
+    ;; Structure: (CATEGORY ANNOTATOR FALLBACK ...)
+    (when (boundp 'marginalia-annotators)
+      (setf (alist-get 'file marginalia-annotators)
+            '(my/marginalia-annotate-file-icon nil)))))
 
 
 ;; ============================================================================

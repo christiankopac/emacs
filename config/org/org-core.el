@@ -18,6 +18,16 @@
   (setq-local visual-line-fringe-indicators '(nil nil))  ; No fringe indicators for wrapped lines
   (visual-line-mode 1)                                   ; Wrap lines at word boundaries
   (setq line-spacing 0.1)                                ; Add slight spacing between lines
+  
+  ;; In terminal mode, ensure stars are properly hidden
+  (unless (display-graphic-p)
+    (setq-local org-hide-leading-stars t)
+    (setq-local org-indent-indentation-per-level 2)
+    ;; Force enable org-indent-mode to hide stars
+    (org-indent-mode 1)
+    ;; Disable org-modern if it somehow got enabled
+    (when (bound-and-true-p org-modern-mode)
+      (org-modern-mode -1)))
 
   ;; Apply custom org-reading preset (only if fontaine is loaded)
   (when (and (boundp 'fontaine-presets) (fboundp 'fontaine-set-preset))
@@ -55,52 +65,55 @@
 
   ;; Set custom heading sizes (subtle scale - variable-pitch is already large)
   ;; Headings inherit from variable-pitch, so they're already bigger than monospace
-  (dolist (level (number-sequence 1 6))
-    (let ((height (nth (- level 1) '(1.35 1.25 1.15 1.08 1.04 1.00)))
-          (face (intern (format "org-level-%d" level))))
+  (when (boundp 'my/font-serif)
+    (dolist (level (number-sequence 1 6))
+      (let ((height (nth (- level 1) '(1.35 1.25 1.15 1.08 1.04 1.00)))
+            (face (intern (format "org-level-%d" level))))
+        (when (facep face)
+          (set-face-attribute face nil
+                              :weight 'regular
+                              :height height
+                              :family my/font-serif  ; Inherit from variable-pitch
+                              :foreground 'unspecified)))))  ; Don't override theme colors
+
+  ;; Only set font families if font variables are defined
+  (when (boundp 'my/font-monospace)
+    (set-face-attribute 'org-sexp-date nil
+                        :family my/font-monospace
+                        :height 90)
+    ;; Document title styling
+    (when (facep 'org-document-title)
+      (set-face-attribute 'org-document-title nil
+                          :weight 'bold
+                          :height 1.1     ; Prominent but not overwhelming
+                          :underline nil
+                          :family my/font-monospace
+                          :foreground 'unspecified))
+
+    ;; Fix org-drawer face to use fixed-pitch font
+    (my/apply-org-drawer-face)
+
+    ;; Ensure fixed-pitch font for code and technical elements
+    ;; These should always use monospace, regardless of theme
+    (dolist (face '(org-block
+                    org-block-begin-line
+                    org-block-end-line
+                    org-code
+                    org-comment
+                    org-quote
+                    org-document-info
+                    org-document-info-keyword
+                    org-meta-line
+                    org-property-value
+                    org-special-keyword
+                    org-table
+                    org-verbatim))
       (when (facep face)
         (set-face-attribute face nil
-                            :weight 'regular
-                            :height height
-                            :family my/font-serif  ; Inherit from variable-pitch
-                            :foreground 'unspecified))))  ; Don't override theme colors
-
-  (set-face-attribute 'org-sexp-date nil
-                      :family my/font-monospace
-                      :height 90)
-  ;; Document title styling
-  (when (facep 'org-document-title)
-    (set-face-attribute 'org-document-title nil
-                        :weight 'bold
-                        :height 1.1     ; Prominent but not overwhelming
-                        :underline nil
-                        :family my/font-monospace
-                        :foreground 'unspecified))
-
-  ;; Fix org-drawer face to use fixed-pitch font
-  (my/apply-org-drawer-face)
-
-  ;; Ensure fixed-pitch font for code and technical elements
-  ;; These should always use monospace, regardless of theme
-  (dolist (face '(org-block
-                  org-block-begin-line
-                  org-block-end-line
-                  org-code
-                  org-comment
-                  org-quote
-                  org-document-info
-                  org-document-info-keyword
-                  org-meta-line
-                  org-property-value
-                  org-special-keyword
-                  org-table
-                  org-verbatim))
-    (when (facep face)
-      (set-face-attribute face nil
-                          :family my/font-monospace
-                          :inherit 'fixed-pitch
-                          :foreground 'unspecified  ; Let theme handle colors
-                          :background 'unspecified)))
+                            :family my/font-monospace
+                            :inherit 'fixed-pitch
+                            :foreground 'unspecified  ; Let theme handle colors
+                            :background 'unspecified))))
 
   ;; Make org-priority face match heading height
   (when (facep 'org-priority)
@@ -132,7 +145,7 @@
 ;; This must be applied after themes to override any theme settings
 (defun my/apply-org-drawer-face ()
   "Apply org-drawer face with fixed-pitch font."
-  (when (facep 'org-drawer)
+  (when (and (facep 'org-drawer) (boundp 'my/font-monospace))
     (set-face-attribute 'org-drawer nil
                         :family my/font-monospace
                         :height 90
@@ -148,6 +161,33 @@
 
 ;; Apply setup function to all org-mode buffers
 (add-hook 'org-mode-hook 'my/setup-org-mode)
+
+;; Load modus-vivendi theme for org-mode in terminal
+(unless (display-graphic-p)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (unless (member 'modus-vivendi custom-enabled-themes)
+                (condition-case err
+                    (progn
+                      (modus-themes-load-vivendi)
+                      (message "Loaded modus-vivendi theme for org-mode (terminal)"))
+                  (error
+                   ;; Fallback to load-theme if modus-themes-load-vivendi doesn't exist
+                   (load-theme 'modus-vivendi t)
+                   (message "Loaded modus-vivendi theme for org-mode (terminal)")))))
+            t))
+
+;; In terminal mode, force org-indent-mode early and hide stars
+(unless (display-graphic-p)
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (setq-local org-hide-leading-stars t)
+              (org-indent-mode 1)
+              ;; Make stars invisible by setting their face
+              (set-face-attribute 'org-hide nil :foreground (face-background 'default))
+              (when (bound-and-true-p org-modern-mode)
+                (org-modern-mode -1)))
+            t))  ; Append to hook
 
 ;; Enable file path completion in org-mode
 (defun my/org-mode-setup-completion ()
@@ -183,8 +223,8 @@
   "Test function to verify that fonts are loading correctly."
   (interactive)
   (message "Testing font configuration...")
-  (message "Serif font variable: %s" my/font-serif)
-  (message "Monospace font variable: %s" my/font-monospace)
+  (message "Serif font variable: %s" (if (boundp 'my/font-serif) my/font-serif "NOT DEFINED"))
+  (message "Monospace font variable: %s" (if (boundp 'my/font-monospace) my/font-monospace "NOT DEFINED"))
   (message "Fontaine loaded: %s" (boundp 'fontaine-presets))
   (message "Mixed-pitch loaded: %s" (fboundp 'mixed-pitch-mode))
   (when (boundp 'fontaine-presets)
@@ -201,8 +241,8 @@
 ;; ----------------------------------------------------------------------------
 
 (modify-all-frames-parameters
- '((right-divider-width . 40)
-   (internal-border-width . 40)))
+ '((right-divider-width . 0)
+   (internal-border-width . 0)))
 (dolist (face '(window-divider
                 window-divider-first-pixel
                 window-divider-last-pixel))
@@ -212,6 +252,10 @@
 
 (setq org-directory "~/org/"
       org-startup-indented t                     ; Indent according to heading level
+      ;; In terminal, always use indentation mode
+      org-indent-mode-turns-on-hiding-stars t    ; Hide stars when indentation is on
+      ;; Force hide stars globally in terminal mode
+      org-hide-leading-stars t                    ; Hide leading stars
       org-startup-folded 'content                ; Show only top-level headings on open
       org-hide-emphasis-markers t                ; Hide markup characters (*bold*, /italic/, etc.)
       org-pretty-entities t                      ; Show LaTeX symbols as unicode
@@ -226,13 +270,10 @@
       org-log-done 'time                         ; Log completion time for tasks
       org-deadline-warning-days 14               ; Warn 14 days before deadline
 
-      org-agenda-files '("~/org/journal/personal.org"
-                         "~/org/journal/work.org"
+      org-agenda-files '("~/org/journal"              ; All ~/org/journal/*.org
                          "~/org/gtd/inbox.org"
                          "~/org/gtd/tasks.org"
-                         "~/org/gtd/work.org"
-                         "~/org/gtd/personal.org"
-                         "~/org/gtd/routines.org")  ; Files for agenda (routines for time-bound recurring tasks)
+                         "~/org/gtd/routines.org")   ; Files for agenda (routines for time-bound recurring tasks)
       
       ;; Attachment settings
       org-attach-id-dir "~/org/attachments"        ; Directory for ID-based attachments
@@ -317,9 +358,10 @@
 ;;         (gtd :maxlevel . 2)        ; GTD files up to 2 levels
 ;;         (archive :maxlevel . 2)))  ; Archive files up to 2 levels
 
-;; Refile to any agenda file at most 2 levels deep
-(setq org-refile-targets '((nil :maxlevel . 2)              ; Current file
-                           (org-agenda-files :maxlevel . 2))) ; All agenda files
+;; Refile targets: inbox, current file, and all agenda files
+(setq org-refile-targets '((nil :maxlevel . 1)              ; Current file up to level 2
+                           ("~/org/gtd/inbox.org" :maxlevel . 1))); Inbox file
+                           ;(org-agenda-files :maxlevel . 1))) ; All agenda files up to level 2
 
 ;; generate refile tarets and show them at once
 (setq org-outline-path-complete-in-steps nil)

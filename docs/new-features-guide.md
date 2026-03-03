@@ -12,7 +12,7 @@ This guide covers the new features added to your Emacs configuration.
 Quickly create fleeting denote (temporary thoughts/ideas) in a dedicated subdirectory.
 
 ### Location
-All fleeting denote are stored in: `~/notes/2_denote/2_denote/fleeting-2_denote/`
+All fleeting denote are stored in: `~/org/denote/fleeting-2_denote/`
 
 ### Usage
 
@@ -28,7 +28,7 @@ C-c d F
 ```
 C-c d F
 Title: Interesting idea about productivity
-→ Creates: ~/notes/2_denote/2_denote/fleeting-2_denote/20250930T120000--interesting-idea-about-productivity__fleeting.org
+→ Creates: ~/org/denote/fleeting-2_denote/20250930T120000--interesting-idea-about-productivity__fleeting.org
 ```
 
 ### Workflow
@@ -148,7 +148,7 @@ Description of accomplishment...
 Structured movie denote with pre-filled metadata template.
 
 ### Location
-All movie denote in: `~/notes/2_denote/2_denote/movies/`
+All movie denote in: `~/org/denote/permanent/movies/`
 
 ### Usage
 
@@ -261,7 +261,7 @@ Organized subdirectories for different types of denote.
 ### Structure
 
 ```
-~/notes/2_denote/2_denote/
+~/org/denote/
 ├── fleeting-2_denote/        # Quick captures, temporary thoughts
 ├── permanent-2_denote/       # Processed, evergreen denote
 ├── literature-2_denote/      # Book/article summaries
@@ -368,7 +368,7 @@ In `config/org/denote.el`:
 
 2. **Daily Processing:**
    ```
-   Open ~/notes/2_denote/2_denote/fleeting-2_denote/
+   Open ~/org/2_denote/2_denote/fleeting-2_denote/
    Review each note:
      - Trivial? Delete it
      - Valuable? Create permanent note

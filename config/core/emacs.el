@@ -14,7 +14,10 @@
   apropos-do-all t ;; Make apropos (help search) search more extensively
   mouse-yank-at-point t ;; Paste at point, not at mouse cursor position
   fast-but-imprecise-scrolling t ;; Enable faster scrolling at the cost of some accuracy
-  auto-save-default nil ;; Disable auto-save files (#file#)
+  auto-save-default t ;; Enable auto-save files (#file#) - prevents data loss
+  auto-save-interval 100 ;; Auto-save after every 100 keystrokes
+  auto-save-timeout 30 ;; Auto-save after 30 seconds of idle time
+  auto-save-visited-file-name nil ;; Save to #file# instead of overwriting (safer)
   create-lockfiles nil ;; Disable lockfiles (.#file)
   make-backup-files t ;; Create backup files (file~)
   kept-new-versions 5 ;; Keep 6 newest versions of backup files
@@ -104,9 +107,8 @@
 
 ;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 
-;; (defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text.")
-(defvar my/font-serif "Literata" "Default serif font for variable pitch text.")
-
-(defvar my/font-monospace "MonoLisa Nerd Font" "Default monospace font for fixed pitch text.")
-;;(defvar my/font-monospace "MonoLisa Nerd Font" "Default monospace font for fixed pitch text.")
+;; Font definitions are now in config/ui/fonts-ligatures.el with fallback support
+;; These are kept here for backward compatibility but will be overridden by fonts-ligatures.el
+(unless (boundp 'my/font-serif)
+  (defvar my/font-serif "Literata" "Default serif font for variable pitch text."))
 (provide 'emacs-config)

@@ -210,13 +210,10 @@
     (string-join `(,filepath "::" "datetree/"))))
 
 ;; Simplified GTD structure:
-;; - ~/org/journal.org (single journal file)
 ;; - ~/org/gtd/inbox.org (capture everything here)
-;; - ~/org/gtd/tasks.org (processed tasks)
-;; - ~/org/gtd/work.org (work-related items)
-;; - ~/org/gtd/personal.org (personal items)
+;; - ~/org/gtd/tasks.org (processed tasks from inbox)
 (setq org-gtd-directory "~/org/gtd"
-      org-gtd-default-file-name "inbox"
+      org-gtd-inbox (expand-file-name "inbox.org" org-gtd-directory)
       org-gtd-areas-of-focus '(
             "Health"         ;; Physical and Mental Well-being
             "Finance"        ;; Financial Management
@@ -231,10 +228,13 @@
             ;; --- Creative/Leisure
             "Music"          ;; Musical Pursuits
             "Recreation"     ;; Travel, Leisure and Hobbies
-      ) 
+      )
       org-gtd-archive-location #'my/org-gtd-archive-location
-      org-gtd-mode t
-      org-gtd-inbox (expand-file-name (concat org-gtd-default-file-name ".org") org-gtd-directory))
+      org-gtd-mode t)
+
+;; Processed items go to ~/org/gtd/tasks.org (override package default org-gtd-tasks.org)
+(with-eval-after-load 'org-gtd
+  (setq org-gtd-default-file-name "tasks"))
 
 (defun org-gtd-set-area-of-focus ()
   "Use as a hook when decorating items after clarifying them.
@@ -264,9 +264,13 @@ If a new re of focus pops-up that is not in the list, it will not be set."
 ;; Org Capture Templates - Simplified GTD Workflow
 ;; Helper function for denote capture - opens full screen
 (defun my/denote-capture-fullscreen ()
-  "Create a new denote note and maximize the window."
+  "Create a new denote note and maximize the window (saves previous layout)."
   (call-interactively 'denote)
-  (delete-other-windows))
+  ;; If the frame currently has multiple windows, save the configuration then
+  ;; maximize so the user can restore the layout afterwards by toggling.
+  (when (> (length (window-list)) 1)
+    (setq my/previous-window-configuration (current-window-configuration))
+    (delete-other-windows)))
 
 ;; ============================================================================
 ;; SIMPLIFIED CAPTURE WORKFLOW:
@@ -564,26 +568,37 @@ If a new re of focus pops-up that is not in the list, it will not be set."
 ;; Org Modern Configuration - Modern UI elements for org
 ;; ============================================================================
 
-(with-eval-after-load 'org-modern
-  (setq org-modern-timestamp t
-        org-modern-priority '((?A . "🔥") (?B . "🌶️") (?C . "🫑"))
-        org-modern-priority-align '(t . t)                       ; Align priority symbols
-        org-modern-keyword '((t . "▶"))
-        ;; ("date" . "\uf455")                 ; Date symbol
-        ;; ("filetags" . "\uea66")             ; File tags symbol
-        ;; ("identifier" . "\ueb11")           ; Identifier symbol
-        ;; Heading stars - use invisible stars for clean appearance
-        org-modern-star '("" "" "" "" "" "")
-        ;; Fold indicators (collapsed/expanded)
-        org-modern-fold-stars '(("◈" . "◇")
-                                ("⦿" . "◦")
-                                ("⊙" . "•")
-                                ("▸" . "▹")
-                                ("▪" . "▫"))
-        org-modern-table nil
-        org-modern-block-name nil
-        )
-
-  (add-hook 'org-mode-hook 'org-modern-mode))  ; Enable org-modern for org buffers
+;; Configure org-modern - only enable in GUI mode
+(if (display-graphic-p)
+    ;; GUI mode - configure and enable org-modern
+    (progn
+      ;; Set priority icons early so they're available
+      (setq org-modern-priority '((?A . "🔥") (?B . "🌶️") (?C . "🫑")))
+      (with-eval-after-load 'org-modern
+        (setq org-modern-timestamp t
+              org-modern-priority '((?A . "🔥") (?B . "🌶️") (?C . "🫑"))
+              org-modern-priority-align '(t . t)
+              org-modern-keyword '((t . "▶"))
+              org-modern-star '("" "" "" "" "" "")
+              org-modern-fold-stars '(("◈" . "◇")
+                                      ("⦿" . "◦")
+                                      ("⊙" . "•")
+                                      ("▸" . "▹")
+                                      ("▪" . "▫"))
+              org-modern-table nil
+              org-modern-block-name nil)
+        ;; Enable org-modern-mode for new org buffers
+        (add-hook 'org-mode-hook 'org-modern-mode)
+        ;; Also enable for existing org buffers
+        (dolist (buffer (buffer-list))
+          (with-current-buffer buffer
+            (when (derived-mode-p 'org-mode)
+              (org-modern-mode 1))))))
+  ;; Terminal mode - ensure org-modern is never enabled
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (when (bound-and-true-p org-modern-mode)
+                (org-modern-mode -1)))
+            t))
 
 (provide 'org-extensions)

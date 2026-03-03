@@ -41,7 +41,7 @@ Denote is a simple, signature-based note-taking system for Emacs that emphasizes
 
 ```
 ~/notes/archive              # archives
-~/notes/export               # exports form md/org notes
+~/org/export               # exports form md/org notes
 ~/org/attachments      # attachments for md/org files
 
 ~/org              # org-gtd

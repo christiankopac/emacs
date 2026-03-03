@@ -15,16 +15,17 @@
 (with-eval-after-load 'dirvish
   ;; Use nerd-icons for both GUI and terminal (requires nerd-fonts in terminal)
   (setq dirvish-mode-line-format              ; Simplified mode-line
-        '(:left (sort symlink) :right (omit yank index)))
+         '(:left (sort symlink) :right (omit yank index)))
   
-  (setq dirvish-attributes '(nerd-icons file-size file-time)) ; Show icons, size, time
+  ;; Keep the main file list minimal: icon + name only.
+  ;; (Dirvish preview/peek can still show richer info when needed.)
+  (setq dirvish-attributes '(nerd-icons))
   
   ;; Nerd icons configuration
   (setq dirvish-nerd-icons-offset 0.0         ; No horizontal offset for icons
-        dirvish-nerd-icons-height 1.0         ; Icon height relative to text (1.0 for terminal)
-        dirvish-nerd-icons-palette 'nerd-icons ; Use nerd-icons palette
-        dirvish-icon-delimiter " "))          ; Space between icon and text
+         dirvish-nerd-icons-height 1.0         ; Icon height relative to text (1.0 for terminal)
+         dirvish-nerd-icons-palette 'nerd-icons ; Use nerd-icons palette
+         dirvish-icon-delimiter " "))          ; Space between icon and text
 
 (provide 'ui-icons)
 ;;; ui-icons.el ends here
-

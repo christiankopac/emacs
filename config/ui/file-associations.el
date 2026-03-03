@@ -34,6 +34,11 @@
   (define-key dired-mode-map (kbd "h") 'dired-up-directory)    ; like yazi
   (define-key dired-mode-map (kbd "l") 'dired-find-file))      ; like yazi
 
+(add-hook 'dired-mode-hook
+          (lambda ()
+            (hl-line-mode 1)                             ; Highlight current line
+            (dired-hide-details-mode 1)))                ; Hide details by default
+
 ;; ============================================================================
 ;; OpenWith - Open files with external programs
 ;; ============================================================================
@@ -125,7 +130,12 @@
   
   ;; Header and mode-line format
   (setq dirvish-header-line-format '(:left (path) :right (free-space)))
-  (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index))))
+  (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
+
+  ;; Keep the main listing minimal (icon + filename).
+  ;; This complements `config/ui/ui-icons.el` and also acts as a safe override
+  ;; in case this file is loaded later.
+  (setq dirvish-attributes '(nerd-icons)))
 
 ;; NOTE: mixed-pitch configuration moved to org-core.el
 
