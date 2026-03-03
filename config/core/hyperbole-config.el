@@ -10,6 +10,20 @@
 ;;
 ;; Hyperbole upstream entry points vary a bit across versions, so this file
 ;; avoids hard failures by checking for functions before calling them.
+;;
+;; Creative uses with Org and Markdown:
+;; - Activate any implicit button (URL, path, email, org link, markdown link)
+;;   with {C-c h a} or {C-c h RET} from any buffer.
+;; - In Org/MD: pathnames like gtd/inbox.org or denote/20250101...org resolve
+;;   via hpath:auto-variable-alist (org-directory and .md → org).
+;; - C-c h o g: grep across org files (hsys-org-consult-grep).
+;; - C-c h o t: tags view across org headlines.
+;; - C-c h f: find file with Hyperbole path resolution (supports variables).
+;; - C-c h z: Xeft note search; C-c h n: Denote new note (quick from anywhere).
+;; - In markdown: same implicit buttons (URLs, paths, mailto) work; use Action
+;;   Key on [[link](url)] or [text](path) to follow.
+;; - Bare Denote IDs (e.g. 20250101T120000) in Org/MD/any buffer: put point on
+;;   the ID and use {C-c h a} to open that note (custom implicit button).
 
 (defvar my/hyperbole-prefix-key (kbd "C-c h")
   "Prefix key used for Hyperbole-related commands.")
@@ -40,7 +54,13 @@
   (when (fboundp 'which-key-add-key-based-replacements)
     (which-key-add-key-based-replacements
       "C-c h" "Hyperbole"
+      "C-c h a" "Activate button / follow link"
+      "C-c h z" "Xeft note search"
+      "C-c h n" "Denote (new note)"
+      "C-c h f" "Find path (hpath:find)"
       "C-c h o" "Hyperbole (Org)"
+      "C-c h o g" "Org grep (consult)"
+      "C-c h o t" "Org tags view"
       "C-c h b" "Hyperbole (BBDB)"
       "C-c h m" "Hyperbole (Mail)")))
 
@@ -52,6 +72,13 @@
 (when (require 'hyperbole nil t)
   ;; Load core subsystems that provide user-facing commands we bind below.
   (require 'hycontrol nil t)
+  (require 'hpath nil t)
+
+  ;; Path resolution for Markdown: .md files under org (e.g. nb/foo.md) resolve
+  ;; via org-directory so Hyperbole's pathname implicit button opens them.
+  (when (boundp 'hpath:auto-variable-alist)
+    (add-to-list 'hpath:auto-variable-alist
+                 '("\\.md\\'" . org-directory) t))
 
   ;; Enable Hyperbole globally if a mode is provided.
   (when (fboundp 'hyperbole-mode)
@@ -88,6 +115,12 @@
   (when (commandp 'hbut:delete)
     (define-key my/hyperbole-map (kbd "d") #'hbut:delete))
 
+  ;; Notes (Org/Denote/Xeft): quick access from any buffer.
+  (when (fboundp 'xeft)
+    (define-key my/hyperbole-map (kbd "z") #'xeft))
+  (when (fboundp 'denote)
+    (define-key my/hyperbole-map (kbd "n") #'denote))
+
   ;; Optional subsystems that enable richer behavior in specific areas.
   ;; Load them lazily and only if present in the installed Hyperbole version.
   (with-eval-after-load 'org
@@ -110,6 +143,31 @@
     (require 'hsmail nil t)
     (when (commandp 'hmail:compose)
       (define-key my/hyperbole-mail-map (kbd "c") #'hmail:compose))))
+
+;; ----------------------------------------------------------------------------
+;; Custom implicit button: bare Denote ID (e.g. 20250101T120000) opens that note
+;; ----------------------------------------------------------------------------
+;; In Org, Markdown, or any buffer, put point on a Denote-style timestamp ID
+;; and press {C-c h a} (or Hyperbole Action Key) to open that note.
+(with-eval-after-load 'denote
+  (when (and (featurep 'hyperbole) (fboundp 'denote-get-path-by-id))
+    (require 'hbut nil t)
+    (require 'hpath nil t)
+    (require 'hactypes nil t)
+    (when (fboundp 'defib)
+      (defib denote-id ()
+        "Open the Denote note with the date identifier at point (e.g. 20250101T120000)."
+        (let (id start end path)
+          (when (save-excursion
+                  (skip-chars-backward "0-9T")
+                  (setq start (point))
+                  (when (looking-at "\\([0-9]\\{8\\}T[0-9]\\{6\\}\\)")
+                    (setq id (match-string-no-properties 1))
+                    (setq end (match-end 1))
+                    id))
+            (when (and id (setq path (denote-get-path-by-id id)))
+              (ibut:label-set id start end)
+              (hact 'link-to-file path)))))))
 
 (provide 'hyperbole-config)
 ;;; hyperbole-config.el ends here
