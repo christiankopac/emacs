@@ -368,8 +368,45 @@
 ;; ask to confirm creating parent nodes
 (setq org-refile-allow-creating-parent-nodes 'confirm)
 
+;; ----------------------------------------------------------------------------
+;; Time tracking (clock) - automatic on state change, pause, total per task
+;; ----------------------------------------------------------------------------
+;; - Switching to NEXT or IN_PROGRESS starts the clock; switching away stops it.
+;;   (IN_PROGRESS for files that use it, e.g. DEWESoft journal.) Manual: C-c C-x C-i / C-c C-x C-o.
+;; - All clock intervals are stored in the LOGBOOK drawer; Org sums them.
+;; - View total: column view %CLOCKSUM (or :CLOCK_SUM_T:), or agenda clock report.
+(setq org-clock-into-drawer "LOGBOOK"          ; Store clock entries in LOGBOOK drawer
+      org-clock-drawers-up-to-last-state t     ; Only one drawer open at a time
+      org-clock-out-remove-zero-time-clocks t ; Remove 0-length clocks
+      org-clock-out-when-done t                ; Auto clock out when task set to DONE
+      org-clock-persist t                      ; Persist clock across Emacs sessions
+      org-clock-persist-query-save nil         ; Save without asking
+      org-clock-auto-clock-out nil             ; Optional: set to 30 to auto-stop after 30 min idle
+      org-clock-mode-line-total 'current)      ; Mode line: show current clock or today total
+
+(defvar my/org-clock-in-states '("NEXT" "IN_PROGRESS")
+  "TODO states that start the clock when entered. NEXT and IN_PROGRESS (e.g. agenda/journal).")
+
+(defun my/org-clock-in-when-working (new-state)
+  "When entering NEXT or IN_PROGRESS, clock in on this task."
+  (when (member new-state my/org-clock-in-states)
+    (org-clock-in)))
+
+(defun my/org-clock-out-when-leaving-working (new-state)
+  "When leaving a clocked-in state (NEXT/IN_PROGRESS), clock out if this task is clocked."
+  (unless (member new-state my/org-clock-in-states)
+    (when (and (org-clock-is-active)
+               (org-clock-get-clock-task)
+               (let ((clock-pos (marker-position (org-clock-get-clock-task)))
+                     (here (save-excursion (org-back-to-heading t) (point))))
+                 (eq clock-pos here)))
+      (org-clock-out))))
+
+(add-hook 'org-after-todo-state-change-hook #'my/org-clock-in-when-working)
+(add-hook 'org-after-todo-state-change-hook #'my/org-clock-out-when-leaving-working)
+
 ;; Modules - additional org features
-(setq org-modules '(org-habit))    ; Enable habit tracking
+(setq org-modules '(org-habit))    ; Enable habit tracking (org-clock is core)
 
 ;; ----------------------------------------------------------------------------
 ;; Org Capture Templates
