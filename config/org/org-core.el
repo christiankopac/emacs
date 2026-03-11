@@ -61,7 +61,8 @@
   ;; Hide various markers for cleaner appearance
   (setq-local org-hide-emphasis-markers t)  ; Hide *, /, _, = markers
   (setq-local org-hide-macro-markers t)     ; Hide macro markers
-  (setq-local org-hide-drawer-startup t)    ; Hide drawer markers on startup
+  ;; Show drawers (including LOGBOOK with clock data) by default
+  (setq-local org-hide-drawer-startup nil)
 
   ;; Set custom heading sizes (subtle scale - variable-pitch is already large)
   ;; Headings inherit from variable-pitch, so they're already bigger than monospace
@@ -387,20 +388,26 @@
 (defvar my/org-clock-in-states '("NEXT" "IN_PROGRESS")
   "TODO states that start the clock when entered. NEXT and IN_PROGRESS (e.g. agenda/journal).")
 
-(defun my/org-clock-in-when-working (new-state)
-  "When entering NEXT or IN_PROGRESS, clock in on this task."
-  (when (member new-state my/org-clock-in-states)
-    (org-clock-in)))
+(defun my/org-clock-in-when-working (&optional new-state)
+  "When entering NEXT or IN_PROGRESS, clock in on this task.
+NEW-STATE is passed by org-after-todo-state-change-hook when available;
+otherwise we read the current TODO state at point."
+  (let ((state (or new-state (nth 2 (org-heading-components)))))
+    (when (and state (member state my/org-clock-in-states))
+      (org-clock-in))))
 
-(defun my/org-clock-out-when-leaving-working (new-state)
-  "When leaving a clocked-in state (NEXT/IN_PROGRESS), clock out if this task is clocked."
-  (unless (member new-state my/org-clock-in-states)
-    (when (and (org-clock-is-active)
-               (org-clock-get-clock-task)
-               (let ((clock-pos (marker-position (org-clock-get-clock-task)))
-                     (here (save-excursion (org-back-to-heading t) (point))))
-                 (eq clock-pos here)))
-      (org-clock-out))))
+(defun my/org-clock-out-when-leaving-working (&optional new-state)
+  "When leaving a clocked-in state (NEXT/IN_PROGRESS), clock out if this task is clocked.
+NEW-STATE is passed by org-after-todo-state-change-hook when available;
+otherwise we read the current TODO state at point."
+  (let ((state (or new-state (nth 2 (org-heading-components)))))
+    (unless (and state (member state my/org-clock-in-states))
+      (when (and (org-clock-is-active)
+                 (org-clock-get-clock-task)
+                 (let ((clock-pos (marker-position (org-clock-get-clock-task)))
+                       (here (save-excursion (org-back-to-heading t) (point))))
+                   (eq clock-pos here)))
+        (org-clock-out)))))
 
 (add-hook 'org-after-todo-state-change-hook #'my/org-clock-in-when-working)
 (add-hook 'org-after-todo-state-change-hook #'my/org-clock-out-when-leaving-working)
