@@ -37,14 +37,14 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; ----------------------------------------------------------------------------
 
 (setq org-element-use-cache nil)
-(defvar elpaca-installer-version 0.11)
+(defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil :depth 1 :inherit ignore
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
+                              :build (:not elpaca-activate)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -112,6 +112,12 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 ;; Core Settings and Optimizations
 ;; ----------------------------------------------------------------------------
+
+;; Suppress native-compiler "function not known to be defined" warnings from
+;; third-party packages (e.g. copilot, format-all use project-root; git-timemachine
+;; uses magit-blame-quit). The functions exist at runtime; the compiler just
+;; doesn't see them when building those packages.
+(add-to-list 'warning-suppress-types '(comp))
 
 ;; Performance optimizations
 (setq read-process-output-max (* 1024 1024)
@@ -615,7 +621,11 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el"
                  :branch "main")
-  :hook (prog-mode . copilot-mode))
+  :hook (prog-mode . (lambda ()
+                       (when (ignore-errors (copilot-server-executable))
+                         (copilot-mode 1)))))
+  ;; Install the language server with: M-x copilot-install-server
+  ;; Requires: Node.js/npm (e.g. sudo pacman -S nodejs npm)
 
 (use-package claudemacs
   :ensure (:host github 

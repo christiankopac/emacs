@@ -64,19 +64,20 @@
       "C-c h b" "Hyperbole (BBDB)"
       "C-c h m" "Hyperbole (Mail)")))
 
-;; Org integration: avoid taking over `org-meta-return' globally.
-;; Hyperbole uses {M-RET} as an Action Key; this setting keeps it constrained
-;; to Hyperbole button contexts inside Org buffers.
-(setq hsys-org-enable-smart-keys 'buttons)
-
 (when (require 'hyperbole nil t)
+  ;; Org integration: avoid taking over `org-meta-return' globally.
+  ;; Hyperbole uses {M-RET} as an Action Key; this setting keeps it constrained
+  ;; to Hyperbole button contexts inside Org buffers.
+  (when (boundp 'hsys-org-enable-smart-keys)
+    (setq hsys-org-enable-smart-keys :buttons))
+
   ;; Load core subsystems that provide user-facing commands we bind below.
   (require 'hycontrol nil t)
   (require 'hpath nil t)
 
   ;; Path resolution for Markdown: .md files under org (e.g. nb/foo.md) resolve
   ;; via org-directory so Hyperbole's pathname implicit button opens them.
-  (when (boundp 'hpath:auto-variable-alist)
+  (when (and (boundp 'hpath:auto-variable-alist) (boundp 'org-directory))
     (add-to-list 'hpath:auto-variable-alist
                  '("\\.md\\'" . org-directory) t))
 
@@ -167,7 +168,7 @@
                     id))
             (when (and id (setq path (denote-get-path-by-id id)))
               (ibut:label-set id start end)
-              (hact 'link-to-file path)))))))
+              (hact 'link-to-file path))))))))
 
 (provide 'hyperbole-config)
 ;;; hyperbole-config.el ends here

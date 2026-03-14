@@ -73,8 +73,8 @@
   (add-hook 'text-mode-hook #'jinx-mode)                 ; Spell check text files
   (add-hook 'org-mode-hook #'jinx-mode))                 ; Spell check org files
 
-;; Custom face for misspelled words
+;; Custom face for misspelled words (use 'unspecified' if theme face not yet set)
 (custom-set-faces
- `(jinx-misspelled ((t (:underline t :foreground ,(face-foreground 'font-lock-warning-face))))))
+ `(jinx-misspelled ((t (:underline t :foreground ,(or (face-foreground 'font-lock-warning-face nil t) 'unspecified))))))
 
 (provide 'writing)
