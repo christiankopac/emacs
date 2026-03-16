@@ -392,6 +392,7 @@
   "When entering NEXT or IN_PROGRESS, clock in on this task.
 NEW-STATE is passed by org-after-todo-state-change-hook when available;
 otherwise we read the current TODO state at point."
+  (require 'org-clock nil t)
   (let ((state (or new-state (nth 2 (org-heading-components)))))
     (when (and state (member state my/org-clock-in-states))
       (org-clock-in))))
@@ -400,9 +401,11 @@ otherwise we read the current TODO state at point."
   "When leaving a clocked-in state (NEXT/IN_PROGRESS), clock out if this task is clocked.
 NEW-STATE is passed by org-after-todo-state-change-hook when available;
 otherwise we read the current TODO state at point."
+  (require 'org-clock nil t)
   (let ((state (or new-state (nth 2 (org-heading-components)))))
     (unless (and state (member state my/org-clock-in-states))
       (when (and (org-clock-is-active)
+                 (fboundp 'org-clock-get-clock-task)
                  (org-clock-get-clock-task)
                  (let ((clock-pos (marker-position (org-clock-get-clock-task)))
                        (here (save-excursion (org-back-to-heading t) (point))))
