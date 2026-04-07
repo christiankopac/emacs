@@ -7,8 +7,10 @@
 (require 'ox-hugo)
 
 ;; Set Hugo base directory (where the Hugo site lives)
-;; Customize this path to point to your Hugo site
-(setq org-hugo-base-dir (expand-file-name "~/src/my_domains/kopac_ch/"))
+;; Only set if the directory exists (avoids startup errors when ~/src is absent)
+(let ((hugo-base (expand-file-name "~/src/my_domains/kopac_ch/")))
+  (when (file-directory-p hugo-base)
+    (setq org-hugo-base-dir hugo-base)))
 
 ;; Set directory where org source files are stored
 ;; Customize this path to point to your org notes directory

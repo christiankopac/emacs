@@ -167,7 +167,7 @@
                     id))
             (when (and id (setq path (denote-get-path-by-id id)))
               (ibut:label-set id start end)
-              (hact 'link-to-file path)))))))
+              (hact 'link-to-file path))))))))
 
 (provide 'hyperbole-config)
 ;;; hyperbole-config.el ends here

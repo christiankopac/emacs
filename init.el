@@ -37,15 +37,17 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; ----------------------------------------------------------------------------
 
 (setq org-element-use-cache nil)
-(defvar elpaca-installer-version 0.11)
+;; Must match `doc/installer.el' in your Elpaca checkout (see *Warnings* if it drifts).
+(defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+;; Upstream uses `sources/`; keep `repos/` here if that is where your clones live.
+(defvar elpaca-sources-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil :depth 1 :inherit ignore
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+                              :build (:not elpaca-activate)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
        (default-directory repo))

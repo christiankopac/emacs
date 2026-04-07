@@ -1,5 +1,7 @@
 ;;; development.el --- Development tools configuration
 
+(require 'seq)
+
 ;; ----------------------------------------------------------------------------
 ;; Language-Specific Configuration
 ;; ----------------------------------------------------------------------------
@@ -43,7 +45,14 @@
 
 (with-eval-after-load 'project
   (setq project-vc-extra-root-markers '(".project" "Cargo.toml" "package.json" "pyproject.toml"))
-  (project-remember-projects-under "~/src/" nil))
+  (let ((src (expand-file-name "~/src/")))
+    (when (file-directory-p src)
+      (project-remember-projects-under src nil)))
+  ;; ghq layout: $GHQ_ROOT or ~/ghq/host/user/repo — recurse to find nested repos
+  (let ((ghq (file-name-as-directory
+              (expand-file-name (or (getenv "GHQ_ROOT") "~/ghq")))))
+    (when (file-directory-p ghq)
+      (project-remember-projects-under ghq t))))
 
 
 (global-set-key (kbd "C-c p f") 'project-find-file)      ; Find file in project
@@ -152,8 +161,15 @@
 
 (global-set-key (kbd "C-x g") 'magit-status)  ; Open magit status buffer
 (with-eval-after-load 'magit
-  (setq magit-repository-directories '(("~/src/" . 2)
-                                       ("~/notes/" . 2))))
+  (setq magit-repository-directories
+        (seq-filter
+         (lambda (pair)
+           (file-directory-p (expand-file-name (car pair))))
+         (list '("~/src/" . 2)
+               (cons (file-name-as-directory
+                      (expand-file-name (or (getenv "GHQ_ROOT") "~/ghq")))
+                     3)   ; host / user / repo
+               '("~/org/" . 2)))))
 
 ;; ============================================================================
 ;; Diff-hl Configuration - Show git changes in fringe
