@@ -620,7 +620,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 ;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
 ;; Explicit :main avoids Elpaca "Unable to find main elisp file" when the MELPA cache is wrong.
 (use-package ellama
-  :ensure (:host github :repo "s-kostyaev/ellama" :main "ellama.el" :protocol https)
+  :ensure (:host github :repo "s-kostyaev/ellama" :main "ellama.el")
   :defer t
   :bind (("C-c M-e" . ellama))
   :hook (org-ctrl-c-ctrl-c-hook . ellama-chat-send-last-message)
