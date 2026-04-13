@@ -44,6 +44,11 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 ;; Must match where clones live (Elpaca default: `elpaca/sources/`). Using `repos/`
 ;; here breaks startup if packages were installed under `sources/` (typical after Elpaca updates).
 (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
+;; If MELPA's sparse clone failed, `cache/melpa/recipes' is missing and Elpaca errors.
+(let* ((melpa-dir (expand-file-name "cache/melpa" elpaca-directory))
+       (recipes-dir (expand-file-name "recipes" melpa-dir)))
+  (when (and (file-exists-p melpa-dir) (not (file-directory-p recipes-dir)))
+    (delete-directory melpa-dir t)))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil :depth 1 :inherit ignore
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
@@ -613,22 +618,27 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 ;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see config/ai/ai-tools.el).
 ;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
+;; Explicit :main avoids Elpaca "Unable to find main elisp file" when the MELPA cache is wrong.
 (use-package ellama
-  :ensure t
+  :ensure (:host github :repo "s-kostyaev/ellama" :main "ellama.el" :protocol https)
   :defer t
   :bind (("C-c M-e" . ellama))
   :hook (org-ctrl-c-ctrl-c-hook . ellama-chat-send-last-message)
   :config
   (setopt ellama-auto-scroll t))
 
-;; Update track-changes first
+;; copilot.el requires `track-changes' (GNU ELPA); install before copilot.
 (use-package track-changes
-  :ensure (:host github :repo "emacs-straight/track-changes"))
+  :ensure t
+  :demand t)
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el"
                  :branch "main")
-  :hook (prog-mode . copilot-mode))
+  :after track-changes
+  :hook (prog-mode . (lambda ()
+                       (when (ignore-errors (copilot-server-executable))
+                         (copilot-mode 1)))))
 
 (use-package claudemacs
   :ensure (:host github 
