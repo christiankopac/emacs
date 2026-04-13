@@ -31,6 +31,25 @@
   (global-set-key (kbd "C-c g c") 'gptel-clear-context))
 
 ;; ============================================================================
+;; Ellama — local LLM (Ollama) via GNU ELPA `llm` (declared in init.el)
+;; ============================================================================
+;;
+;; `C-c M-e' runs `ellama'. With `ellama-provider' nil, Ellama uses the first
+;; model from `ollama list'. To pin models (and embeddings for context/RAG):
+;;
+;;   ollama pull qwen2.5:3b
+;;   ollama pull nomic-embed-text
+;;
+;; Then add a `with-eval-after-load' in this file, for example:
+;;
+;;   (with-eval-after-load 'ellama
+;;     (require 'llm-ollama)
+;;     (setopt ellama-provider
+;;             (make-llm-ollama
+;;              :chat-model "qwen2.5:3b"
+;;              :embedding-model "nomic-embed-text")))
+;;
+;; ============================================================================
 ;; Copilot Configuration - AI code completion
 ;; ============================================================================
 

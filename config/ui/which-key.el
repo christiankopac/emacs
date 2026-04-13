@@ -13,6 +13,7 @@
   ;; "C-c f" "🔍 Consult Find"
   "C-c l" "🔗 Store Link"
   "C-c z" "🔍 Xeft Search"
+  "C-c M-e" "🦙 Ellama (Ollama)"
   
   ;; Helpful key bindings
   "C-h f" "❓ Helpful Function"

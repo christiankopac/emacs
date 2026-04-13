@@ -611,6 +611,16 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 (use-package gptel :ensure t)
 
+;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see config/ai/ai-tools.el).
+;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
+(use-package ellama
+  :ensure t
+  :defer t
+  :bind (("C-c M-e" . ellama))
+  :hook (org-ctrl-c-ctrl-c-hook . ellama-chat-send-last-message)
+  :config
+  (setopt ellama-auto-scroll t))
+
 ;; Update track-changes first
 (use-package track-changes
   :ensure (:host github :repo "emacs-straight/track-changes"))
