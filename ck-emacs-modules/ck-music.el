@@ -133,7 +133,7 @@ RATING should be 1-5. Returns t if successful, nil otherwise."
   (defun my/read-music-groups ()
     "Read predefined music groups from config file.
 Returns a list of group names (comments and empty lines filtered)."
-    (let ((groups-file (expand-file-name "~/.config/emacs/config/media/music-groups.txt")))
+    (let ((groups-file (expand-file-name "ck-emacs-modules/music-groups.txt" user-emacs-directory)))
       (if (file-exists-p groups-file)
           (with-temp-buffer
             (insert-file-contents groups-file)
@@ -311,5 +311,5 @@ Saves to both MPD stickers and file tags."
   ;; Keybindings
   (global-set-key (kbd "C-c m m") 'listen))
 
-(provide 'music)
+(provide 'ck-music)
 ;;; music.el ends here

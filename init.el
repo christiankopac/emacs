@@ -113,7 +113,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
     `(progn ,@body)))
 
 ;; Define org-gtd-inbox early so configs that reference it (hyperbole, org, etc.) don't error
-;; The real value is set in config/org/org-extensions.el; this ensures the symbol exists.
+;; The real value is set in ck-emacs-modules/ck-org-extensions.el; this ensures the symbol exists.
 (when (not (boundp 'org-gtd-inbox))
   (defvar org-gtd-inbox nil "Path to GTD inbox file. Set in org-extensions.el."))
 
@@ -143,15 +143,9 @@ This macro was removed in newer Org versions. It now just executes BODY normally
   (tool-bar-mode -1))    ; Also fixed: use -1 instead of nil
 (setq inhibit-startup-screen 1)
 
-;; Add config subdirectories to load-path
-(add-to-list 'load-path (expand-file-name "config/core" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/ui" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/org" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/email" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/dev" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/writing" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/media" user-emacs-directory))
-(add-to-list 'load-path (expand-file-name "config/functions" user-emacs-directory))
+;; Add module and lisp directories to load-path
+(add-to-list 'load-path (expand-file-name "ck-emacs-modules" user-emacs-directory))
+(add-to-list 'load-path (expand-file-name "ck-lisp" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Essential Packages
@@ -159,7 +153,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 
 (use-package emacs
   :config
-  (load-file (expand-file-name "config/core/emacs.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-core.el" user-emacs-directory)))
 
 ;; ----------------------------------------------------------------------------
 ;; UI: Themes Packages (no config needed, just ensure)
@@ -192,7 +186,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package cape :ensure t)
 
 ;; Load completion config
-(load-file (expand-file-name "config/ui/completion.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-completion.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; UI: Icons
@@ -208,7 +202,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
                           (all-the-icons-dired-mode 1)))))
 (use-package nerd-icons :ensure t)
 
-(load-file (expand-file-name "config/ui/ui-icons.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-icons.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; UI: Fonts & Ligatures
@@ -223,7 +217,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; Load font configuration after fontaine is ready (only in graphical mode)
 (when (display-graphic-p)
   (with-eval-after-load 'fontaine
-    (load-file (expand-file-name "config/ui/fonts-ligatures.el" user-emacs-directory))))
+    (load-file (expand-file-name "ck-emacs-modules/ck-fonts.el" user-emacs-directory))))
 
 (use-package show-font
   :ensure t
@@ -305,128 +299,13 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package helm :ensure t)
 (use-package helm-org :ensure t :after (helm org))
 (use-package multiple-cursors :ensure t)
-(use-package mood-line 
-  :ensure t
-  :config
-  (setq mood-line-glyph-alist mood-line-glyphs-fira-code
-        mood-line-show-encoding-information nil
-        mood-line-show-eol-style nil
-        mood-line-show-cursor-point t
-        mood-line-right-align nil
-        mood-line-percent-position nil)
-  ;; Customize faces (only if they exist)
-  (when (facep 'mood-line-modified)
-    (set-face-attribute 'mood-line-modified nil
-                        :foreground "#d08770"
-                        :weight 'bold))
-  (when (facep 'mood-line-status-neutral)
-    (set-face-attribute 'mood-line-status-neutral nil
-                        :foreground "#88c0d0"))
-  (when (facep 'mood-line-status-info)
-    (set-face-attribute 'mood-line-status-info nil
-                        :foreground "#81a1c1"))
-  (when (facep 'mood-line-status-success)
-    (set-face-attribute 'mood-line-status-success nil
-                        :foreground "#a3be8c"))
-  (when (facep 'mood-line-status-warning)
-    (set-face-attribute 'mood-line-status-warning nil
-                        :foreground "#ebcb8b"))
-  (when (facep 'mood-line-status-error)
-    (set-face-attribute 'mood-line-status-error nil
-                        :foreground "#bf616a"))
-  (when (facep 'mood-line-encoding)
-    (set-face-attribute 'mood-line-encoding nil
-                        :inherit 'mood-line-unimportant))
-  ;; Enable mood-line
-  (mood-line-mode 1))
+(use-package mood-line :ensure t)
 
-;; Minimal emoji mode-line enhancements (modern, minimal)
+;; Mood-line + emoji mode-line configuration lives in ck-modeline.el.
+;; Loading after mood-line ensures the segment libraries are available
+;; before we wire in the format and the emoji segment.
 (with-eval-after-load 'mood-line
-  ;; Prefer Noto Color Emoji if available for colorful emoji support
-  (when (member "Noto Color Emoji" (font-family-list))
-    (set-fontset-font t 'emoji (font-spec :family "Noto Color Emoji") nil 'prepend))
-
-  (defface my/mode-line-emoji-face
-    '((t :inherit mode-line :weight bold))
-    "Face for the emoji in the mode-line.")
-
-  (defvar my/mode-line-emoji-alist
-    '((emacs-lisp-mode . "λ")
-      (python-mode . "🐍")
-      (org-mode . "📝")
-      (org-agenda-mode . "📅")
-      (markdown-mode . "📰")
-      (js-mode . "✨")
-      (typescript-mode . "🟦")
-      (rust-mode . "🦀")
-      (go-mode . "🐹")
-      (sh-mode . "🐚")
-      (eshell-mode . "🐚")
-      (vterm-mode . "🖥️")
-      (term-mode . "🖥️")
-      (dired-mode . "📁")
-      (magit-status-mode . "🔀")
-      (help-mode . "❓")
-      (compilation-mode . "⚙️")
-      (sql-mode . "🗄️")
-      (default . "📄"))
-    "Alist mapping major-mode to an emoji.")
-
-  (defvar my/messages-unread-count 0
-    "Count of unread messages since the last view of the *Messages* buffer.")
-
-  (defun my/_increment-messages-unread (&rest _args)
-    "Increment the unread messages counter when `message' is called."
-    (setq my/messages-unread-count (1+ (or my/messages-unread-count 0))))
-
-  (defun my/reset-messages-unread (&rest _args)
-    "Reset messages unread counter (called when user views messages)."
-    (setq my/messages-unread-count 0))
-
-  ;; Hook into message generation and message viewing
-  (advice-add 'message :after #'my/_increment-messages-unread)
-  (advice-add 'view-echo-area-messages :after #'my/reset-messages-unread)
-  ;; Also reset when *Messages* is displayed
-  (defun my/reset-if-messages-buffer-showing (&rest args)
-    (let ((buf (if (bufferp (car args)) (car args) (get-buffer (car args)))))
-      (when (and buf (string= (buffer-name buf) "*Messages*"))
-        (my/reset-messages-unread))))
-  (advice-add 'switch-to-buffer :after #'my/reset-if-messages-buffer-showing)
-  (advice-add 'display-buffer :after (lambda (buf &rest _) (my/reset-if-messages-buffer-showing buf)))
-
-  (defun my/mode-line-emoji-for-mode ()
-    "Return an emoji for the current buffer.
-Checks for *Messages* / notification buffers first, then major mode (using derived-mode-p).")
-
-  (defun my/mode-line-emoji-for-mode ()
-    (cond
-     ;; Messages or notification buffers (show count when > 0)
-     ((or (> (or my/messages-unread-count 0) 0)
-          (string-match-p "\*Messages?\*\|\*Notifications?\*\|\*alerts?\*" (buffer-name)))
-      (let ((count (or my/messages-unread-count 0)))
-        (if (> count 0)
-            (format "🔔%d" count)
-          "🔔")))
-     ;; Match by derived major mode
-     (t
-      (let ((res (catch 'found
-                   (dolist (pair my/mode-line-emoji-alist)
-                     (when (and (symbolp (car pair)) (derived-mode-p (car pair)))
-                       (throw 'found (cdr pair))))
-                   nil)))
-        (or res (cdr (assoc 'default my/mode-line-emoji-alist)))))))
-
-  (defun my/mode-line-emoji ()
-    (let* ((emoji (my/mode-line-emoji-for-mode))
-           (state (cond (buffer-read-only "🔒")
-                        ((buffer-modified-p) "✏️")
-                        (t "✅"))))
-      (concat " " (propertize emoji 'face 'my/mode-line-emoji-face) " " state " ")))
-
-  ;; Only add once
-  (unless (member '(:eval (my/mode-line-emoji)) mode-line-format)
-    (setq-default mode-line-format
-                  (cons '(:eval (my/mode-line-emoji)) mode-line-format))))
+  (load-file (expand-file-name "ck-emacs-modules/ck-modeline.el" user-emacs-directory)))
 
 (use-package openwith 
   :ensure t
@@ -435,26 +314,26 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
   (add-hook 'after-init-hook 
             (lambda () 
               (require 'openwith)
-              (load-file (expand-file-name "config/ui/file-associations.el" user-emacs-directory)))))
+              (load-file (expand-file-name "ck-emacs-modules/ck-file-associations.el" user-emacs-directory)))))
 
 ;; Load UI configuration files (after Elpaca loads packages)
 ;; Load dashboard.el after dashboard package is available
 (with-eval-after-load 'dashboard
   (condition-case err
-      (load-file (expand-file-name "config/ui/dashboard.el" user-emacs-directory))
+      (load-file (expand-file-name "ck-emacs-modules/ck-dashboard.el" user-emacs-directory))
     (error (message "Warning: Could not load dashboard.el - %s" (error-message-string err)))))
-(load-file (expand-file-name "config/ui/ui-enhancements.el" user-emacs-directory))
-(load-file (expand-file-name "config/ui/navigation.el" user-emacs-directory))
-(load-file (expand-file-name "config/ui/editing.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-ui.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-navigation.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-editing.el" user-emacs-directory))
 
 ;; Load Hyperbole configuration after Elpaca initialization (ensures package is installed).
 (add-hook 'elpaca-after-init-hook
           (lambda ()
-            (load-file (expand-file-name "config/core/hyperbole-config.el" user-emacs-directory))))
+            (load-file (expand-file-name "ck-emacs-modules/ck-hyperbole.el" user-emacs-directory))))
 
 ;; Load dirvish config after package is ready
 (with-eval-after-load 'dirvish
-  (load-file (expand-file-name "config/ui/file-associations.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-file-associations.el" user-emacs-directory)))
 
 (use-package clipetty
   :ensure t
@@ -496,7 +375,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 ;; (use-package org-journal :ensure t)
 
 ;; Load org configurations
-(load-file (expand-file-name "config/org/org-core.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-org-core.el" user-emacs-directory))
 
 ;; All remaining org packages (extensions)
 (use-package org-appear :ensure t :hook (org-mode . org-appear-mode))
@@ -508,11 +387,11 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 (use-package org-ql :ensure t :after org)
 (use-package org-web-tools :ensure t)
 (use-package org-modern :ensure t :defer t)
-;; org-modern is configured in config/org/org-extensions.el to only enable in GUI mode
+;; org-modern is configured in ck-emacs-modules/ck-org-extensions.el to only enable in GUI mode
 
 ;; Load org extensions configuration
 (with-eval-after-load 'org
-  (load-file (expand-file-name "config/org/org-extensions.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-org-extensions.el" user-emacs-directory)))
 
 ;; Export packages
 (use-package ox :ensure nil :after org)
@@ -522,11 +401,11 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 ;; Load org export configuration
 (with-eval-after-load 'org
-  (load-file (expand-file-name "config/org/org-export.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-org-export.el" user-emacs-directory)))
 
 ;; Load ox-hugo configuration for Hugo website workflow
 (with-eval-after-load 'ox-hugo
-  (load-file (expand-file-name "config/org/ox-hugo.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-ox-hugo.el" user-emacs-directory)))
 
 
 ;; ----------------------------------------------------------------------------
@@ -538,7 +417,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 ;; Load org-roam configuration
 ;; (with-eval-after-load 'org-roam
-;;  (load-file (expand-file-name "config/org/org-roam.el" user-emacs-directory)))
+;;  (load-file (expand-file-name "ck-emacs-modules/ck-org-roam.el" user-emacs-directory)))
 
 ;; ----------------------------------------------------------------------------
 ;; Denote Packages
@@ -564,12 +443,12 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 ;; Load denote configuration after Elpaca initialization
 (add-hook 'elpaca-after-init-hook
           (lambda ()
-            (load-file (expand-file-name "config/org/denote.el" user-emacs-directory))))
+            (load-file (expand-file-name "ck-emacs-modules/ck-denote.el" user-emacs-directory))))
 
 ;; Load xeft configuration after Elpaca initialization
 (add-hook 'elpaca-after-init-hook
           (lambda ()
-            (load-file (expand-file-name "config/org/xeft.el" user-emacs-directory))))
+            (load-file (expand-file-name "ck-emacs-modules/ck-xeft.el" user-emacs-directory))))
 
 ;; ----------------------------------------------------------------------------
 ;; Language Specific Packages
@@ -616,7 +495,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 (use-package gptel :ensure t)
 
-;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see config/ai/ai-tools.el).
+;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see ck-emacs-modules/ck-ai.el).
 ;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
 ;; Explicit :main avoids Elpaca "Unable to find main elisp file" when the MELPA cache is wrong.
 (use-package ellama
@@ -647,7 +526,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
                  :main "claudemacs.el"))
 
 ;; Load AI tools configuration
-(load-file (expand-file-name "config/ai/ai-tools.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-ai.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Terminal Packages
@@ -657,7 +536,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 (use-package exec-path-from-shell :ensure t)
 
 ;; Load development configuration
-(load-file (expand-file-name "config/dev/development.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-development.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Writing
@@ -672,7 +551,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 (use-package jinx :ensure t :hook (emacs-startup . global-jinx-mode))
 
 ;; Load writing configuration
-(load-file (expand-file-name "config/writing/writing.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-writing.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Media & Music
@@ -683,9 +562,9 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 
 ;; Load media configuration
 (with-eval-after-load 'emms
-  (load-file (expand-file-name "config/media/music.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-music.el" user-emacs-directory)))
 (with-eval-after-load 'listen
-  (load-file (expand-file-name "config/media/music.el" user-emacs-directory)))
+  (load-file (expand-file-name "ck-emacs-modules/ck-music.el" user-emacs-directory)))
 
 ;; ----------------------------------------------------------------------------
 ;; E-Mail & Contacts
@@ -718,7 +597,7 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
   :commands (consult-mu consult-mu-dynamic consult-mu-async consult-mu-contacts))
 
 ;; Load email configuration early (safe to load even when mu4e isn't installed).
-(load-file (expand-file-name "config/email/email.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-email.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Machine Specific Configuration
@@ -744,8 +623,8 @@ Checks for *Messages* / notification buffers first, then major mode (using deriv
 ;; Custom Functions
 ;; ----------------------------------------------------------------------------
 
-(load-file (expand-file-name "config/functions/custom-functions.el" user-emacs-directory))
-(load-file (expand-file-name "config/functions/maintenance.el" user-emacs-directory))
+(load-file (expand-file-name "ck-lisp/ck-functions.el" user-emacs-directory))
+(load-file (expand-file-name "ck-lisp/ck-maintenance.el" user-emacs-directory))
 
 ;; ----------------------------------------------------------------------------
 ;; Global Keybindings

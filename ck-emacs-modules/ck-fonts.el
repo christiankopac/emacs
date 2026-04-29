@@ -246,4 +246,4 @@ Only applies in graphical displays."
 ;;   ;; Don't apply ligatures to org-mode to avoid conflicts with org-hide-leading-stars
 ;;   (global-ligature-mode t))
 
-(provide 'fonts-ligatures)
+(provide 'ck-fonts)

@@ -539,4 +539,4 @@ Prompts to choose between personal or work journal."
 (global-set-key (kbd "C-c j") 'my/open-todays-personal-journal)  ; Quick access to today's personal journal
 (global-set-key (kbd "C-c J") 'my/open-todays-work-journal)  ; Quick access to today's work journal
 
-(provide 'org-core)
+(provide 'ck-org-core)

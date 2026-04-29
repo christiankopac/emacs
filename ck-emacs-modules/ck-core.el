@@ -107,8 +107,8 @@
 
 ;; (defvar my/font-sans-serif "Open Sans" "Sans Serif font GUI.")
 
-;; Font definitions are now in config/ui/fonts-ligatures.el with fallback support
-;; These are kept here for backward compatibility but will be overridden by fonts-ligatures.el
+;; Font definitions are in ck-emacs-modules/ck-fonts.el with fallback support
+;; These are kept here for backward compatibility but will be overridden by ck-fonts.el
 (unless (boundp 'my/font-serif)
   (defvar my/font-serif "Literata" "Default serif font for variable pitch text."))
-(provide 'emacs-config)
+(provide 'ck-core)

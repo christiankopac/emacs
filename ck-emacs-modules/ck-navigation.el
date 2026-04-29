@@ -85,4 +85,4 @@ configuration (if any)."
 ;; Keybindings for toggles
 (global-set-key (kbd "<f11>") 'my/toggle-frame-fullscreen)
 (global-set-key (kbd "C-c M-<f11>") 'my/toggle-window-maximize)
-(provide 'navigation)
+(provide 'ck-navigation)

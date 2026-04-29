@@ -92,4 +92,4 @@
 
 (setq org-pandoc-options '((standalone . t)))  ; Generate standalone documents
 
-(provide 'org-export-config)
+(provide 'ck-org-export)

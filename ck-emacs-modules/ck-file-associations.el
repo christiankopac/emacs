@@ -5,7 +5,7 @@
   (setq dirvish-preview-dispatchers '(image gif pdf font)))
 
 (setq dirvish-sidecar nil) ; Disable left sidecar/tree column
-;;; file-associations.el --- External program associations and file managers
+;;; ck-file-associations.el --- External program associations and file managers
 
 ;; ============================================================================
 ;; Dired - File manager for Emacs
@@ -133,7 +133,7 @@
   (setq dirvish-mode-line-format '(:left (sort symlink) :right (omit yank index)))
 
   ;; Keep the main listing minimal (icon + filename).
-  ;; This complements `config/ui/ui-icons.el` and also acts as a safe override
+  ;; This complements `ck-emacs-modules/ck-icons.el` and also acts as a safe override
   ;; in case this file is loaded later.
   (setq dirvish-attributes '(nerd-icons)))
 
@@ -155,4 +155,4 @@
   (setq helm-split-window-inside-p t                      ; Split inside current window
         helm-move-to-line-cycle-in-source t))             ; Cycle through candidates
 
-(provide 'file-associations)
+(provide 'ck-file-associations)

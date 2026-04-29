@@ -363,4 +363,4 @@ This rebuilds copilot from the latest source in the repository."
         (let ((default-directory repo-dir))
           (call-process "git" nil t nil "pull" "origin" "main"))))))
 
-(provide 'custom-functions)
+(provide 'ck-functions)

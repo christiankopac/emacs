@@ -129,4 +129,4 @@
 (with-eval-after-load 'embark
   (add-hook 'embark-collect-mode-hook 'consult-preview-at-point-mode))  ; Enable preview in embark collect
 
-(provide 'completion)
+(provide 'ck-completion)

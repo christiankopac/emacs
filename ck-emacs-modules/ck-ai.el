@@ -63,4 +63,4 @@
   (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)         ; Accept with TAB
   (define-key copilot-completion-map (kbd "C-<tab>") 'copilot-accept-completion-by-word))  ; Accept word by word
 
-(provide 'ai-tools)
+(provide 'ck-ai)

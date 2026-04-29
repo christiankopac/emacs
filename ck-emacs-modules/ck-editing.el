@@ -20,4 +20,4 @@
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)      ; Mark next occurrence
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)  ; Mark previous occurrence
 
-(provide 'editing)
+(provide 'ck-editing)

@@ -169,5 +169,5 @@ Looks for DONE items older than 30 days."
 (global-set-key (kbd "C-c m a") 'my/maintenance-check)
 (global-set-key (kbd "C-c m o") 'my/cleanup-old-archives)
 
-(provide 'maintenance)
+(provide 'ck-maintenance)
 

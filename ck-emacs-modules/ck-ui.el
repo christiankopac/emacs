@@ -49,4 +49,4 @@
 ;; Mood-line Configuration - Moved to init.el
 ;; ============================================================================
 
-(provide 'ui-enhancements)
+(provide 'ck-ui)

@@ -226,4 +226,4 @@
   (when (memq window-system '(mac ns x))     ; Only on macOS and X window systems
     (exec-path-from-shell-initialize)))      ; Import shell environment variables
 
-(provide 'development)
+(provide 'ck-development)

@@ -77,4 +77,4 @@
 (custom-set-faces
  `(jinx-misspelled ((t (:underline t :foreground ,(face-foreground 'font-lock-warning-face))))))
 
-(provide 'writing)
+(provide 'ck-writing)

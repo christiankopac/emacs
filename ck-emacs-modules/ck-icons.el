@@ -27,5 +27,5 @@
          dirvish-nerd-icons-palette 'nerd-icons ; Use nerd-icons palette
          dirvish-icon-delimiter " "))          ; Space between icon and text
 
-(provide 'ui-icons)
+(provide 'ck-icons)
 ;;; ui-icons.el ends here

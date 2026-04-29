@@ -169,5 +169,5 @@
               (ibut:label-set id start end)
               (hact 'link-to-file path))))))))
 
-(provide 'hyperbole-config)
+(provide 'ck-hyperbole)
 ;;; hyperbole-config.el ends here

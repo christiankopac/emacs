@@ -601,4 +601,4 @@ If a new re of focus pops-up that is not in the list, it will not be set."
                 (org-modern-mode -1)))
             t))
 
-(provide 'org-extensions)
+(provide 'ck-org-extensions)

@@ -24,7 +24,7 @@
 
 (defun my/dashboard-random-banner ()
   "Select a random ASCII art banner from the dashboard directory."
-  (let* ((dashboard-dir "~/.config/emacs/banner")
+  (let* ((dashboard-dir "~/.emacs.d/banner")
          (banner-files (directory-files dashboard-dir nil "\\.txt$")))
     (if banner-files
         (let ((random-banner (nth (random (length banner-files)) banner-files)))
@@ -133,4 +133,4 @@
                   (remove-overlays (point-min) (point-max))
                   (redisplay))))))
 )
-(provide 'dashboard-config)
+(provide 'ck-dashboard)

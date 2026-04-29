@@ -958,5 +958,5 @@ Handles complete metadata, partial metadata, and no metadata cases."
 ;; ============================================================================
 ;; End of Configuration
 ;; ============================================================================
-(provide 'denote)
+(provide 'ck-denote)
 ;;; denote.el ends here

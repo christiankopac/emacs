@@ -180,5 +180,5 @@
 ;;
 ;; (add-hook 'after-save-hook #'my/hugo-auto-export)
 
-(provide 'ox-hugo-config)
+(provide 'ck-ox-hugo)
 ;;; ox-hugo.el ends here

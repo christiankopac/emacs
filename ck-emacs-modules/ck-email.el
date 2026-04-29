@@ -276,4 +276,4 @@
       "C-c m f" "󰇮 Search Fastmail"
       "C-c m e" "󰉋 Search Everywhere")))
 
-(provide 'email)
+(provide 'ck-email)

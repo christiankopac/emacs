@@ -160,4 +160,4 @@
   ;; Markdown
   "g" "👁️ Grip Preview")
 
-(provide 'which-key)
+(provide 'ck-which-key)

@@ -105,5 +105,5 @@
 ;; Add keybinding for quick search
 (global-set-key (kbd "C-c z w") 'my/xeft-search-current-word)
 
-(provide 'xeft-config)
+(provide 'ck-xeft)
 
