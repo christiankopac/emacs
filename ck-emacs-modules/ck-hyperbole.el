@@ -28,6 +28,8 @@
 (defvar my/hyperbole-prefix-key (kbd "C-c h")
   "Prefix key used for Hyperbole-related commands.")
 
+(setq hywiki-directory "~/org/hywiki/")
+
 (defvar my/hyperbole-map
   (let ((map (make-sparse-keymap)))
     map)

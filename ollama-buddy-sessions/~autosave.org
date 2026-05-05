@@ -1,0 +1,77 @@
+#+TITLE: Ollama Buddy Chat
+
+* Ollama Buddy [v7.1.3]
+#+begin_example
+┌───────────────────────────────────┐
+│  O L L A M A   B U D D Y          │
+└───────────────────────────────────┘
+#+end_example
+
+Quick parameter profiles: the parameter menu offers Default, Creative and Precise presets to switch generation style in one step.
+
+Project: [[file:~/org/][~/org/]] (7324 files)
+
+Hint: Type =/init= to generate a project summary — it will be auto-loaded as context in future sessions.
+
+o: Ollama (7)            c: Ollama Cloud (9)
+u: Cloud (20)
+
+- /Ask me anything!/       *C-c C-c* OR *C-c RET*
+- /Main transient menu/    *C-c O*
+- /Select model/           *C-c m*
+- /Pull new model/         *C-c l*
+** More Commands
+- /Browse prompt history/  *M-p/n/r*
+- /Manage models/          *C-c M*
+- /Recommended models/     *C-c L*
+- /Load session/           *C-c f*
+- /Save session/           *C-c s*
+- /In-buffer replace/      *C-c W*
+- /Toggle airplane mode/   *C-c !*
+- /Slash commands/         */*
+- /ollama-buddy Manual/    *C-c ?*
+
+Presets/prompts not installed. Use *C-c O* → *I* to install extras for the full experience.
+:PROPERTIES:
+:TIMESTAMP: [2026-05-04 Mon 22:07]
+:TOKENS:   106
+:RATE:     51.0
+:ELAPSED:  2.1s
+:WAIT:     6.6s
+:END:
+
+* *kimi-k2.6:cloud* ☁⚒⊙✦ >> PROMPT: hi
+
+** [kimi-k2.6:cloud: RESPONSE]
+*** Think
+
+
+The user said "hi". This is a simple greeting. I should respond in a friendly, helpful manner. The system instruction says to format responses in plain prose, never use markdown tables, and use clear paragraphs and bullet points for structured information. Since this is just a greeting, a simple paragraph response is appropriate. No bullet points needed yet unless I provide multiple pieces of information, but a simple greeting doesn't require that.
+
+I should keep it concise and open-ended to invite further conversation.
+
+*** Response
+
+Hello! How can I help you today?
+
+* >> PROMPT: you good?
+
+** [u:minimax-m2.7:cloud: RESPONSE]
+:PROPERTIES:
+:TIMESTAMP: [2026-05-04 Mon 22:08]
+:TOKENS:   2
+:RATE:     2.9
+:ELAPSED:  0.7s
+:WAIT:     2.5s
+:END:
+
+*** Think
+
+
+The user is asking "you good?" which is a casual greeting or check-in. I should respond in a friendly, conversational way. Since the system prompt mentions format responses in plain prose, I should keep it simple and natural.
+
+*** Response
+
+I'm doing well, thanks for asking! Just ready to help out with whatever you need. What can I do for you today?
+
+* *u:minimax-m2.7:cloud* ☁⚒✦ >> PROMPT: 

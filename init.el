@@ -82,6 +82,7 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
     (elpaca-generate-autoloads "elpaca" repo)
     (let ((load-source-file-function nil)) (load "./elpaca-autoloads"))))
 (add-hook 'after-init-hook #'elpaca-process-queues)
+(setq elpaca-show-process-buffer nil)
 (elpaca `(,@elpaca-order))
 
 ;; Install use-package support for elpaca
@@ -176,9 +177,13 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; UI: Completion Packages
 ;; ----------------------------------------------------------------------------
 
-(use-package vertico :ensure t)
+(use-package vertico
+  :elpaca (vertico :depth 1)
+  :ensure t)
 (use-package corfu :ensure t)
-(use-package orderless :ensure t)
+(use-package orderless
+  :elpaca (orderless :host github :repo "oantolin/orderless" :depth 1)
+  :ensure t)
 (use-package marginalia :ensure t)
 (use-package embark :ensure t)
 (use-package consult :ensure t)
@@ -238,7 +243,8 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package spacious-padding :ensure t)
 (use-package mixed-pitch :ensure t)
 (use-package helpful :ensure t)
-(use-package smartparens :ensure t)
+(use-package smartparens
+  :elpaca (smartparens :host github :repo "oantolin/smartparens" :depth 1))
 (use-package expand-region :ensure t)
 (use-package which-key :ensure t)
 (use-package hyperbole :ensure t)
@@ -483,7 +489,9 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; Version Control Packages
 ;; ----------------------------------------------------------------------------
 
-(use-package magit :after transient :ensure t :demand t)
+(use-package magit
+  :elpaca (magit :depth 1)
+  :after transient :ensure t :demand t)
 (use-package diff-hl :ensure t :after magit)
 (use-package git-timemachine :ensure t)
 (use-package git-messenger :ensure t :after magit)
@@ -525,6 +533,29 @@ This macro was removed in newer Org versions. It now just executes BODY normally
                  :branch "main"
                  :main "claudemacs.el"))
 
+(use-package ollama-buddy
+  :ensure t
+  :bind
+  ("C-c o" . ollama-buddy-role-transient-menu)
+  ("C-c O" . ollama-buddy-transient-menu)
+  :config
+  (require 'savehist)
+  (require 'color)
+  (require 'ollama-buddy-provider)
+  (ollama-buddy-provider-create
+   :name "Ollama Cloud"
+   :prefix "c:"
+   :api-type 'claude
+   :api-key (lambda () (auth-source-pick-first-password
+                        :host "ollama-buddy-claude" :user "apikey"))
+   :endpoint "https://api.anthropic.com/v1/messages"
+   :models-endpoint "https://api.anthropic.com/v1/models")
+  (setq ollama-buddy-cloud-api-key
+        (auth-source-pick-first-password :host "ollama-buddy-cloud" :user "apikey"))
+  (setq ollama-buddy-default-model "minimax-m2.7:cloud")
+  (setq ollama-buddy-host "localhost")
+  (setq ollama-buddy-port 11434))
+
 ;; Load AI tools configuration
 (load-file (expand-file-name "ck-emacs-modules/ck-ai.el" user-emacs-directory))
 
@@ -548,7 +579,10 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package pdf-tools :ensure t)
 (use-package nov :ensure t :mode ("\\.epub\\'" . nov-mode))
 (use-package olivetti :ensure t)
-(use-package jinx :ensure t :hook (emacs-startup . global-jinx-mode))
+(use-package jinx
+  :ensure t
+  :init (require 'cl)
+  :hook (emacs-startup . global-jinx-mode))
 
 ;; Load writing configuration
 (load-file (expand-file-name "ck-emacs-modules/ck-writing.el" user-emacs-directory))
@@ -604,6 +638,21 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 ;; Clipboard settings
+(when (and (eq system-type 'gnu/linux)
+           (getenv "WSL_DISTRO_NAME"))
+  (setq interprogram-cut-function
+        (lambda (text)
+          (let ((process-connection-type nil))
+            (let ((proc (start-process "win32yank-w" nil
+                                       "/mnt/c/Users/Public/win32yank/win32yank.exe"
+                                       "-i" "--crlf")))
+              (process-send-string proc text)
+              (process-send-eof proc)))))
+  (setq interprogram-paste-function
+        (lambda ()
+          (let ((stdout (shell-command-to-string "/mnt/c/Users/Public/win32yank/win32yank.exe -o --lf")))
+            (unless (string= stdout "") stdout)))))
+
 (defvar my/clipboard-wayland-command "wl-copy")
 (defvar my/clipboard-wayland-paste-command "wl-paste")
 (defvar my/clipboard-x11-command "xclip")
