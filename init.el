@@ -638,9 +638,12 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 ;; Clipboard settings
-;; Under WSLg, X11/Wayland clipboard works natively via xclip/wl-copy — no
-;; need for win32yank.exe, which would also require Windows interop to be
-;; enabled. Emacs' default `select-enable-clipboard' handling is sufficient.
+;; For GUI Emacs (and WSLg + GUI) the default `select-enable-clipboard'
+;; path is sufficient. For terminal Emacs (`emacs -nw') on WSL we need
+;; an explicit bridge — see `ck-wsl-clipboard.el', which wires
+;; `interprogram-paste-function' / `interprogram-cut-function' to
+;; wl-paste/xclip with a PowerShell fallback.
+(load-file (expand-file-name "ck-emacs-modules/ck-wsl-clipboard.el" user-emacs-directory))
 
 (defvar my/clipboard-wayland-command "wl-copy")
 (defvar my/clipboard-wayland-paste-command "wl-paste")
