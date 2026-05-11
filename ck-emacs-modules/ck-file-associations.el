@@ -47,36 +47,23 @@
 
 
 (with-eval-after-load 'openwith
-  ;; Configure file associations for WSL/Arch Linux and Windows interop
+  ;; Native-Linux file associations. Works on plain Linux and on WSLg without
+  ;; requiring Windows interop. xdg-open is used as a generic fallback so the
+  ;; system's mime defaults (or wslu's wslview, if installed) handle anything
+  ;; without a dedicated viewer here.
   (setq openwith-associations
-        (if (and (eq system-type 'gnu/linux)
-                 (getenv "WSL_DISTRO_NAME"))
-            ;; WSL: use powershell.exe to open in Windows
-            '(;; Images
-              ("\\.\\(?:png\\|jpg\\|jpeg\\|gif\\|bmp\\|webp\\)\\'" "powershell.exe" ("Start-Process" file))
-              ;; PDF
-              ("\\.pdf\\'" "powershell.exe" ("Start-Process" file))
-              ;; Office
-              ("\\.\\(?:docx?\\|xlsx?\\|pptx?\\)\\'" "powershell.exe" ("Start-Process" file))
-              ;; Video
-              ("\\.\\(?:mp4\\|mkv\\|avi\\|mov\\|wmv\\|flv\\|webm\\|m4v\\)\\'" "powershell.exe" ("Start-Process" file))
-              ;; Audio
-              ("\\.\\(?:mp3\\|flac\\|ogg\\|wav\\|m4a\\|opus\\|aac\\)\\'" "powershell.exe" ("Start-Process" file))
-              ;; Archives
-              ("\\.\\(?:zip\\|tar\\.gz\\|tgz\\|tar\\.bz2\\|tbz2\\|7z\\|rar\\)\\'" "powershell.exe" ("Start-Process" file)))
-          ;; Native Linux
-            '(;; Video files - MPV
-              ("\\.\\(?:mp4\\|mkv\\|avi\\|mov\\|wmv\\|flv\\|webm\\|m4v\\)\\'" "mpv" (file))
-              ;; Audio files - MPV
-              ("\\.\\(?:mp3\\|flac\\|ogg\\|wav\\|m4a\\|opus\\|aac\\)\\'" "mpv" (file))
-              ;; Images - feh (excluding SVG, which Emacs handles natively)
-              ("\\.\\(?:png\\|jpg\\|jpeg\\|gif\\|bmp\\|webp\\)\\'" "feh" (file))
-              ;; Microsoft Office - LibreOffice
-              ("\\.\\(?:docx?\\|xlsx?\\|pptx?\\)\\'" "libreoffice" (file))
-              ;; PDF - zathura (or okular/evince as fallback)
-              ("\\.pdf\\'" "zathura" (file))
-              ;; Archives - file-roller/xarchiver
-              ("\\.\\(?:zip\\|tar\\.gz\\|tgz\\|tar\\.bz2\\|tbz2\\|7z\\|rar\\)\\'" "xarchiver" (file)))))
+        '(;; Video
+          ("\\.\\(?:mp4\\|mkv\\|avi\\|mov\\|wmv\\|flv\\|webm\\|m4v\\)\\'" "mpv" (file))
+          ;; Audio
+          ("\\.\\(?:mp3\\|flac\\|ogg\\|wav\\|m4a\\|opus\\|aac\\)\\'" "mpv" (file))
+          ;; Images (SVG handled natively by Emacs)
+          ("\\.\\(?:png\\|jpg\\|jpeg\\|gif\\|bmp\\|webp\\)\\'" "xdg-open" (file))
+          ;; Microsoft Office
+          ("\\.\\(?:docx?\\|xlsx?\\|pptx?\\)\\'" "xdg-open" (file))
+          ;; PDF
+          ("\\.pdf\\'" "xdg-open" (file))
+          ;; Archives
+          ("\\.\\(?:zip\\|tar\\.gz\\|tgz\\|tar\\.bz2\\|tbz2\\|7z\\|rar\\)\\'" "xdg-open" (file))))
   ;; Enable openwith mode globally
   (openwith-mode 1)
   ;; Make openwith work with dired

@@ -638,20 +638,9 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 ;; Clipboard settings
-(when (and (eq system-type 'gnu/linux)
-           (getenv "WSL_DISTRO_NAME"))
-  (setq interprogram-cut-function
-        (lambda (text)
-          (let ((process-connection-type nil))
-            (let ((proc (start-process "win32yank-w" nil
-                                       "/mnt/c/Users/Public/win32yank/win32yank.exe"
-                                       "-i" "--crlf")))
-              (process-send-string proc text)
-              (process-send-eof proc)))))
-  (setq interprogram-paste-function
-        (lambda ()
-          (let ((stdout (shell-command-to-string "/mnt/c/Users/Public/win32yank/win32yank.exe -o --lf")))
-            (unless (string= stdout "") stdout)))))
+;; Under WSLg, X11/Wayland clipboard works natively via xclip/wl-copy — no
+;; need for win32yank.exe, which would also require Windows interop to be
+;; enabled. Emacs' default `select-enable-clipboard' handling is sufficient.
 
 (defvar my/clipboard-wayland-command "wl-copy")
 (defvar my/clipboard-wayland-paste-command "wl-paste")
