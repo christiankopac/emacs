@@ -341,8 +341,11 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (with-eval-after-load 'dirvish
   (load-file (expand-file-name "ck-emacs-modules/ck-file-associations.el" user-emacs-directory)))
 
+;; Skip clipetty on WSL — ck-wsl-clipboard already bridges to Windows via
+;; wl-copy. Running both pays OSC52 + wl-copy work on every kill.
 (use-package clipetty
   :ensure t
+  :unless (getenv "WSL_DISTRO_NAME")
   :hook (after-init . global-clipetty-mode))
 
 ;; Context-menu (GUI only)
@@ -393,11 +396,16 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package org-ql :ensure t :after org)
 (use-package org-web-tools :ensure t)
 (use-package org-modern :ensure t :defer t)
+(use-package gnuplot :ensure t :defer t)  ;; needed by ob-gnuplot for ck-org-graphs
 ;; org-modern is configured in ck-emacs-modules/ck-org-extensions.el to only enable in GUI mode
 
 ;; Load org extensions configuration
 (with-eval-after-load 'org
   (load-file (expand-file-name "ck-emacs-modules/ck-org-extensions.el" user-emacs-directory)))
+
+;; Gnuplot graphs over org/gtd + journal (M-x ck-org-graphs-generate)
+(with-eval-after-load 'org
+  (load-file (expand-file-name "ck-emacs-modules/ck-org-graphs.el" user-emacs-directory)))
 
 ;; Export packages
 (use-package ox :ensure nil :after org)
@@ -579,8 +587,9 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package pdf-tools :ensure t)
 (use-package nov :ensure t :mode ("\\.epub\\'" . nov-mode))
 (use-package olivetti :ensure t)
+(use-package compat :ensure t)
 (use-package jinx
-  :ensure t
+  :ensure (:depth nil)
   :init (require 'cl)
   :hook (emacs-startup . global-jinx-mode))
 

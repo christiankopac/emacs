@@ -10,7 +10,7 @@
   fill-column 80 ;; Default line width for text wrapping (M-q)
   scroll-conservatively 10000 ;; Scroll smoothly without jumping
   auto-window-vscroll nil ;; Disable automatic vertical scrolling adjustments (improves performance)
-  save-interprogram-paste-before-kill t ;; Save clipboard contents before killing text in Emacs
+  save-interprogram-paste-before-kill nil ;; Off: triggers a clipboard read on every kill, sluggish across the WSL bridge
   apropos-do-all t ;; Make apropos (help search) search more extensively
   mouse-yank-at-point t ;; Paste at point, not at mouse cursor position
   fast-but-imprecise-scrolling t ;; Enable faster scrolling at the cost of some accuracy

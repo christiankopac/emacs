@@ -17,7 +17,8 @@
 (delete-selection-mode t)                                ; Replace selection when typing
 (setq sentence-end-double-space nil                      ; Single space ends sentence
       scroll-error-top-bottom t                          ; Wrap at top/bottom of buffer
-      save-interprogram-paste-before-kill t)             ; Save clipboard before kill
+      save-interprogram-paste-before-kill nil            ; Off: clipboard read on every kill is slow over WSL
+      text-mode-ispell-word-completion nil)              ; No /usr/share/dict/words on this box; cape-dabbrev covers it
 
 ;; ----------------------------------------------------------------------------
 ;; Document Viewing
