@@ -58,7 +58,7 @@
 
 (defun my/toggle-frame-fullscreen ()
   "Toggle the current frame's fullscreen state between 'fullboth' and nil.
-This stores the previous value so the toggle works both directions." 
+This stores the previous value so the toggle works both directions."
   (interactive)
   (let ((cur (frame-parameter nil 'fullscreen)))
     (if (memq cur '(fullboth fullscreen maximized full-screen))
@@ -72,7 +72,7 @@ This stores the previous value so the toggle works both directions."
   "Toggle a simple maximize for the current window.
 When multiple windows are present the current configuration is saved and
 `delete-other-windows' is used. When called again it restores the saved
-configuration (if any)." 
+configuration (if any)."
   (interactive)
   (if (> (length (window-list)) 1)
       (progn
