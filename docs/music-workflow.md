@@ -28,7 +28,7 @@ The setup uses MPD as the audio backend daemon, with EMMS as the Emacs frontend.
 ### Related Files
 
 - MPD config: `~/.config/mpd/mpd.conf`
-- EMMS config: `~/.config/emacs/config/media/music.el`
+- EMMS config: `~/.config/emacs/ck-emacs-modules/ck-music.el`
 
 ## Key Bindings
 
@@ -218,7 +218,7 @@ Grouping allows you to categorize songs by mood, activity, or genre using predef
 - Select a group to tag the currently playing song
 
 **Configuration:**
-- Edit `~/.config/emacs/config/media/music-groups.txt` to add/remove groups
+- Edit `~/.config/emacs/ck-emacs-modules/music-groups.txt` to add/remove groups
 - One group per line (comments start with `#`)
 - Groups are saved to:
   - **MPD stickers** (can be queried with `mpc sticker "file" get grouping`)

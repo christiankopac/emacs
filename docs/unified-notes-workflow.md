@@ -46,11 +46,11 @@ A comprehensive guide to the note-taking system shared between Emacs and Neovim.
 
 | Tool            | Purpose                        | Config File                        |
 | --------------- | ------------------------------ | ---------------------------------- |
-| **org-mode**    | Task management, notes, agenda | `org-core.el`, `org-extensions.el` |
-| **org-gtd**     | GTD workflow implementation    | `org-extensions.el`                |
-| **denote**      | Zettelkasten-style PKM         | `denote.el`                        |
-| **org-capture** | Quick capture to inbox         | `org-extensions.el`                |
-| **org-agenda**  | Task views & scheduling        | `org-extensions.el`                |
+| **org-mode**    | Task management, notes, agenda | `ck-org-core.el`, `ck-org-extensions.el` |
+| **org-gtd**     | GTD workflow implementation    | `ck-org-extensions.el`             |
+| **denote**      | Zettelkasten-style PKM         | `ck-denote.el`                     |
+| **org-capture** | Quick capture to inbox         | `ck-org-extensions.el`             |
+| **org-agenda**  | Task views & scheduling        | `ck-org-extensions.el`             |
 
 ### Neovim Tools
 
@@ -338,10 +338,10 @@ zk new           → New zk note (terminal)
 
 ```
 ~/.config/emacs/
-├── config/org/
-│   ├── org-core.el        # Core org settings, journal
-│   ├── org-extensions.el  # GTD, capture templates, agenda
-│   └── denote.el          # Denote PKM configuration
+├── ck-emacs-modules/
+│   ├── ck-org-core.el        # Core org settings, journal
+│   ├── ck-org-extensions.el  # GTD, capture templates, agenda
+│   └── ck-denote.el          # Denote PKM configuration
 ```
 
 ### Neovim

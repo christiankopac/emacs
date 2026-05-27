@@ -1077,8 +1077,8 @@ zk recent        → Recent notes
 **Emacs:**
 
 - Main: `~/.config/emacs/init.el`
-- Org: `~/.config/emacs/config/org/`
-- Denote: `~/.config/emacs/config/org/denote.el`
+- Org: `~/.config/emacs/ck-emacs-modules/` (`ck-org-core.el`, `ck-org-extensions.el`)
+- Denote: `~/.config/emacs/ck-emacs-modules/ck-denote.el`
 
 **Neovim:**
 

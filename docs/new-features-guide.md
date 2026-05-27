@@ -238,7 +238,7 @@ C-c d f  → Find specific movie
 **Advanced Usage:**
 
 **Add Custom Fields:**
-Edit the template in `config/org/denote.el`:
+Edit the template in `ck-emacs-modules/ck-denote.el`:
 ```elisp
 (insert "- Actors: %s\n" actors)
 (insert "- IMDb: %s\n" imdb-link)
@@ -314,7 +314,7 @@ denote-known-keywords:
 
 **Add Custom Subdirectory:**
 
-In `config/org/denote.el`:
+In `ck-emacs-modules/ck-denote.el`:
 ```elisp
 (setq denote-subdirectories '("fleeting-denote" 
                               "permanent-denote" 
@@ -509,7 +509,7 @@ Link by:
 
 **Monthly instead of weekly:**
 ```elisp
-;; In config/org/org-core.el
+;; In ck-emacs-modules/ck-org-core.el
 :tree-type week  →  :tree-type month
 ```
 
@@ -520,7 +520,7 @@ Link by:
 
 ### Add Movie Fields
 
-**In config/org/denote.el, add to `my/denote-movie`:**
+**In ck-emacs-modules/ck-denote.el, add to `my/denote-movie`:**
 ```elisp
 (let* ((title (read-string "Movie title: "))
        (year (read-string "Year: "))

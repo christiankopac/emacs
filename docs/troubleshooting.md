@@ -181,13 +181,13 @@ rm -rf ~/.emacs.d/elpa/
 **Solution:**
 ```elisp
 ;; Use expand-file-name with user-emacs-directory
-(load-file (expand-file-name "config/ui/dashboard.el" user-emacs-directory))
+(load-file (expand-file-name "ck-emacs-modules/ck-dashboard.el" user-emacs-directory))
 ```
 
 **Debug:**
 ```elisp
 ;; Check if file exists
-(file-exists-p (expand-file-name "config/ui/dashboard.el" user-emacs-directory))
+(file-exists-p (expand-file-name "ck-emacs-modules/ck-dashboard.el" user-emacs-directory))
 ;; → Should return t
 ```
 

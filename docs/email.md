@@ -50,10 +50,20 @@ pass insert email/fastmail
 
 ### 1) Install `mu` (provides mu4e)
 
-On Arch Linux:
+Per-OS:
 
 ```bash
+# Arch
 sudo pacman -S mu
+
+# Debian / Ubuntu / WSL
+sudo apt install mu4e maildir-utils
+
+# macOS
+brew install mu
+
+# NixOS / home-manager
+home.packages = with pkgs; [ mu ];
 ```
 
 After installing, restart Emacs. If mu4e can’t be found, `C-c m m` will show a helpful error message.
@@ -68,11 +78,11 @@ You need to provide your own offlineimap configuration (outside this repo), typi
 
 ## Maildir layout expectations
 
-Contexts in `config/email/email.el` match on Maildir prefix:
+Contexts in `ck-emacs-modules/ck-email.el` match on Maildir prefix:
 - Gmail maildirs under `~/.mail/Gmail/...`
 - Fastmail maildirs under `~/.mail/Fastmail/...`
 
-If your sync tool uses different names (e.g. `[Gmail]/Sent Mail` vs `Sent`), adjust the folder vars in `config/email/email.el`.
+If your sync tool uses different names (e.g. `[Gmail]/Sent Mail` vs `Sent`), adjust the folder vars in `ck-emacs-modules/ck-email.el`.
 
 ## Common issues
 
@@ -85,9 +95,9 @@ If your sync tool uses different names (e.g. `[Gmail]/Sent Mail` vs `Sent`), adj
 ### “Cannot open load file: bbdb-site”
 
 BBDB’s upstream expects `bbdb-site.el` to exist. This config provides a shim at:
-- `config/email/bbdb-site.el`
+- `ck-lisp/bbdb-site.el`
 
-If you still see the error, it usually means `config/email/` isn’t on `load-path` early enough (it is added in `init.el` in this config).
+If you still see the error, it usually means `ck-lisp/` isn’t on `load-path` early enough (it is added in `init.el` in this config).
 
 ### “Cannot load consult-mu”
 
