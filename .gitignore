@@ -23,6 +23,8 @@ bookmarks
 projects
 .org-id-locations
 fontaine-latest-state.eld
+/history
+/places
 /eshell/history
 /eshell/lastdir
 *_flymake.*
