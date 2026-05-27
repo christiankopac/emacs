@@ -1,153 +1,289 @@
-;;; fonts-ligatures.el --- Fonts and ligatures configuration
+;;; ck-fonts.el --- Fonts and fontaine presets -*- lexical-binding: t -*-
+
+;; Why fonts go wrong on this config:
+;;
+;;   1. The monospace fallback chain is evaluated ONCE at load time. If
+;;      Emacs is started as a daemon BEFORE any GUI frame exists,
+;;      `font-family-list' returns an empty (or TTY-only) list and the
+;;      defvar caches "Monospace" forever — even after a GUI frame opens.
+;;   2. The chain hard-codes "JetBrains Mono" but the JetBrains Nerd font
+;;      ships as "JetBrainsMono Nerd Font Mono" (one word). Different
+;;      family name → silent fall-through.
+;;   3. Material Design Icons used by nerd-icons (and several themes) live
+;;      at codepoints U+F0001..U+F1FFF, past the standard PUA range.
+;;
+;; Fixes here:
+;;   - Resolve fonts lazily via `ck/fonts--resolve' that re-queries
+;;     `font-family-list' on every call, so daemon frames get the right
+;;     answer once a real frame exists.
+;;   - Updated fallback chain that lists actual installed family names
+;;     (including the JetBrainsMono Nerd Font variants).
+;;   - Extended PUA fontset coverage to U+F1FFF for Material Design.
+;;   - Re-apply fontaine + face attributes on `server-after-make-frame-hook'.
 
 (require 'seq)
 
-;; ============================================================================
-;; Font Variables - Ensure they're defined before fontaine configuration
-;; ============================================================================
+;; ---------------------------------------------------------------------------
+;; Preference chains
+;; ---------------------------------------------------------------------------
+;; In order of preference. Family names must match `fc-list' output exactly
+;; — that's where the old chain's "JetBrains Mono" → "JetBrainsMono Nerd
+;; Font" mismatch came from.
 
-;; Define font variables if not already defined
-(unless (boundp 'my/font-serif)
-  (defvar my/font-serif "Literata" "Default serif font for variable pitch text."))
-  ;;(defvar my/font-serif "ETBookOT" "Default serif font for variable pitch text."))
+(defvar ck/fonts-monospace-chain
+  '("MonoLisa Nerd Font Mono"
+    "MonoLisa Nerd Font"
+    "MonoLisa"
+    "JetBrainsMono Nerd Font Mono"
+    "JetBrainsMono Nerd Font"
+    "JetBrains Mono"
+    "FiraCode Nerd Font Mono"
+    "FiraCode Nerd Font"
+    "Fira Code"
+    "Source Code Pro"
+    "DejaVu Sans Mono"
+    "Liberation Mono"
+    "Consolas"
+    "Adwaita Mono"
+    "Courier New"
+    "monospace")
+  "Preferred monospace families, first installed wins.")
 
-;; Font fallback function
-(defun my/font-first-available (families)
-  "Return the first installed font family from FAMILIES, or nil."
-  (seq-find (lambda (f) (member f (font-family-list))) families))
+(defvar ck/fonts-serif-chain
+  '("Literata"
+    "ETBookOT"
+    "Iowan Old Style"
+    "Charter"
+    "Source Serif Pro"
+    "DejaVu Serif"
+    "Times New Roman"
+    "Times"
+    "serif")
+  "Preferred serif (variable-pitch) families.")
 
-;; Monospace font with fallback chain
-(unless (boundp 'my/font-monospace)
-  (defvar my/font-monospace
-    (or (my/font-first-available '("MonoLisa Nerd Font Mono"
-                                  "MonoLisa Nerd Font"
-                                  "Fira Code"
-                                  "JetBrains Mono"
-                                  "Source Code Pro"
-                                  "DejaVu Sans Mono"
-                                  "Liberation Mono"
-                                  "Consolas"
-                                  "Adwaita Mono"
-                                  "Courier New"
-                                  "Monospace"))
-        "Monospace")  ; Ultimate fallback
-    "Default monospace font for fixed pitch text."))
+(defvar ck/fonts-nerd-symbols-chain
+  '("Symbols Nerd Font Mono"
+    "Symbols Nerd Font"
+    "Noto Sans Symbols2"
+    "Noto Color Emoji")
+  "Preferred Nerd Font symbol family for PUA glyphs.")
 
-;; Nerd Icons / Symbols fallback font (PUA glyphs used by nerd-icons, dirvish, etc.)
-;; Note: In terminal Emacs, fonts are controlled by your terminal emulator.
-;; (my/font-first-available is defined above)
+;; ---------------------------------------------------------------------------
+;; Lazy resolution
+;; ---------------------------------------------------------------------------
 
-(defvar my/font-nerd-symbols
-  (or (my/font-first-available '("Symbols Nerd Font Mono"
-                                "Symbols Nerd Font"
-                                "Nerd Font Symbols"
-                                "Noto Sans Symbols2"))
-      my/font-monospace)
-  "Font family to use as a fallback for Nerd Font symbols / icons.")
+(defun ck/fonts--resolve (chain)
+  "Return the first installed family in CHAIN, or nil. Re-queries every
+call so daemon frames pick up GUI fonts once a real frame exists."
+  (when (display-graphic-p)
+    (let ((available (font-family-list)))
+      (seq-find (lambda (f) (member f available)) chain))))
 
-;; ============================================================================
-;; Fontaine Configuration - Font configuration
-;; ============================================================================
+(defvar ck/fonts-monospace nil "Resolved monospace family, set lazily.")
+(defvar ck/fonts-serif nil     "Resolved serif family, set lazily.")
+(defvar ck/fonts-nerd-symbols nil "Resolved Nerd Font symbol family, set lazily.")
 
-;; Detect WSL for HiDPI font scaling
+(defun ck/fonts-refresh ()
+  "Resolve the actual font families from the chains. Idempotent."
+  (when (display-graphic-p)
+    (setq ck/fonts-monospace    (or (ck/fonts--resolve ck/fonts-monospace-chain)
+                                    "monospace")
+          ck/fonts-serif        (or (ck/fonts--resolve ck/fonts-serif-chain)
+                                    "serif")
+          ck/fonts-nerd-symbols (or (ck/fonts--resolve ck/fonts-nerd-symbols-chain)
+                                    ck/fonts-monospace))))
+
+;; Back-compat aliases — old code reads these.
+(defvar my/font-monospace nil)
+(defvar my/font-serif nil)
+(defvar my/font-nerd-symbols nil)
+
+(defun ck/fonts--sync-back-compat ()
+  (setq my/font-monospace    ck/fonts-monospace
+        my/font-serif        ck/fonts-serif
+        my/font-nerd-symbols ck/fonts-nerd-symbols))
+
+;; ---------------------------------------------------------------------------
+;; HiDPI scaling
+;; ---------------------------------------------------------------------------
+;; WSLg currently reports a logical DPI that needs ~2x scaling for Emacs to
+;; look right at common laptop resolutions. Override with M-x customize or
+;; just (setq my/font-height-multiplier 1.5) before this loads if you want
+;; something different.
+
 (defvar my/wsl-p (and (eq system-type 'gnu/linux) (getenv "WSL_DISTRO_NAME"))
   "Non-nil if running on WSL.")
 
-;; Font height multiplier for WSL/HiDPI (2x for better readability)
 (defvar my/font-height-multiplier (if my/wsl-p 2.0 1.0)
   "Multiplier for font heights. Increased for WSL/HiDPI displays.")
 
-;; Compute font heights based on WSL detection (must be integers for fontaine)
-(defvar my/font-regular-height (round (* 90 my/font-height-multiplier)))
-(defvar my/font-writing-height (round (* 90 my/font-height-multiplier)))
-(defvar my/font-org-reading-height (round (* 90 my/font-height-multiplier)))
+(defvar my/font-regular-height      (round (* 90  my/font-height-multiplier)))
+(defvar my/font-writing-height      (round (* 90  my/font-height-multiplier)))
+(defvar my/font-org-reading-height  (round (* 90  my/font-height-multiplier)))
 (defvar my/font-presentation-height (round (* 110 my/font-height-multiplier)))
-(defvar my/font-compact-height (round (* 85 my/font-height-multiplier)))
-(defvar my/font-large-height (round (* 90 my/font-height-multiplier)))
+(defvar my/font-compact-height      (round (* 85  my/font-height-multiplier)))
+(defvar my/font-large-height        (round (* 90  my/font-height-multiplier)))
+
+;; ---------------------------------------------------------------------------
+;; Fontaine presets
+;; ---------------------------------------------------------------------------
+
+(defun ck/fonts--build-presets ()
+  "Build the fontaine preset alist from currently-resolved families."
+  `((regular
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-regular-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 1.0
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height 1.0
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing nil)
+
+    (writing
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-writing-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 140
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height ,my/font-writing-height
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing 0.2)
+
+    (org-reading
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-org-reading-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 1.4
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height ,my/font-org-reading-height
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing 0.2)
+
+    (presentation
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-presentation-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 220
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height ,my/font-presentation-height
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing 0.2)
+
+    (compact
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-compact-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 0.9
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height 1.0
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing nil)
+
+    (large
+     :default-family ,ck/fonts-monospace
+     :default-weight normal
+     :default-height ,my/font-large-height
+     :variable-pitch-family ,ck/fonts-serif
+     :variable-pitch-weight normal
+     :variable-pitch-height 180
+     :fixed-pitch-family ,ck/fonts-monospace
+     :fixed-pitch-height ,my/font-large-height
+     :bold-weight bold
+     :italic-slant italic
+     :line-spacing 0.15)))
+
+;; ---------------------------------------------------------------------------
+;; PUA fontset — make Nerd Font glyphs render
+;; ---------------------------------------------------------------------------
+
+(defun ck/fonts--register-pua ()
+  "Map the Nerd Font private use areas to the resolved symbol font.
+Covers both the standard PUA (#xE000–#xF8FF) and the high-plane PUA
+ranges where Material Design Icons and modern Nerd Font glyphs live
+(#xF0000–#xFFFFD and #x100000–#x10FFFD)."
+  (when (and (display-graphic-p)
+             ck/fonts-nerd-symbols
+             (member ck/fonts-nerd-symbols (font-family-list)))
+    (let ((spec (font-spec :family ck/fonts-nerd-symbols)))
+      (set-fontset-font t '(#xE000  . #xF8FF)  spec nil 'append)
+      (set-fontset-font t '(#xF0000 . #xFFFFD) spec nil 'append)
+      (set-fontset-font t '(#x100000 . #x10FFFD) spec nil 'append))))
+
+;; ---------------------------------------------------------------------------
+;; Face setup
+;; ---------------------------------------------------------------------------
+
+(defun my/set-variable-fixed-pitch-faces ()
+  "Set variable-pitch and fixed-pitch faces to the resolved families.
+Heights stay under fontaine's control."
+  (when (display-graphic-p)
+    (when ck/fonts-serif
+      (set-face-attribute 'variable-pitch nil :family ck/fonts-serif))
+    (when ck/fonts-monospace
+      (set-face-attribute 'fixed-pitch nil :family ck/fonts-monospace)
+      (set-face-attribute 'default     nil :family ck/fonts-monospace))))
+
+;; ---------------------------------------------------------------------------
+;; Apply — runs every time a GUI frame becomes available
+;; ---------------------------------------------------------------------------
+
+(defun ck/fonts-apply ()
+  "Resolve fonts, rebuild fontaine presets, register PUA, set faces.
+Safe to call multiple times — used both at load and on every frame
+creation so daemon frames are correct."
+  (when (display-graphic-p)
+    (ck/fonts-refresh)
+    (ck/fonts--sync-back-compat)
+    (when (boundp 'fontaine-presets)
+      (setq fontaine-presets (ck/fonts--build-presets)))
+    (when (fboundp 'fontaine-set-preset)
+      (ignore-errors (fontaine-set-preset 'regular)))
+    (ck/fonts--register-pua)
+    (my/set-variable-fixed-pitch-faces)
+    ;; nerd-icons reads this to pick its symbol font.
+    (when (boundp 'nerd-icons-font-family)
+      (setq nerd-icons-font-family ck/fonts-nerd-symbols))))
+
+;; Apply immediately if we already have a GUI frame.
+(when (display-graphic-p)
+  (with-eval-after-load 'fontaine
+    (ck/fonts-apply)
+    ;; If fontaine sets a preset later (e.g., via a saved state), re-apply
+    ;; face families because fontaine clobbers `default'.
+    (advice-add 'fontaine-set-preset :after
+                (lambda (&rest _) (my/set-variable-fixed-pitch-faces)))))
+
+;; Re-apply on every new frame — fixes daemon cold-start.
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (when (display-graphic-p frame)
+              (with-selected-frame frame (ck/fonts-apply)))))
+;; Some Emacs builds fire server-after-make-frame-hook *before*
+;; after-make-frame-functions sees the new frame as graphic, so hook both.
+(when (boundp 'server-after-make-frame-hook)
+  (add-hook 'server-after-make-frame-hook #'ck/fonts-apply))
+
+;; ---------------------------------------------------------------------------
+;; Keybindings
+;; ---------------------------------------------------------------------------
 
 (with-eval-after-load 'fontaine
-  (setq fontaine-presets
-        `((regular                            
-           :default-family ,my/font-monospace
-           :default-weight normal
-           :default-height ,my/font-regular-height
-           :variable-pitch-family ,my/font-serif
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.0
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height 1.0
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing nil)
-          
-          (writing
-           :default-family ,my/font-monospace 
-           :default-weight normal
-           :default-height ,my/font-writing-height                   
-           :variable-pitch-family ,my/font-serif 
-           :variable-pitch-weight normal
-           :variable-pitch-height 140           
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height ,my/font-writing-height
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing 0.2)
-          
-          (org-reading                          
-           :default-family ,my/font-monospace 
-           :default-weight normal
-           :default-height ,my/font-org-reading-height                   
-           :variable-pitch-family ,my/font-serif      
-           :variable-pitch-weight normal
-           :variable-pitch-height 1.4  
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height ,my/font-org-reading-height
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing 0.2)
-          
-          (presentation
-           :default-family ,my/font-monospace 
-           :default-weight normal
-           :default-height ,my/font-presentation-height   
-           :variable-pitch-family ,my/font-serif      
-           :variable-pitch-weight normal
-           :variable-pitch-height 220           
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height ,my/font-presentation-height
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing 0.2)
-          
-          (compact
-           :default-family ,my/font-monospace
-           :default-weight normal
-           :default-height ,my/font-compact-height
-           :variable-pitch-family ,my/font-serif
-           :variable-pitch-weight normal
-           :variable-pitch-height 0.9
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height 1.0
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing nil)
-          
-          (large
-           :default-family ,my/font-monospace 
-           :default-weight normal
-           :default-height ,my/font-large-height                  
-           :variable-pitch-family ,my/font-serif       
-           :variable-pitch-weight normal
-           :variable-pitch-height 180           
-           :fixed-pitch-family ,my/font-monospace
-           :fixed-pitch-height ,my/font-large-height
-           :bold-weight bold
-           :italic-slant italic
-           :line-spacing 0.15)))
-
-  (fontaine-set-preset 'regular)
-
-  ;; Fontaine keybindings
   (global-set-key (kbd "C-c M-f r") (lambda () (interactive) (fontaine-set-preset 'regular)))
   (global-set-key (kbd "C-c M-f o") (lambda () (interactive) (fontaine-set-preset 'org-reading)))
   (global-set-key (kbd "C-c M-f w") (lambda () (interactive) (fontaine-set-preset 'writing)))
@@ -156,94 +292,11 @@
   (global-set-key (kbd "C-c M-f l") (lambda () (interactive) (fontaine-set-preset 'large)))
   (global-set-key (kbd "C-c M-f t") 'fontaine-set-preset))
 
-;; -----------------------------------------------------------------------------
-;; Ensure icon glyphs can be rendered (GUI frames)
-;; -----------------------------------------------------------------------------
-
-(when (display-graphic-p)
-  ;; Private Use Areas (PUA) where Nerd Font glyphs live.
-  ;; Append ensures we don't clobber your main text fonts.
-  (when (and my/font-nerd-symbols (member my/font-nerd-symbols (font-family-list)))
-    (set-fontset-font t '(#xE000 . #xF8FF) (font-spec :family my/font-nerd-symbols) nil 'append)
-    (set-fontset-font t '(#xF0000 . #xFFFFD) (font-spec :family my/font-nerd-symbols) nil 'append)))
-
-;; Configure nerd-icons to use the symbols font when available.
-(with-eval-after-load 'nerd-icons
-  (when (boundp 'nerd-icons-font-family)
-    (setq nerd-icons-font-family my/font-nerd-symbols))
-  (when (fboundp 'nerd-icons-set-fontset-font)
-    (nerd-icons-set-fontset-font)))
-
-;; ============================================================================
-;; Explicitly set variable-pitch and fixed-pitch faces
-;; ============================================================================
-;; Ensure variable-pitch and fixed-pitch faces use the correct fonts
-;; This is critical for mixed-pitch-mode in org-mode
-
-;; Define function early to prevent void function errors
-(defun my/set-variable-fixed-pitch-faces ()
-  "Set variable-pitch and fixed-pitch faces to use configured fonts.
-Heights are managed by fontaine, so we only set the font families here.
-Only applies in graphical displays."
-  (when (display-graphic-p)
-    ;; Verify fonts are available
-    (let ((serif-font (if (and (boundp 'my/font-serif)
-                               (member my/font-serif (font-family-list)))
-                          my/font-serif
-                        (my/font-first-available '("Literata" "Serif" "Times New Roman" "Times"))))
-          (mono-font (if (and (boundp 'my/font-monospace)
-                              (member my/font-monospace (font-family-list)))
-                         my/font-monospace
-                       (my/font-first-available '("Adwaita Mono" "Monospace" "Courier New")))))
-      ;; Set variable-pitch face to use serif font (for prose)
-      ;; Don't set height - let fontaine manage it
-      (set-face-attribute 'variable-pitch nil
-                          :family serif-font)
-      ;; Set fixed-pitch face to use monospace font (for code/tables)
-      ;; Don't set height - let fontaine manage it
-      (set-face-attribute 'fixed-pitch nil
-                          :family mono-font)
-      ;; Also set default face to use monospace (fontaine will set the height)
-      (set-face-attribute 'default nil
-                          :family mono-font))))
-
-;; Only apply configuration in graphical mode
-(when (display-graphic-p)
-  
-  ;; Apply after fontaine loads (fontaine may override, so we apply after)
-  (with-eval-after-load 'fontaine
-    (my/set-variable-fixed-pitch-faces)
-    ;; Reapply after fontaine sets a preset
-    (advice-add 'fontaine-set-preset :after
-                (lambda (&rest _args)
-                  (my/set-variable-fixed-pitch-faces))))
-  
-  ;; Also apply immediately if fontaine is already loaded
-  (when (boundp 'fontaine-presets)
-    (my/set-variable-fixed-pitch-faces))
-  
-  ;; Apply on frame creation (important for daemon mode)
-  (add-hook 'after-make-frame-functions
-            (lambda (frame)
-              (when (display-graphic-p frame)
-                (my/set-variable-fixed-pitch-faces)))))
-
-;; ============================================================================
-;; Ligatures Variables - Define before packages load
-;; ============================================================================
-
-;; Ligatures variables (define before packages load)
-;; (defvar my/ligatures-general '("www")
-;;   "General ligatures for all modes.")
-
-;; (defvar my/ligatures-prog-mode
-;;   '("|||>" "<||>" "<|||" "<|>" "|>" "<|" "::" ":::" "==" "===" "=/=" "!==" "<==" "<=>" "=>" "->" "<-" "<<-" "->>" "<<" ">>" "<<<" ">>>" "<~" "~>" "-<" ">-" "=<<" ">>=" "<=<" ">=>" "<*" "*>" ":-" "-:" "++" "+++" "**" "***" "~~" "~~>" "::=" ":=" ".." "..." "//" "/*" "*/" "##" "###" "&&" "||")
-;;   "Programming mode ligatures.")
-
-;; (with-eval-after-load 'ligature
-;;   (ligature-set-ligatures 't my/ligatures-general)
-;;   (ligature-set-ligatures 'prog-mode my/ligatures-prog-mode)
-;;   ;; Don't apply ligatures to org-mode to avoid conflicts with org-hide-leading-stars
-;;   (global-ligature-mode t))
+(defun ck/fonts-status ()
+  "Show which fonts actually resolved on this frame."
+  (interactive)
+  (message "ck/fonts: monospace=%s  serif=%s  nerd=%s"
+           ck/fonts-monospace ck/fonts-serif ck/fonts-nerd-symbols))
 
 (provide 'ck-fonts)
+;;; ck-fonts.el ends here

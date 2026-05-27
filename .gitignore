@@ -1,46 +1,46 @@
+# Caches & runtime state
 .cache
-*_archive
 auto-save-list
 backups
+*_archive
+*~
+\#*\#
+*.elc
+/.emacs.desktop
+/.emacs.desktop.lock
 
-# package manager
+# Package managers
 elpa
 elpaca
 eln-cache
 
-# packages
+# Per-machine state (do not commit — moves stale across hosts)
 recentf
 tramp
-.org-id-locations
-*_flymake.*
-/eshell/history
-/eshell/lastdir
 transient
 tree-sitter
-
-# network security
-/network-security.data
-/network-security.data
-
-# emacs
-*.elc
-*~
-\#*\#
-/.emacs.desktop
-/.emacs.desktop.lock
-*.elc
-
-*~
-\#*#
-/.emacs.desktop
-/.emacs.desktop.lock
-
-forge-database.sqlite
+bookmarks
 projects
+.org-id-locations
+fontaine-latest-state.eld
+/eshell/history
+/eshell/lastdir
+*_flymake.*
 
-bookmarks
+# Per-app databases
+forge-database.sqlite
+ruvector.db
+*.sqlite
 thumbnails
-bookmarks
+
+# Network security
+network-security.data
 
 # Auto-generated custom file (contains personal paths)
 custom.el
+
+# AI tool state
+ollama-buddy-sessions
+ollama-buddy-presets
+ollama-buddy-user-prompts
+.claude
