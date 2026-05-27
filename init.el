@@ -576,18 +576,28 @@ This macro was removed in newer Org versions. It now just executes BODY normally
   :config
   (setopt ellama-auto-scroll t))
 
-;; copilot.el requires `track-changes' (GNU ELPA); install before copilot.
-(use-package track-changes
-  :ensure t
-  :demand t)
+;; copilot.el requires `track-changes' (GNU ELPA). Drop :demand so it
+;; only loads when copilot itself does — there's no other consumer.
+(use-package track-changes :ensure t :defer t)
 
 (use-package copilot
   :ensure (:host github :repo "copilot-emacs/copilot.el"
                  :branch "main")
+  :defer t
   :after track-changes
-  :hook (prog-mode . (lambda ()
-                       (when (ignore-errors (copilot-server-executable))
-                         (copilot-mode 1)))))
+  :commands (copilot-mode copilot-complete copilot-accept-completion)
+  :hook (prog-mode . ck/copilot-maybe-enable)
+  :init
+  ;; Skip internal buffers (*scratch*, *Messages*, *Org Src*, etc.) so
+  ;; copilot doesn't fire up its node server at startup just because
+  ;; `lisp-interaction-mode' derives from `prog-mode'. Real source files
+  ;; have a `buffer-file-name'; scratch and other transient buffers do not.
+  (defun ck/copilot-maybe-enable ()
+    "Enable `copilot-mode' if this buffer is a real on-disk source file."
+    (when (and buffer-file-name
+               (not (string-prefix-p "*" (buffer-name)))
+               (ignore-errors (copilot-server-executable)))
+      (copilot-mode 1))))
 
 (use-package claudemacs
   :ensure (:host github

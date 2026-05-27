@@ -95,6 +95,26 @@
       savehist-additional-variables
       '(kill-ring search-ring regexp-search-ring))
 
+;; recentf: bigger list, write less often, ignore noisy paths so the
+;; recentf list stays useful instead of being 50% elpaca/eln-cache cruft.
+(setq recentf-max-saved-items 300
+      recentf-max-menu-items 50
+      recentf-auto-cleanup 300            ; cleanup every 5 min, not on every save
+      recentf-exclude
+      '("/elpaca/" "/eln-cache/" "/.git/" "/auto-save-list/" "/backups/"
+        "/recentf$" "/bookmarks$" "/transient/" "/COMMIT_EDITMSG$"
+        "/.cache/" "/tmp/" "/.local/share/Trash/" "\\.gpg\\'"))
+(add-hook 'after-init-hook #'recentf-mode)
+
+;; Perf: assume left-to-right text in code buffers — skips Emacs's
+;; expensive bidirectional reorder pass on lines without RTL chars.
+(setq-default bidi-paragraph-direction 'left-to-right
+              bidi-inhibit-bpa t)
+
+;; Perf: don't case-fold when matching auto-mode-alist regexes (most are
+;; already case-sensitive); shaves a tiny but free amount off every open.
+(setq auto-mode-case-fold nil)
+
 ;; ----------------------------------------------------------------------------
 ;; Useful Modes
 ;; ----------------------------------------------------------------------------
