@@ -11,15 +11,18 @@
            :mode-line-inactive vertical-border))
   (spacious-padding-mode 1))                              ; Enable spacious padding
 
-;; Beacon - Highlight cursor on jump
+;; Beacon - Highlight cursor on jump.
+;; beacon-mode is enabled in init.el (deferred 2s). Here we just tune it.
+;; Smaller size + bigger jump threshold cut the redraw cost on every motion.
 (with-eval-after-load 'beacon
-  (beacon-mode 1)                                         ; Enable beacon
-  (setq beacon-color "#ff6c6b"                            ; Red color
-        beacon-size 40                                    ; Size of beacon
-        beacon-blink-when-point-moves-vertically 10       ; Blink after 10 lines
-        beacon-blink-when-window-scrolls t                ; Blink on scroll
-        beacon-blink-when-focused t                       ; Blink on window focus
-        beacon-dont-blink-commands '(dashboard-refresh-buffer))) ; Don't blink on dashboard refresh
+  (setq beacon-color "#ff6c6b"
+        beacon-size 20
+        beacon-blink-when-point-moves-vertically 15
+        beacon-blink-when-point-moves-horizontally nil
+        beacon-blink-when-window-scrolls nil
+        beacon-blink-when-window-changes t
+        beacon-blink-when-focused nil
+        beacon-dont-blink-commands '(dashboard-refresh-buffer next-line previous-line)))
 
 ;; ============================================================================
 ;; Helpful Configuration - Better help buffers

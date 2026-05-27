@@ -22,22 +22,29 @@
 ;; ============================================================================
 
 (with-eval-after-load 'corfu
-  (global-corfu-mode 1)               ; Enable corfu globally
-  (setq corfu-auto t                  ; Enable automatic completion
-        corfu-auto-delay 0.2          ; Delay before showing completion (seconds)
-        corfu-auto-prefix 2           ; Minimum prefix length for auto completion
-        corfu-cycle t                 ; Cycle through candidates
-        corfu-preselect 'prompt))     ; Preselect the prompt
+  ;; Latency-sensitive: a 2-char prefix + 0.2s delay fires the
+  ;; completion engine on almost every keystroke. 3-char prefix and
+  ;; a longer delay are calmer without feeling laggy.
+  (setq corfu-auto t
+        corfu-auto-delay 0.3
+        corfu-auto-prefix 3
+        corfu-cycle t
+        corfu-preselect 'prompt
+        corfu-quit-no-match 'separator
+        corfu-on-exact-match nil)
+  (global-corfu-mode 1))
 
 ;; ============================================================================
 ;; Cape Configuration - Completion At Point Extensions
 ;; ============================================================================
 
 (with-eval-after-load 'cape
-  ;; Add useful cape backends globally
-  ;; Note: Specific modes may add additional backends via their hooks
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)  ; Dynamic abbreviations
-  (add-to-list 'completion-at-point-functions #'cape-file))    ; File paths
+  ;; cape-dabbrev scans ALL buffers by default — make it search only the
+  ;; current buffer so it doesn't get slow once you have 50+ buffers open.
+  (setq cape-dabbrev-check-other-buffers nil
+        cape-dabbrev-min-length 3)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file))
 
 ;; ============================================================================
 ;; Orderless Configuration - Flexible completion style

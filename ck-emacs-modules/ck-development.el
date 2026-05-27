@@ -222,8 +222,21 @@
 ;; Exec-path-from-shell Configuration - Import PATH from shell
 ;; ============================================================================
 
+;; exec-path-from-shell is only useful when Emacs is launched by something
+;; that does NOT inherit a login shell's PATH (macOS Dock, GNOME launcher,
+;; daemon started by systemd). When you launch Emacs from a terminal — the
+;; common case on WSL/Arch/Nix — PATH is already correct and running this
+;; costs ~1s of synchronous shell startup.
+;;
+;; Heuristic: only initialize on macOS, or when running as a daemon, or when
+;; PATH looks suspiciously short (no /usr/local/bin AND no nix profile).
 (with-eval-after-load 'exec-path-from-shell
-  (when (memq window-system '(mac ns x))     ; Only on macOS and X window systems
-    (exec-path-from-shell-initialize)))      ; Import shell environment variables
+  (setq exec-path-from-shell-arguments '("-l")           ; login, not interactive
+        exec-path-from-shell-check-startup-files nil)
+  (when (or (memq window-system '(mac ns))
+            (daemonp)
+            (and (not (string-match-p "/nix/" (or (getenv "PATH") "")))
+                 (not (string-match-p "/usr/local/bin" (or (getenv "PATH") "")))))
+    (exec-path-from-shell-initialize)))
 
 (provide 'ck-development)

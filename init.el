@@ -1,4 +1,4 @@
-;;; init-modular.el --- Modular Emacs configuration
+;;; init.el --- Modular Emacs configuration -*- lexical-binding: t -*-
 ;;
 ;;;; Commentary:
 ;;;; My personal modular Emacs configuration for org-mode, note-taking, coding, and writing.
@@ -6,16 +6,23 @@
 ;;;; Code:
 
 ;; ----------------------------------------------------------------------------
-;; BOILERPLATE: Early Optimizations
+;; BOILERPLATE: Post-startup GC strategy
 ;; ----------------------------------------------------------------------------
-
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
-
+;; Startup GC is deferred in early-init.el (most-positive-fixnum). After
+;; startup we want a high-but-finite threshold and a GC pass on idle so the
+;; collector never fires while you're typing.
 (add-hook 'emacs-startup-hook
           (lambda ()
-            (setq gc-cons-threshold (* 100 1024 1024)
-                  gc-cons-percentage 0.1)))
+            (setq gc-cons-threshold (* 256 1024 1024)
+                  gc-cons-percentage 0.2)
+            ;; Collect when idle so pauses are invisible.
+            (run-with-idle-timer 5 t (lambda () (garbage-collect)))))
+
+;; GC during minibuffer use is the classic stutter source — pause it.
+(add-hook 'minibuffer-setup-hook
+          (lambda () (setq gc-cons-threshold most-positive-fixnum)))
+(add-hook 'minibuffer-exit-hook
+          (lambda () (setq gc-cons-threshold (* 256 1024 1024))))
 
 ;; ----------------------------------------------------------------------------
 ;; BOILERPLATE: Custom Macros
@@ -234,28 +241,40 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; UI: Menus & Dashboard
 ;; ----------------------------------------------------------------------------
 
-(use-package transient :ensure t)
+(use-package transient :ensure t :defer t)
 (use-package dashboard :ensure t :after (nerd-icons)
   :config
   ;; Ensure nerd-icons is loaded before dashboard initializes
   (unless (featurep 'nerd-icons)
     (require 'nerd-icons nil t)))
-(use-package spacious-padding :ensure t)
-(use-package mixed-pitch :ensure t)
-(use-package helpful :ensure t)
+(use-package spacious-padding :ensure t :defer t
+  :hook (after-init . spacious-padding-mode))
+(use-package mixed-pitch :ensure t :defer t
+  :commands (mixed-pitch-mode))
+(use-package helpful :ensure t :defer t
+  :commands (helpful-function helpful-command helpful-key helpful-variable
+             helpful-callable helpful-symbol helpful-macro))
 (use-package smartparens
-  :elpaca (smartparens :host github :repo "oantolin/smartparens" :depth 1))
-(use-package expand-region :ensure t)
-(use-package which-key :ensure t)
-(use-package hyperbole :ensure t)
-(use-package beacon :ensure t)
+  :elpaca (smartparens :host github :repo "oantolin/smartparens" :depth 1)
+  :defer t
+  :hook (prog-mode . smartparens-mode))
+(use-package expand-region :ensure t :defer t
+  :bind ("C-=" . er/expand-region))
+(use-package which-key :ensure t :defer 1
+  :config (which-key-mode))
+(use-package hyperbole :ensure t :defer t
+  :commands (hyperbole hkey-either action-key))
+(use-package beacon :ensure t :defer 2
+  :config (beacon-mode 1))
 
 (use-package dirvish
   :ensure t
+  :defer t
+  :commands (dirvish dirvish-side dirvish-dwim dirvish-override-dired-mode)
+  :hook (dired-mode . (lambda ()
+                        (when (fboundp 'dirvish-override-dired-mode)
+                          (dirvish-override-dired-mode))))
   :config
-  ;; Replace vanilla dired with dirvish for an improved UX, if available
-  (when (fboundp 'dirvish-override-dired-mode)
-    (dirvish-override-dired-mode))
   ;; NOTE: Do NOT enable `dirvish-peek-mode` globally.
   ;; It previews while narrowing in the minibuffer (e.g. `find-file`) and can
   ;; steal the main window away from Vertico.
@@ -302,10 +321,14 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package ace-window :ensure t)
 (use-package avy :ensure t :after ace-window)
 (use-package grip-mode :ensure t :after markdown-mode)
-(use-package helm :ensure t)
-(use-package helm-org :ensure t :after (helm org))
-(use-package multiple-cursors :ensure t)
-(use-package mood-line :ensure t)
+(use-package helm :ensure t :defer t
+  :commands (helm-M-x helm-find-files helm-buffers-list helm-imenu))
+(use-package helm-org :ensure t :defer t :after (helm org))
+(use-package multiple-cursors :ensure t :defer t
+  :commands (mc/edit-lines mc/mark-next-like-this mc/mark-previous-like-this
+             mc/mark-all-like-this))
+(use-package mood-line :ensure t :defer 0.5
+  :config (mood-line-mode))
 
 ;; Mood-line + emoji mode-line configuration lives in ck-modeline.el.
 ;; Loading after mood-line ensures the segment libraries are available
@@ -352,11 +375,17 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (when (display-graphic-p)
   (context-menu-mode))
 
-(setq global-auto-revert-non-file-buffers t) ;; auto-revert non-file buffers
-(global-auto-revert-mode 1)  ;; emacs watches for changes to files and updates the buffer
-(setq auto-revert-verbose nil       ;; don't show messages
-      auto-revert-use-notify nil    ;; don't show notifications
-      auto-revert-stop-on-user-input nil) ;; don't stop on user input
+;; Auto-revert: use inotify (not polling) and only on file-visiting buffers.
+;; The previous setup (`use-notify nil` + `non-file-buffers t`) polled every
+;; live buffer every 5s, which is a major source of typing latency on
+;; large projects. inotify is push-based and effectively free.
+(setq auto-revert-verbose nil
+      auto-revert-use-notify t
+      auto-revert-avoid-polling t
+      auto-revert-interval 5
+      global-auto-revert-non-file-buffers nil
+      auto-revert-stop-on-user-input nil)
+(global-auto-revert-mode 1)
 
 ;; File Conversion Variables
 (defvar my/pandoc-input-formats
@@ -377,9 +406,8 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package org-habit-stats :ensure t)
 (use-package org-edna :ensure t :after (org seq))
 
-(setq org-gtd-update-ack "3.0.0")
 (setq org-gtd-update-ack "4.0.0")
-(use-package org-gtd :ensure t :after (org transient))
+(use-package org-gtd :ensure t :defer t :after (org transient))
 
 ;; (use-package org-journal :ensure t)
 
@@ -410,7 +438,10 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; Export packages
 (use-package ox :ensure nil :after org)
 (use-package ox-hugo :ensure t :defer t :after ox)
-(use-package pandoc-mode :ensure t :hook ((markdown-mode . pandoc-mode) (org-mode . pandoc-mode)))
+;; pandoc-mode lazy-loads via its hooks; the hooks themselves don't fire
+;; until you actually open a markdown/org file.
+(use-package pandoc-mode :ensure t :defer t
+  :hook ((markdown-mode . pandoc-mode) (org-mode . pandoc-mode)))
 (use-package ox-pandoc :ensure t :defer t :after pandoc)
 
 ;; Load org export configuration
@@ -499,17 +530,25 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 
 (use-package magit
   :elpaca (magit :depth 1)
-  :after transient :ensure t :demand t)
-(use-package diff-hl :ensure t :after magit)
-(use-package git-timemachine :ensure t)
-(use-package git-messenger :ensure t :after magit)
-(use-package forge :ensure t :after (magit))
+  :ensure t
+  :defer t
+  :commands (magit magit-status magit-blame magit-log magit-dispatch
+             magit-file-dispatch))
+(use-package diff-hl :ensure t :defer t
+  :hook ((prog-mode . diff-hl-mode)
+         (dired-mode . diff-hl-dired-mode)))
+(use-package git-timemachine :ensure t :defer t
+  :commands (git-timemachine git-timemachine-toggle))
+(use-package git-messenger :ensure t :defer t
+  :commands (git-messenger:popup-message))
+(use-package forge :ensure t :defer t :after magit)
 
 ;; ----------------------------------------------------------------------------
 ;; AI Packages
 ;; ----------------------------------------------------------------------------
 
-(use-package gptel :ensure t)
+(use-package gptel :ensure t :defer t
+  :commands (gptel gptel-menu gptel-send))
 
 ;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see ck-emacs-modules/ck-ai.el).
 ;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
@@ -536,13 +575,16 @@ This macro was removed in newer Org versions. It now just executes BODY normally
                          (copilot-mode 1)))))
 
 (use-package claudemacs
-  :ensure (:host github 
-                 :repo "cpoile/claudemacs" 
+  :ensure (:host github
+                 :repo "cpoile/claudemacs"
                  :branch "main"
-                 :main "claudemacs.el"))
+                 :main "claudemacs.el")
+  :defer t
+  :commands (claudemacs claudemacs-start))
 
 (use-package ollama-buddy
   :ensure t
+  :defer t
   :bind
   ("C-c o" . ollama-buddy-role-transient-menu)
   ("C-c O" . ollama-buddy-transient-menu)
@@ -572,7 +614,17 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 (use-package eat :ensure t :defer t)
-(use-package exec-path-from-shell :ensure t)
+;; exec-path-from-shell is expensive (~1s spawning a login shell). Only
+;; auto-install it; the call to `exec-path-from-shell-initialize' is
+;; gated in ck-development.el so terminal-launched Emacs on
+;; WSL/Arch/Nix skips it entirely.
+(use-package exec-path-from-shell
+  :ensure t
+  :defer t
+  :commands (exec-path-from-shell-initialize exec-path-from-shell-copy-env))
+(when (or (memq window-system '(mac ns))
+          (daemonp))
+  (require 'exec-path-from-shell nil t))
 
 ;; Load development configuration
 (load-file (expand-file-name "ck-emacs-modules/ck-development.el" user-emacs-directory))
@@ -588,10 +640,17 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package nov :ensure t :mode ("\\.epub\\'" . nov-mode))
 (use-package olivetti :ensure t)
 (use-package compat :ensure t)
+;; Jinx scans every text buffer on first activation; defer past startup so
+;; opening the first file isn't blocked by enchant initialisation. Only
+;; enabled when `enchant-2' is actually installed (Arch: `enchant',
+;; Debian/WSL: `libenchant-2-2', Nix: `enchant').
 (use-package jinx
   :ensure (:depth nil)
-  :init (require 'cl)
-  :hook (emacs-startup . global-jinx-mode))
+  :defer 3
+  :commands (jinx-mode global-jinx-mode jinx-correct)
+  :config
+  (when (executable-find "enchant-2")
+    (global-jinx-mode 1)))
 
 ;; Load writing configuration
 (load-file (expand-file-name "ck-emacs-modules/ck-writing.el" user-emacs-directory))
@@ -799,16 +858,3 @@ This ensures daemon frames have the same appearance as regular frames."
 
 (provide 'init)
 ;;; init.el ends here
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-vc-selected-packages
-   '((claudemacs :url "https://github.com/cpoile/claudemacs" :branch "main"))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
