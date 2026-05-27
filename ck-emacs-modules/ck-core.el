@@ -28,8 +28,7 @@
   backup-directory-alist `(("." . ,(concat user-emacs-directory "backups"))) ;; Store all backup files in one directory instead of cluttering directories
   version-control t ;; Enable versioned backups
   delete-old-versions t ;; Delete old backup versions without asking
-  history-length 50 ;; Remember last 50 commands
-  ; save-place-mode 1 ;; Remember last cursor position in a file
+  ;; history-length set below in savehist-mode block (200)
   )
 
 ;; ----------------------------------------------------------------------------
@@ -65,6 +64,36 @@
       inhibit-compacting-font-caches t ;; Don't compact font caches during GC (improves performance with many fonts)
       highlight-nonselected-windows nil;; Don't highlight text in non-selected windows (improves performance)
       )
+
+;; ----------------------------------------------------------------------------
+;; Modern Emacs niceties (free with Emacs 30+)
+;; ----------------------------------------------------------------------------
+
+;; Restrict the VC backend probe to Git. Default tries CVS / SVN / Bzr /
+;; Hg / Mtn / RCS / SCCS / SRC on every file open — adds 10–30ms per
+;; open, more on slow disks (WSL DrvFs).
+(setq vc-handled-backends '(Git))
+
+;; `repeat-mode' lets you press the trailing key of a prefix command to
+;; repeat it: `C-x o o o' cycles windows, `C-x { { {' resizes, etc.
+(when (fboundp 'repeat-mode) (repeat-mode 1))
+
+;; Pixel-precise smooth scrolling (Emacs 29+). WSLg's stock line-by-line
+;; scroll feels especially janky; this fixes it. No effect in TTY.
+(when (and (display-graphic-p) (fboundp 'pixel-scroll-precision-mode))
+  (pixel-scroll-precision-mode 1)
+  (setq pixel-scroll-precision-large-scroll-height 40.0
+        pixel-scroll-precision-interpolation-factor 30.0))
+
+;; Persist cursor position across file reopens, and minibuffer / M-x
+;; history across sessions.
+(save-place-mode 1)
+(setq save-place-file (expand-file-name "places" user-emacs-directory)
+      save-place-limit 400)
+(savehist-mode 1)
+(setq history-length 200
+      savehist-additional-variables
+      '(kill-ring search-ring regexp-search-ring))
 
 ;; ----------------------------------------------------------------------------
 ;; Useful Modes

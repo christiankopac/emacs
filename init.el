@@ -521,9 +521,16 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package flycheck :ensure t)
 (use-package sideline-flycheck :after (sideline flycheck) :ensure t)
 (use-package hl-todo :ensure t :hook (prog-mode . hl-todo-mode))
-(use-package tree-sitter :ensure t)
-(use-package tree-sitter-langs :ensure t :after tree-sitter)
-(use-package treesit-auto :ensure t)
+;; Tree-sitter: use ONLY the modern built-in `treesit' via treesit-auto.
+;; Emacs 30 ships treesit; the legacy `tree-sitter' + `tree-sitter-langs'
+;; packages duplicated the work and parsed every buffer twice. Dropped.
+(use-package treesit-auto
+  :ensure t
+  :defer 1
+  :custom (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 ;; ----------------------------------------------------------------------------
 ;; Formatting Packages

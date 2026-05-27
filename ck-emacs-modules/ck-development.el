@@ -109,18 +109,9 @@
         ("NOTE"   . "#4CC9F0")   ; Blue - important denote
         ("HACK"   . "#E0AAFF"))) ; Pink - temporary solutions
 
-;; ============================================================================
-;; Tree-sitter Configuration - Better syntax highlighting and parsing
-;; ============================================================================
-
-(with-eval-after-load 'tree-sitter
-  (require 'tree-sitter-langs)                               ; Load language definitions
-  (global-tree-sitter-mode)                                  ; Enable tree-sitter globally
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))  ; Enable syntax highlighting
-
-;; Treesit-auto - Auto-install tree-sitter parsers
-;; (with-eval-after-load 'tree-sitter
-;;   (treesit-auto-install-all))
+;; Tree-sitter configuration lives in init.el via `treesit-auto', which
+;; bridges Emacs 30's built-in `treesit' to standard major modes. The
+;; old `tree-sitter' / `tree-sitter-langs' packages have been removed.
 
 ;; ----------------------------------------------------------------------------
 ;; Formatting
