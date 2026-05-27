@@ -1,349 +1,331 @@
 # Emacs Configuration
 
-A comprehensive, modular Emacs configuration optimized for note-taking, writing, coding, and productivity. Built with modern packages and best practices.
+A modular Emacs setup for note-taking, writing, coding, and productivity. Works the same on WSL, Arch, NixOS, Debian/Ubuntu, and macOS — system differences are detected at runtime and handled by `ck-system.el`.
 
-## Features
+## Quick start
 
-### Core Functionality
-- **Package Management**: Uses [Elpaca](https://github.com/progfolio/elpaca) for fast, async package installation
-- **Completion System**: Vertico (vertical completion) + Corfu (in-buffer completion) + Cape
-- **Search**: Consult, Embark, and ripgrep integration
-- **Icons**: Nerd Icons and All The Icons support
-- **Themes**: Multiple theme support (Modus, Poet, Doric, EF Themes, Everforest, Leuven)
-
-### Note-Taking & Organization
-- **Org Mode**: Full-featured Org mode setup with modern enhancements
-- **Denote**: Zettelkasten-style note-taking system
-- **Xeft**: Fast note search and creation
-- **Org-GTD**: Getting Things Done workflow integration
-- **Org Journal**: Daily journaling system
-- **Org QL**: Powerful query language for Org files
-
-### Development
-- **LSP Support**: Language Server Protocol integration
-- **Tree-sitter**: Modern syntax parsing
-- **Version Control**: Magit, Forge, and Git integration
-- **Code Quality**: Flycheck, Format-all, Apheleia
-- **AI Tools**: GPTel (Claude, OpenAI, Perplexity) and Copilot
-
-### Writing & Publishing
-- **Spell Checking**: Jinx (fast spell checker)
-- **Markdown**: Full Markdown mode support
-- **Export**: Org export with Pandoc integration
-- **PDF Tools**: PDF viewing and annotation
-- **EPUB**: Nov mode for EPUB reading
-
-### Email
-- **Mu4e**: Email client with multiple account support
-- **BBDB**: Address book integration
-- **Consult-Mu**: Fast email search
-
-Docs: see `docs/email.md`.
-
-### UI Enhancements
-- **Dashboard**: Customizable startup screen
-- **Dirvish**: Modern file manager with icons
-- **Mood-line**: Customizable modeline
-- **Which-key**: Keybinding hints
-- **Beacon**: Visual cursor tracking
-- **Fontaine**: Font preset management
-
-## Requirements
-
-### Essential
-- **Emacs 29+** (recommended) or Emacs 28
-- **Git** (for package installation)
-- **ripgrep** or **ugrep** (for fast search)
-
-### Optional but Recommended
-- **pass** (password store) - for API keys and email passwords
-- **mu** and **offlineimap** - for email functionality
-- **pandoc** - for document conversion
-- **Nerd Fonts** - for icons in terminal
-
-### System Dependencies
-- For PDF viewing: `poppler` utilities
-- For tree-sitter: Build tools (gcc, make)
-
-## Installation
-
-1. **Clone this repository** to your Emacs config directory:
-   ```bash
-   git clone <your-repo-url> ~/.config/emacs
-   ```
-
-2. **Start Emacs** - it will automatically:
-   - Install Elpaca package manager
-   - Download and install all packages
-   - Configure everything
-
-3. **First startup may take 5-10 minutes** while packages are installed.
-
-## Configuration Structure
-
-```
-~/.config/emacs/
-├── init.el                 # Main configuration file
-├── early-init.el           # Early initialization (performance)
-├── config/
-│   ├── core/              # Core Emacs settings
-│   ├── ui/                # UI packages and themes
-│   ├── org/               # Org mode configuration
-│   ├── dev/               # Development tools
-│   ├── writing/           # Writing tools
-│   ├── email/             # Email configuration
-│   ├── ai/                # AI tools
-│   ├── media/             # Media players
-│   └── functions/         # Custom functions
-├── docs/                  # Documentation
-└── banner/                # Dashboard ASCII art
+```bash
+git clone <repo-url> ~/.config/emacs
+emacs                   # first launch installs ~80 packages via Elpaca (a few minutes)
 ```
 
-## Customization Required
+First launch is slow because Elpaca clones every package; subsequent launches are ~0.5–1s on TTY and a few seconds on GUI (most of which is theme + dashboard + fontset setup).
 
-### 1. Email Configuration (`custom.el`)
+## Layout
 
-Email addresses and names are configured in `custom.el` (not tracked in git). Update these variables:
+```
+.emacs.d/
+├── init.el                   # Top-level: package declarations + module loads
+├── early-init.el             # Pre-init: GC, file-name-handler, frame params
+├── ck-emacs-modules/         # All package configuration (one file per area)
+│   ├── ck-system.el          # OS / distro / display-server detection (loaded first)
+│   ├── ck-core.el            # Basic editing, search, modern Emacs niceties
+│   ├── ck-clipboard.el       # Portable clipboard (WSL/Wayland/X11/macOS, GUI + TTY)
+│   ├── ck-fonts.el           # Daemon-safe font resolution + fontaine presets
+│   ├── ck-completion.el      # Vertico + Corfu + Cape + Marginalia + Consult
+│   ├── ck-icons.el           # all-the-icons, nerd-icons
+│   ├── ck-ui.el              # Spacious-padding, beacon, helpful, which-key
+│   ├── ck-modeline.el        # mood-line config (loaded after package)
+│   ├── ck-dashboard.el       # Startup dashboard
+│   ├── ck-navigation.el      # Window/buffer navigation
+│   ├── ck-editing.el         # Editing helpers
+│   ├── ck-file-associations.el  # openwith + dirvish + dired
+│   ├── ck-org-core.el        # Core org-mode
+│   ├── ck-org-extensions.el  # org-appear, org-modern, etc.
+│   ├── ck-org-export.el      # ox-pandoc, etc.
+│   ├── ck-org-graphs.el      # ck-org-graphs-generate (gnuplot)
+│   ├── ck-ox-hugo.el         # Blog publishing
+│   ├── ck-denote.el          # Zettelkasten notes
+│   ├── ck-xeft.el            # Fast note search
+│   ├── ck-hyperbole.el       # Hyperbole
+│   ├── ck-development.el     # LSP, flycheck, tree-sitter (via treesit-auto)
+│   ├── ck-writing.el         # Markdown, olivetti, jinx
+│   ├── ck-email.el           # mu4e, smtpmail, bbdb
+│   ├── ck-ai.el              # gptel, ellama, copilot
+│   └── ck-music.el           # emms, listen
+├── ck-lisp/
+│   ├── ck-functions.el       # Custom interactive commands
+│   └── ck-maintenance.el     # Maintenance utilities
+├── bin/                      # Helper scripts (compile.el, check.el)
+├── Makefile                  # Optional byte-compile (see below)
+└── docs/                     # Workflow guides (denote, org-gtd, music, email, etc.)
+```
+
+## Dependencies
+
+### Fonts
+
+Three families are required for a complete GUI experience. JetBrains Mono is the free default and is the actual installed name used by the fallback chain.
+
+| Font | Role |
+|---|---|
+| **JetBrainsMono Nerd Font** (or **MonoLisa Nerd Font Mono** if you have it) | Code / default |
+| **Symbols Nerd Font Mono** | Icon glyphs (nerd-icons, dirvish, mood-line) |
+| **Literata** | Prose / variable-pitch |
+
+Per-OS install:
+
+- **Arch**: `sudo pacman -S ttf-jetbrains-mono-nerd ttf-nerd-fonts-symbols-mono` and `yay -S otf-literata`
+- **NixOS / home-manager**: `nerd-fonts.jetbrains-mono`, `nerd-fonts.symbols-only`. Literata isn't packaged — drop from Google Fonts into `~/.local/share/fonts/`.
+- **Debian / Ubuntu / WSL**: Tarball install from [nerdfonts.com](https://www.nerdfonts.com/) — apt's nerd-fonts coverage is poor. Literata via Google Fonts.
+- **macOS**: `brew install --cask font-jetbrains-mono-nerd-font font-symbols-only-nerd-font` + Literata from Google Fonts.
+
+After installing, run `M-x ck/fonts-status` to verify the chain resolved to a real installed family (and not silently fell through to "monospace").
+
+### System binaries
+
+| Tool | Used by | Required? |
+|---|---|---|
+| `ripgrep` | consult-ripgrep, xeft | yes |
+| `fd` (or `fdfind`) | consult-fd, dirvish | yes |
+| `gnuplot` | ck-org-graphs | for graphs |
+| `enchant-2` (with `hunspell`/`aspell` dicts) | jinx | for spell-check |
+| `wl-clipboard` (`wl-copy` / `wl-paste`) | ck-clipboard | yes on WSL/Wayland |
+| `xclip` or `xsel` | ck-clipboard fallback | recommended |
+| `xdg-open` / `wslview` / `open` | openwith | yes on Linux/WSL/macOS |
+| `mpv` | openwith video/audio | recommended |
+| `mu` | mu4e email | for email |
+| `pandoc` | ox-pandoc, pandoc-mode | for export |
+| `hugo` | ox-hugo blog | for blog |
+| `node` + `npm` | copilot.el server | for copilot |
+| `trash-cli` or `gio` | delete-by-moving-to-trash | yes (either) |
+
+Per-OS install commands are listed at the end of this README.
+
+## What's where
+
+### System detection (`ck-system.el`)
+
+The first module loaded. Single source of truth for which platform Emacs is running on:
+
+```
+ck/macos-p      ck/linux-p      ck/wsl-p       ck/windows-p
+ck/distro       ck/nix-active-p
+ck/display-server   ; one of: tty, ns, w32, wslg, wayland, x11
+```
+
+Helpers:
+
+- `(ck/has? "rg")` — memoized `executable-find`
+- `(ck/has-any "wl-copy" "xclip" "pbcopy")` — first executable wins
+- `(ck/open-command)` — platform-correct "open this" (`open` on macOS, `wslview` on WSL if installed, else `xdg-open`)
+
+Interactive:
+
+- `M-x ck/system-status` — shows the detected platform + open command.
+
+### Clipboard (`ck-clipboard.el`)
+
+One module replacing the old WSL-only one. Works in **both GUI and TTY** on all platforms.
+
+- **GUI mode**: trusts Emacs's built-in selection (NS / X11 / pgtk). Do not override.
+- **TTY mode**: bridges `interprogram-paste-function` / `interprogram-cut-function` to the system clipboard.
+- Writes are synchronous with backend caching — first successful backend (`wl-copy` → `xclip` → `clip.exe` on WSL) is cached and reused.
+- Reads also cache the first working backend.
+
+Interactive:
+
+- `M-x ck/clipboard-status` — shows detected system, the read/write chain, and which backends are cached.
+- `M-x ck/clipboard-paste-force` — bypass the dedupe cache and re-read fresh from the OS clipboard. Useful when WSLg sync goes stale.
+- `M-x ck/clipboard-force-bridge` — force the external bridge on even in GUI mode. Use if your GUI clipboard misbehaves.
+
+### Fonts (`ck-fonts.el`)
+
+Resolves the monospace / serif / nerd-symbol families **lazily**, on the first GUI frame — not at file-load time. This fixes the "daemon shows generic Monospace" bug.
+
+- `M-x ck/fonts-status` — shows which families actually got resolved.
+- `M-x fontaine-set-preset` — switch between presets (`regular`, `writing`, `org-reading`, `presentation`, `compact`, `large`).
+- Quick keys: `C-c M-f r/o/w/p/c/l` for each preset.
+
+### Performance behaviour
+
+- `gc-cons-threshold` is 256MB during interactive use, paused entirely during minibuffer use, with a 5-second idle-timer running GC quietly in the background.
+- `auto-revert-mode` uses inotify (push-based), not 5-second polling.
+- `vc-handled-backends` is restricted to `(Git)` — Emacs no longer probes for CVS / SVN / Bzr / Hg / Mtn on every file open.
+- Heavy packages (magit, dirvish, helm, hyperbole, copilot, ollama-buddy, pandoc-mode, jinx, etc.) are deferred.
+- `corfu` fires at 3 chars + 0.3s delay (was 2 + 0.2) — less aggressive on every keystroke.
+- `cape-dabbrev` searches the current buffer only (was: all buffers).
+- `pixel-scroll-precision-mode` on for smooth GUI scrolling.
+- `repeat-mode` on — after `C-x o` you can hit just `o o o` to keep cycling.
+- `save-place-mode` + `savehist-mode` on — cursor positions and minibuffer history persist across sessions.
+- `bidi-paragraph-direction` is set to `left-to-right` and `bidi-inhibit-bpa` is `t` — skips Emacs's bidirectional reorder pass on lines without RTL text.
+
+## Build (optional)
+
+The `.el` files load fine as-is. Byte-compiling them is opt-in — it shaves a small amount of parse time and lets native-comp produce `.eln` on the side.
+
+```bash
+make compile     # byte-compile ck-emacs-modules/ + ck-lisp/
+make clean       # drop .elc files and eln-cache/
+make status      # count .el vs .elc
+make check       # smoke-test ck-system loads cleanly
+```
+
+Note: `init.el` currently uses `load-file` (not `require`), so byte-compilation alone doesn't change runtime behaviour — it just lets you catch warnings early. Migrating to `require` is a separate change that hasn't been done because it broke twice in interactive testing.
+
+## Customisation you need to do per machine
+
+### Email (`custom.el`)
+
+`custom.el` is gitignored — set your email addresses there:
 
 ```elisp
-(setq my/gmail-address "your.email@gmail.com"
+(setq my/gmail-address "you@gmail.com"
       my/gmail-name "Your Name"
-      my/fastmail-address "your.email@example.com"
+      my/fastmail-address "you@example.com"
       my/fastmail-name "Your Name")
 ```
 
-**Email Passwords**: This config uses `pass` (password store). Set up your passwords:
+Email passwords via `pass`:
+
 ```bash
 pass insert email/gmail
 pass insert email/fastmail
 ```
 
-### 2. API Keys (`config/ai/ai-tools.el`)
+### AI keys
 
-AI tools use `pass` for API keys. Set them up:
 ```bash
 pass insert api-keys/anthropic
 pass insert api-keys/openai
 pass insert api-keys/perplexity
 ```
 
-### 3. File Paths
+### Paths
 
-The configuration uses `~/notes/` for notes and `~/src/` for projects. You can customize these in:
-- `config/org/denote.el` - Note directories
-- `config/org/org-core.el` - Org directories
-- `config/dev/development.el` - Project directories
+The config assumes `~/org/` for org files and `~/src/` for projects. Adjust in `ck-org-core.el` and `ck-development.el` if needed.
 
-### 4. Fonts (`config/ui/fonts-ligatures.el`)
-
-Default fonts are:
-- **Monospace**: MonoLisa Nerd Font
-- **Serif**: Literata
-
-Install these fonts or modify the configuration to use your preferred fonts.
-
-### 5. Theme
-
-Default theme is `poet-dark`. Change in `init.el`:
-```elisp
-(load-theme 'poet-dark t)
-```
-
-Available themes: `modus-themes`, `poet-theme`, `doric-themes`, `ef-themes`, `everforest`, `leuven-theme`
-
-## Key Features Explained
-
-### Package Management (Elpaca)
-
-This config uses [Elpaca](https://github.com/progfolio/elpaca) instead of the built-in package.el:
-- Faster installation
-- Async package processing
-- Better dependency management
-- Automatic autoload generation
-
-### Completion System
-
-**Vertico**: Vertical completion menu in minibuffer
-- `C-n` / `C-p` to navigate
-- `TAB` to complete
-- `RET` to select
-
-**Corfu**: In-buffer completion popup
-- Automatic completion as you type
-- `TAB` to accept
-- `M-1` to select first candidate
-
-**Cape**: Additional completion backends
-- File paths, buffers, symbols, etc.
-
-### Note-Taking Workflow
-
-**Denote**: Zettelkasten-style notes
-- `C-c d n` - Create new note
-- `C-c d f` - Find note
-- `C-c d F` - Quick fleeting note
-- Notes are timestamped and keyword-tagged
-
-**Org-GTD**: Getting Things Done
-- `C-c g c` - Quick capture
-- `C-c g p` - Process inbox
-- `C-c g e` - Engage (work on tasks)
-
-**Xeft**: Fast note search
-- `C-c z f` - Search notes
-- `C-c z n` - New note
-
-### Development Tools
-
-**LSP**: Language Server Protocol
-- Automatic setup for many languages
-- `M-.` - Go to definition
-- `M-,` - Go back
-- `C-c e r` - Rename symbol
-
-**Magit**: Git interface
-- `C-x g` - Git status
-- `C-x v t` - Git timemachine
-- `C-x v p` - Git messenger
-
-## Essential Keybindings
+## Key bindings
 
 ### Navigation
-- `C-c b` - Switch buffer (Consult)
-- `C-x d` - Dired (file manager)
-- `M-p` - Switch window (ace-window)
-- `C-:` - Jump to character (avy)
+- `C-c b` — switch buffer (consult)
+- `C-x C-f` — find file (recentf-aware)
+- `M-p` — switch window (ace-window)
+- `C-:` — jump to char (avy)
+- `C-x o`, then `o o o` — cycle windows via repeat-mode
 
-### Org Mode
-- `C-c a` - Org agenda
-- `C-c c` - Org capture
-- `C-c l` - Store link
+### Org
+- `C-c a` — org-agenda
+- `C-c c` — org-capture
+- `C-c l` — org-store-link
 
 ### Denote
-- `C-c d n` - New note
-- `C-c d f` - Find note
-- `C-c d F` - Fleeting note
+- `C-c d n` — new note
+- `C-c d f` — find note
 
 ### Development
-- `C-x g` - Magit status
-- `C-c p f` - Find file in project
-- `C-c s s` - Search in project
+- `C-x g` — magit-status
+- `C-x v t` — git-timemachine
+
+### AI
+- `C-c M-e` — ellama
+- `C-c o` — ollama-buddy role menu
+- `C-c O` — ollama-buddy full menu
+
+### Status / diagnostics
+- `M-x ck/system-status`
+- `M-x ck/fonts-status`
+- `M-x ck/clipboard-status`
 
 ### Themes
-- `C-c t t` - Toggle theme
-- `C-c t d` - Default theme
+- `C-c t t` — toggle theme
+- `C-c t SPC` — default theme
 
 ### Help
-- `C-h k` - Describe key
-- `C-h f` - Describe function
-- `C-h v` - Describe variable
-
-See `docs/quick-reference.md` for a complete keybinding reference.
+- `C-h k/f/v` — describe key / function / variable (helpful)
 
 ## Documentation
 
-Comprehensive documentation is available in the `docs/` directory:
+Workflow guides in `docs/`:
 
-- **quick-reference.md** - Essential keybindings cheat sheet
-- **new-features-guide.md** - Guide to new features and workflows
-- **org-gtd-workflow.md** - Getting Things Done with Org mode
-- **denote-workflow.md** - Zettelkasten note-taking guide
-- **development-workflow.md** - Development tools and workflows
-- **troubleshooting.md** - Common issues and solutions
+- `quick-reference.md` — keybinding cheatsheet
+- `denote-workflow.md` — Zettelkasten note-taking
+- `org-gtd-workflow.md` — Getting Things Done
+- `development-workflow.md` — LSP, magit, formatting
+- `unified-notes-workflow.md` — combined denote + org-gtd
+- `music-workflow.md` — emms + listen
+- `email.md` — mu4e configuration
+- `troubleshooting.md` — common issues
 
-## Performance
+⚠ The workflow docs still reference an old `config/<area>/` directory layout in places; the real layout is `ck-emacs-modules/`. The workflow content is mostly still correct — just substitute paths.
 
-This configuration includes several performance optimizations:
+## Per-OS install commands
 
-- **Early GC tuning**: High threshold during startup, normal after
-- **Lazy loading**: Packages loaded on-demand
-- **Native compilation**: Automatic byte-compilation
-- **Process output buffering**: Optimized for async operations
-
-## Terminal vs GUI
-
-The configuration adapts to your environment:
-- **GUI**: Full theme support, icons, fonts
-- **Terminal**: Simplified UI, compatible themes, Nerd Font icons
-
-## Customization
-
-### Adding Packages
-
-Use `use-package` in `init.el`:
-```elisp
-(use-package my-package
-  :ensure t
-  :config
-  (my-package-mode 1))
+### Arch / Manjaro
+```bash
+sudo pacman -S ripgrep fd gnuplot enchant wl-clipboard xclip mpv \
+               pandoc hugo nodejs npm graphviz trash-cli mu \
+               ttf-jetbrains-mono-nerd ttf-nerd-fonts-symbols-mono
+yay -S otf-literata wslu
 ```
 
-### Custom Functions
+### NixOS / home-manager
+```nix
+home.packages = with pkgs; [
+  ripgrep fd gnuplot enchant wl-clipboard xclip mpv
+  pandoc hugo nodejs graphviz trash-cli mu
+  nerd-fonts.jetbrains-mono nerd-fonts.symbols-only
+];
+# Literata: drop into ~/.local/share/fonts/ manually
+```
 
-Add custom functions to `config/functions/custom-functions.el`.
+### Debian / Ubuntu / WSL (apt)
+```bash
+sudo apt install ripgrep fd-find gnuplot libenchant-2-2 wl-clipboard \
+                 xclip mpv pandoc hugo nodejs npm graphviz trash-cli \
+                 mu4e maildir-utils wslu
+mkdir -p ~/.local/bin && ln -sf "$(which fdfind)" ~/.local/bin/fd
+# Nerd Fonts + Literata: install via tarball from nerdfonts.com / fonts.google.com
+```
 
-### Theme Customization
-
-Themes are loaded in `init.el`. You can:
-- Switch themes with `C-c t t`
-- Add custom theme files
-- Customize faces in `custom.el` (auto-generated, not in repo)
+### macOS (Homebrew)
+```bash
+brew install ripgrep fd gnuplot enchant mpv pandoc hugo node graphviz mu
+brew install --cask font-jetbrains-mono-nerd-font font-symbols-only-nerd-font
+# Literata: download from Google Fonts → ~/Library/Fonts
+```
 
 ## Troubleshooting
 
-### Packages Not Loading
+### Icons / fonts show as boxes
 
-1. Check Elpaca installation: `M-x elpaca-info`
-2. Rebuild packages: `M-x elpaca-rebuild`
-3. Check `*Messages*` buffer for errors
+```elisp
+M-x ck/fonts-status
+```
 
-### Icons Not Showing
+If `nerd=` falls through to the monospace family, your Symbols Nerd Font Mono isn't installed. Install per the table above and restart Emacs.
 
-1. Install Nerd Fonts: https://www.nerdfonts.com/
-2. Set terminal font to a Nerd Font
-3. In GUI, ensure `all-the-icons` fonts are installed: `M-x all-the-icons-install-fonts`
+### Clipboard isn't working
 
-### Email Not Working
+```elisp
+M-x ck/clipboard-status
+```
 
-1. Install `mu` and `offlineimap`
-2. Set up `pass` entries for email passwords
-3. Configure email accounts in `config/email/email.el`
+Shows the detected system + chain + cached backend. If write-cached is `nil`, no backend succeeded — check `wl-copy` / `xclip` / `clip.exe` is installed.
 
-### Performance Issues
+WSLg out-of-sync? `M-x ck/clipboard-paste-force`.
 
-1. Check `*Messages*` for warnings
-2. Profile startup: `M-x emacs-init-time`
-3. Disable unused packages in `init.el`
+### Packages won't install
 
-See `docs/troubleshooting.md` for more solutions.
+```elisp
+M-x elpaca-info
+M-x elpaca-rebuild
+```
 
-## Contributing
+Check `*Messages*` for errors.
 
-This is a personal configuration, but feel free to:
-- Fork and adapt for your needs
-- Report issues or suggest improvements
-- Share your customizations
+### Email not working
 
-## License
+Install `mu` (system package, not via Elpaca). `M-x mu4e` should then work; the email module gracefully warns if `mu` is missing.
 
-This configuration is provided as-is. Individual packages have their own licenses.
+### Performance
 
-## Acknowledgments
+```elisp
+M-x emacs-init-time
+```
 
-This configuration is built on the excellent work of:
-- [Elpaca](https://github.com/progfolio/elpaca) - Package manager
-- [use-package](https://github.com/jwiegley/use-package) - Package configuration
-- [Doom Emacs](https://github.com/doomemacs/doomemacs) - Inspiration for structure
-- All the package maintainers and contributors
+If high, check `*Messages*` for warnings about slow loads. The most common culprits in this config are:
 
-## Notes
-
-- `custom.el` is auto-generated and excluded from the repository (contains personal paths)
-- Email addresses in `config/email/email.el` are placeholders - update before use
-- API keys are stored in `pass` (password store), not in the configuration
-- File paths use `~/notes/` and `~/src/` - customize as needed
-
----
-
-**Happy Emacsing!** 🐃
-
+- `poet-dark` theme — heavy face setup (typical 0.5–1.5s)
+- Native-comp JIT after editing elisp (`eln-cache/` recompiles; one-time cost)
+- Dashboard rendering with icons
