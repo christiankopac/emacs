@@ -364,7 +364,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (with-eval-after-load 'dirvish
   (load-file (expand-file-name "ck-emacs-modules/ck-file-associations.el" user-emacs-directory)))
 
-;; Skip clipetty on WSL — ck-wsl-clipboard already bridges to Windows via
+;; Skip clipetty on WSL — ck-clipboard already bridges to Windows via
 ;; wl-copy. Running both pays OSC52 + wl-copy work on every kill.
 (use-package clipetty
   :ensure t
@@ -705,25 +705,19 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; Machine Specific Configuration
 ;; ----------------------------------------------------------------------------
 
-;; Clipboard settings
-;; For GUI Emacs (and WSLg + GUI) the default `select-enable-clipboard'
-;; path is sufficient. For terminal Emacs (`emacs -nw') on WSL we need
-;; an explicit bridge — see `ck-wsl-clipboard.el', which wires
-;; `interprogram-paste-function' / `interprogram-cut-function' to
-;; wl-paste/xclip with a PowerShell fallback.
-(load-file (expand-file-name "ck-emacs-modules/ck-wsl-clipboard.el" user-emacs-directory))
-
-(defvar my/clipboard-wayland-command "wl-copy")
-(defvar my/clipboard-wayland-paste-command "wl-paste")
-(defvar my/clipboard-x11-command "xclip")
+;; Clipboard: ck-clipboard.el detects WSL / Wayland / X11 / macOS, wires
+;; `interprogram-*-function' for TTY (and WSL GUI, which is flaky), and
+;; spawns the write command asynchronously so the slow PowerShell fallback
+;; never blocks. `M-x ck/clipboard-status' to inspect, `ck/clipboard-paste-force'
+;; if WSLg gets out of sync.
+(load-file (expand-file-name "ck-emacs-modules/ck-clipboard.el" user-emacs-directory))
 
 ;; Terminal settings
 (setq term-file-prefix nil)
-(add-to-list 'term-file-aliases `(,"ghostty" . ,"xterm-256color"))
+(add-to-list 'term-file-aliases '("ghostty" . "xterm-256color"))
 
 ;; Terminal-specific settings (only in terminal mode)
 (unless (display-graphic-p)
-  (setq xterm-extra-capabilities '(setSelection getSelection))
   (xterm-mouse-mode 1)
   (global-set-key [mouse-4] 'scroll-down-line)
   (global-set-key [mouse-5] 'scroll-up-line))
