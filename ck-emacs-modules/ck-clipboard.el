@@ -18,6 +18,7 @@
 ;; slow backend (notably powershell.exe) never blocks the editor.
 
 (require 'subr-x)
+(require 'ck-system)
 
 ;; ---------------------------------------------------------------------------
 ;; System detection
@@ -25,12 +26,12 @@
 
 (defvar ck/clipboard-system
   (cond
-   ((eq system-type 'darwin) 'macos)
-   ((and (eq system-type 'gnu/linux) (getenv "WSL_DISTRO_NAME")) 'wsl)
-   ((and (eq system-type 'gnu/linux) (getenv "WAYLAND_DISPLAY")) 'wayland)
-   ((eq system-type 'gnu/linux) 'x11)
-   ((eq system-type 'windows-nt) 'windows)
-   (t 'unknown))
+   (ck/macos-p   'macos)
+   (ck/wsl-p     'wsl)
+   (ck/windows-p 'windows)
+   ((eq ck/display-server 'wayland) 'wayland)
+   (ck/linux-p   'x11)
+   (t            'unknown))
   "Detected clipboard environment. One of: macos, wsl, wayland, x11, windows, unknown.")
 
 (defvar ck/clipboard-debug nil

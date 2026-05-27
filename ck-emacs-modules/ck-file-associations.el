@@ -1,11 +1,13 @@
-(when (and (eq system-type 'gnu/linux) (getenv "WSL_DISTRO_NAME"))
-  ;; Configure Dirvish preview for WSL - enable available preview dispatchers
-  ;; Note: 'dired' and 'fallback' are automatically added by Dirvish for directories and text files
-  ;; Include media dispatchers that have their required programs installed
+;;; ck-file-associations.el --- External program associations and file managers -*- lexical-binding: t -*-
+
+(require 'ck-system)
+
+;; WSL preview dispatchers — exclude ones that need external binaries the
+;; WSL environment typically doesn't have.
+(when ck/wsl-p
   (setq dirvish-preview-dispatchers '(image gif pdf font)))
 
 (setq dirvish-sidecar nil) ; Disable left sidecar/tree column
-;;; ck-file-associations.el --- External program associations and file managers
 
 ;; ============================================================================
 ;; Dired - File manager for Emacs
@@ -47,27 +49,25 @@
 
 
 (with-eval-after-load 'openwith
-  ;; Native-Linux file associations. Works on plain Linux and on WSLg without
-  ;; requiring Windows interop. xdg-open is used as a generic fallback so the
-  ;; system's mime defaults (or wslu's wslview, if installed) handle anything
-  ;; without a dedicated viewer here.
-  (setq openwith-associations
-        '(;; Video
-          ("\\.\\(?:mp4\\|mkv\\|avi\\|mov\\|wmv\\|flv\\|webm\\|m4v\\)\\'" "mpv" (file))
-          ;; Audio
-          ("\\.\\(?:mp3\\|flac\\|ogg\\|wav\\|m4a\\|opus\\|aac\\)\\'" "mpv" (file))
-          ;; Images (SVG handled natively by Emacs)
-          ("\\.\\(?:png\\|jpg\\|jpeg\\|gif\\|bmp\\|webp\\)\\'" "xdg-open" (file))
-          ;; Microsoft Office
-          ("\\.\\(?:docx?\\|xlsx?\\|pptx?\\)\\'" "xdg-open" (file))
-          ;; PDF
-          ("\\.pdf\\'" "xdg-open" (file))
-          ;; Archives
-          ("\\.\\(?:zip\\|tar\\.gz\\|tgz\\|tar\\.bz2\\|tbz2\\|7z\\|rar\\)\\'" "xdg-open" (file))))
-  ;; Enable openwith mode globally
-  (openwith-mode 1)
-  ;; Make openwith work with dired
-  (put 'dired-find-alternate-file 'disabled nil))
+  ;; Pick the right "open this file" command per platform:
+  ;;   macOS  : open
+  ;;   WSL    : wslview if installed (Windows-aware), else xdg-open
+  ;;   Linux  : xdg-open
+  ;; Media files prefer mpv when installed (fast, scriptable). If mpv is
+  ;; missing we fall back to the generic opener so the rule still does
+  ;; something useful instead of silently failing.
+  (let* ((opener (ck/open-command))
+         (media-player (or (ck/has? "mpv") opener)))
+    (when opener
+      (setq openwith-associations
+            `(("\\.\\(?:mp4\\|mkv\\|avi\\|mov\\|wmv\\|flv\\|webm\\|m4v\\)\\'" ,media-player (file))
+              ("\\.\\(?:mp3\\|flac\\|ogg\\|wav\\|m4a\\|opus\\|aac\\)\\'"     ,media-player (file))
+              ("\\.\\(?:png\\|jpg\\|jpeg\\|gif\\|bmp\\|webp\\)\\'"           ,opener (file))
+              ("\\.\\(?:docx?\\|xlsx?\\|pptx?\\)\\'"                         ,opener (file))
+              ("\\.pdf\\'"                                                   ,opener (file))
+              ("\\.\\(?:zip\\|tar\\.gz\\|tgz\\|tar\\.bz2\\|tbz2\\|7z\\|rar\\)\\'" ,opener (file))))
+      (openwith-mode 1)
+      (put 'dired-find-alternate-file 'disabled nil))))
 
 ;; ============================================================================
 ;; Dirvish - Modern file manager for dired

@@ -155,6 +155,11 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (add-to-list 'load-path (expand-file-name "ck-emacs-modules" user-emacs-directory))
 (add-to-list 'load-path (expand-file-name "ck-lisp" user-emacs-directory))
 
+;; System detection — provides ck/wsl-p, ck/macos-p, ck/distro,
+;; ck/display-server, ck/has?, ck/open-command. Loaded early so every
+;; later module can use these instead of re-implementing detection.
+(require 'ck-system)
+
 ;; ----------------------------------------------------------------------------
 ;; Essential Packages
 ;; ----------------------------------------------------------------------------
@@ -365,10 +370,13 @@ This macro was removed in newer Org versions. It now just executes BODY normally
   (load-file (expand-file-name "ck-emacs-modules/ck-file-associations.el" user-emacs-directory)))
 
 ;; Skip clipetty on WSL — ck-clipboard already bridges to Windows via
-;; wl-copy. Running both pays OSC52 + wl-copy work on every kill.
+;; wl-copy/xclip/clip.exe. Running both pays OSC52 + clipboard work on
+;; every kill. On macOS clipetty isn't needed either (pbcopy is wired by
+;; ck-clipboard). Only useful on plain Linux TTY without a Wayland/X11
+;; clipboard tool available.
 (use-package clipetty
   :ensure t
-  :unless (getenv "WSL_DISTRO_NAME")
+  :unless (or ck/wsl-p ck/macos-p)
   :hook (after-init . global-clipetty-mode))
 
 ;; Context-menu (GUI only)
@@ -800,55 +808,19 @@ This macro was removed in newer Org versions. It now just executes BODY normally
               (load-theme 'poet-dark t))))
 
 ;; ============================================================================
-;; Daemon Frame Initialization - Ensure daemon-created frames match regular frames
+;; Daemon Frame Initialization
 ;; ============================================================================
-(defun my/initialize-daemon-frame (frame)
-  "Initialize a frame created from daemon with all settings.
-This ensures daemon frames have the same appearance as regular frames."
-  (condition-case err
-      (when (and frame (frame-live-p frame) (display-graphic-p frame))
-        ;; Apply frame parameters
-        (set-frame-parameter frame 'vertical-scroll-bars nil)
-        (set-frame-parameter frame 'horizontal-scroll-bars nil)
-        (set-frame-parameter frame 'fullscreen 'maximized)
-        (set-frame-parameter frame 'internal-border-width 0)
-        (set-frame-parameter frame 'right-divider-width 0)
-        
-        ;; Load theme if not already loaded (only once globally)
-        (unless (member 'poet-dark custom-enabled-themes)
-          (load-theme 'poet-dark t))
-        
-        ;; Reapply fonts and fontaine preset (with frame selected)
-        (with-selected-frame frame
-          ;; Reapply fonts (function is always defined, but only works in GUI)
-          (condition-case err
-              (my/set-variable-fixed-pitch-faces)
-            (error (message "Warning: Could not set fonts: %s" (error-message-string err))))
-          
-          ;; Reapply fontaine preset if available
-          (when (and (boundp 'fontaine-current-preset) 
-                     fontaine-current-preset
-                     (fboundp 'fontaine-set-preset))
-            (condition-case err
-                (fontaine-set-preset fontaine-current-preset)
-              (error (message "Warning: Could not set fontaine preset: %s" (error-message-string err)))))))
-    (error (message "Error initializing daemon frame: %s" (error-message-string err)))))
-
-;; Apply initialization to all frames created from daemon
-;; Keep it simple to avoid crashes - just run once after a small delay
-(add-hook 'after-make-frame-functions 
-          (lambda (new-frame)
-            (when (and new-frame (frame-live-p new-frame))
-              ;; Capture frame in closure to avoid void variable error
-              (let ((frame-to-init new-frame))
-                ;; Delay slightly to ensure packages are loaded
-                (run-with-timer 0.3 nil
-                               (lambda ()
-                                 (condition-case err
-                                     (when (and frame-to-init (frame-live-p frame-to-init))
-                                       (my/initialize-daemon-frame frame-to-init))
-                                   (error (message "Warning: Could not initialize daemon frame: %s" 
-                                                   (error-message-string err))))))))))
+;; Most of what used to live here is now handled elsewhere:
+;;   - Frame parameters come from `default-frame-alist' in early-init.el.
+;;   - Font resolution / fontset / fontaine preset are re-applied by
+;;     ck-fonts.el on `after-make-frame-functions' and
+;;     `server-after-make-frame-hook' — synchronously, no 0.3s timer.
+;; All that's left is loading the theme on the first GUI frame.
+(add-hook 'server-after-make-frame-hook
+          (lambda ()
+            (when (and (display-graphic-p)
+                       (not (member 'poet-dark custom-enabled-themes)))
+              (load-theme 'poet-dark t))))
 
 (provide 'init)
 ;;; init.el ends here

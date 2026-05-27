@@ -22,6 +22,7 @@
 ;;   - Re-apply fontaine + face attributes on `server-after-make-frame-hook'.
 
 (require 'seq)
+(require 'ck-system)
 
 ;; ---------------------------------------------------------------------------
 ;; Preference chains
@@ -111,11 +112,12 @@ call so daemon frames pick up GUI fonts once a real frame exists."
 ;; just (setq my/font-height-multiplier 1.5) before this loads if you want
 ;; something different.
 
-(defvar my/wsl-p (and (eq system-type 'gnu/linux) (getenv "WSL_DISTRO_NAME"))
-  "Non-nil if running on WSL.")
+(defvar my/wsl-p ck/wsl-p
+  "Non-nil if running on WSL. Kept for back-compat — prefer `ck/wsl-p'.")
 
-(defvar my/font-height-multiplier (if my/wsl-p 2.0 1.0)
-  "Multiplier for font heights. Increased for WSL/HiDPI displays.")
+(defvar my/font-height-multiplier (if ck/wsl-p 2.0 1.0)
+  "Multiplier for font heights. 2x on WSL to compensate for WSLg's logical
+DPI. Override in custom.el or before loading this file.")
 
 (defvar my/font-regular-height      (round (* 90  my/font-height-multiplier)))
 (defvar my/font-writing-height      (round (* 90  my/font-height-multiplier)))
