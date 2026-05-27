@@ -216,16 +216,16 @@ DPI. Override in custom.el or before loading this file.")
 
 (defun ck/fonts--register-pua ()
   "Map the Nerd Font private use areas to the resolved symbol font.
-Covers both the standard PUA (#xE000–#xF8FF) and the high-plane PUA
-ranges where Material Design Icons and modern Nerd Font glyphs live
-(#xF0000–#xFFFFD and #x100000–#x10FFFD)."
+Covers the standard PUA (#xE000–#xF8FF) and the supplementary PUA-A
+range used by modern Nerd Font / Material Design glyphs
+(#xF0000–#xF1AFF — that's enough for every current Nerd Font glyph
+without paying the cost of mapping the full 1M-codepoint Plane 16)."
   (when (and (display-graphic-p)
              ck/fonts-nerd-symbols
              (member ck/fonts-nerd-symbols (font-family-list)))
     (let ((spec (font-spec :family ck/fonts-nerd-symbols)))
       (set-fontset-font t '(#xE000  . #xF8FF)  spec nil 'append)
-      (set-fontset-font t '(#xF0000 . #xFFFFD) spec nil 'append)
-      (set-fontset-font t '(#x100000 . #x10FFFD) spec nil 'append))))
+      (set-fontset-font t '(#xF0000 . #xF1AFF) spec nil 'append))))
 
 ;; ---------------------------------------------------------------------------
 ;; Face setup
@@ -245,11 +245,18 @@ Heights stay under fontaine's control."
 ;; Apply — runs every time a GUI frame becomes available
 ;; ---------------------------------------------------------------------------
 
-(defun ck/fonts-apply ()
+(defun ck/fonts-apply (&optional force)
   "Resolve fonts, rebuild fontaine presets, register PUA, set faces.
-Safe to call multiple times — used both at load and on every frame
-creation so daemon frames are correct."
-  (when (display-graphic-p)
+Idempotent — uses the `ck/fonts-applied' frame parameter so repeat calls
+on the same frame become no-ops. Pass non-nil FORCE to override.
+
+Previously this function ran 2-3x at GUI startup because it was wired
+to `after-make-frame-functions', `server-after-make-frame-hook' AND
+`with-eval-after-load fontaine'. The work it does (rebuilding presets,
+registering 3 fontset ranges, setting faces) is expensive enough that
+running it 3x burnt about 1s of startup."
+  (when (and (display-graphic-p)
+             (or force (not (frame-parameter nil 'ck/fonts-applied))))
     (ck/fonts-refresh)
     (ck/fonts--sync-back-compat)
     (when (boundp 'fontaine-presets)
@@ -258,9 +265,9 @@ creation so daemon frames are correct."
       (ignore-errors (fontaine-set-preset 'regular)))
     (ck/fonts--register-pua)
     (my/set-variable-fixed-pitch-faces)
-    ;; nerd-icons reads this to pick its symbol font.
     (when (boundp 'nerd-icons-font-family)
-      (setq nerd-icons-font-family ck/fonts-nerd-symbols))))
+      (setq nerd-icons-font-family ck/fonts-nerd-symbols))
+    (set-frame-parameter nil 'ck/fonts-applied t)))
 
 ;; Apply immediately if we already have a GUI frame.
 (when (display-graphic-p)
@@ -271,13 +278,14 @@ creation so daemon frames are correct."
     (advice-add 'fontaine-set-preset :after
                 (lambda (&rest _) (my/set-variable-fixed-pitch-faces)))))
 
-;; Re-apply on every new frame — fixes daemon cold-start.
+;; Re-apply once per new frame (per-frame guard handles idempotency).
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (when (display-graphic-p frame)
               (with-selected-frame frame (ck/fonts-apply)))))
 ;; Some Emacs builds fire server-after-make-frame-hook *before*
 ;; after-make-frame-functions sees the new frame as graphic, so hook both.
+;; The per-frame guard makes the duplicate hook free.
 (when (boundp 'server-after-make-frame-hook)
   (add-hook 'server-after-make-frame-hook #'ck/fonts-apply))
 
