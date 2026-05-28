@@ -745,7 +745,12 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (unless (display-graphic-p)
   (xterm-mouse-mode 1)
   (global-set-key [mouse-4] 'scroll-down-line)
-  (global-set-key [mouse-5] 'scroll-up-line))
+  (global-set-key [mouse-5] 'scroll-up-line)
+  ;; Enable 24-bit truecolor when the terminal advertises it (ghostty,
+  ;; wezterm, kitty, alacritty all set COLORTERM=truecolor). Without
+  ;; this, ef-symbiosis degrades to nearest-256 and looks washed out.
+  (when (member (getenv "COLORTERM") '("truecolor" "24bit"))
+    (tty-run-terminal-initialization (selected-frame) "xterm-direct" t)))
 
 ;; ----------------------------------------------------------------------------
 ;; Custom Functions
@@ -820,9 +825,9 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ============================================================================
 (add-hook 'elpaca-after-init-hook
           (lambda ()
-            ;; Only load custom theme in GUI, use default theme in terminal
-            (when (display-graphic-p)
-              (load-theme 'poet-dark t))))
+            (if (display-graphic-p)
+                (load-theme 'poet-dark t)
+              (load-theme 'ef-symbiosis t))))
 
 ;; ============================================================================
 ;; Daemon Frame Initialization
