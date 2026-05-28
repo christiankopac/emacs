@@ -48,9 +48,11 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-;; Must match where clones live (Elpaca default: `elpaca/sources/`). Using `repos/`
-;; here breaks startup if packages were installed under `sources/` (typical after Elpaca updates).
-(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
+;; Must match where clones actually live on disk. Upstream Elpaca renamed this
+;; default from `repos/` to `sources/`, but our existing packages were cloned
+;; under `repos/` and the symlinks in `builds/` still point there — overriding
+;; back to `repos/` keeps the current install working without a full reclone.
+(defvar elpaca-sources-directory (expand-file-name "repos/" elpaca-directory))
 ;; If MELPA's sparse clone failed, `cache/melpa/recipes' is missing and Elpaca errors.
 (let* ((melpa-dir (expand-file-name "cache/melpa" elpaca-directory))
        (recipes-dir (expand-file-name "recipes" melpa-dir)))
@@ -190,12 +192,10 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 (use-package vertico
-  :elpaca (vertico :depth 1)
-  :ensure t)
+  :ensure (vertico :depth 1))
 (use-package corfu :ensure t)
 (use-package orderless
-  :elpaca (orderless :host github :repo "oantolin/orderless" :depth 1)
-  :ensure t)
+  :ensure (orderless :host github :repo "oantolin/orderless" :depth 1))
 (use-package marginalia :ensure t)
 (use-package embark :ensure t)
 (use-package consult :ensure t)
@@ -260,7 +260,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
   :commands (helpful-function helpful-command helpful-key helpful-variable
              helpful-callable helpful-symbol helpful-macro))
 (use-package smartparens
-  :elpaca (smartparens :host github :repo "oantolin/smartparens" :depth 1)
+  :ensure (smartparens :host github :repo "Fuco1/smartparens" :depth 1)
   :defer t
   :hook (prog-mode . smartparens-mode))
 (use-package expand-region :ensure t :defer t
@@ -544,8 +544,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 ;; ----------------------------------------------------------------------------
 
 (use-package magit
-  :elpaca (magit :depth 1)
-  :ensure t
+  :ensure (magit :depth 1)
   :defer t
   :commands (magit magit-status magit-blame magit-log magit-dispatch
              magit-file-dispatch))
@@ -565,11 +564,17 @@ This macro was removed in newer Org versions. It now just executes BODY normally
 (use-package gptel :ensure t :defer t
   :commands (gptel gptel-menu gptel-send))
 
+;; Ellama requires yaml >= 1.2.3; pin explicitly so Elpaca fetches the right
+;; tag rather than the stale 1.2.1 cached in its local clone.
+(use-package yaml
+  :ensure (:host github :repo "zkry/yaml.el" :ref "v1.2.3"))
+
 ;; Local LLMs via Ollama; `M-x ellama` or `C-c M-e` (see ck-emacs-modules/ck-ai.el).
 ;; Install Ollama and pull a model, e.g. `ollama pull qwen2.5:3b`.
 ;; Explicit :main avoids Elpaca "Unable to find main elisp file" when the MELPA cache is wrong.
 (use-package ellama
   :ensure (:host github :repo "s-kostyaev/ellama" :main "ellama.el")
+  :after yaml
   :defer t
   :bind (("C-c M-e" . ellama))
   :hook (org-ctrl-c-ctrl-c-hook . ellama-chat-send-last-message)
