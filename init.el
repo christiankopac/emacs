@@ -832,7 +832,7 @@ This macro was removed in newer Org versions. It now just executes BODY normally
           (lambda ()
             (if (display-graphic-p)
                 (load-theme 'poet-dark t)
-              (load-theme 'ef-symbiosis t))))
+              (load-theme 'ef-elea-dark t))))
 
 ;; ============================================================================
 ;; Daemon Frame Initialization
