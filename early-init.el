@@ -10,7 +10,11 @@
       gc-cons-percentage 0.6)
 
 (defvar ck/early--file-name-handler-alist file-name-handler-alist)
-(setq file-name-handler-alist nil)
+;; Keep jka-compr: built-in libs ship as .el.gz, and with `load-prefer-newer'
+;; a newer .el.gz beats its .elc — loading it without the decompression
+;; handler reads raw gzip bytes as lisp ("void: \213" startup errors).
+(setq file-name-handler-alist
+      (list (rassq 'jka-compr-handler file-name-handler-alist)))
 
 (add-hook 'emacs-startup-hook
           (lambda ()
