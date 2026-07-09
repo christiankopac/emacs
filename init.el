@@ -48,11 +48,8 @@ FACES is a list of face specifications in the format (FACE :attribute value ...)
 (defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-;; Must match where clones actually live on disk. Upstream Elpaca renamed this
-;; default from `repos/` to `sources/`, but our existing packages were cloned
-;; under `repos/` and the symlinks in `builds/` still point there — overriding
-;; back to `repos/` keeps the current install working without a full reclone.
-(defvar elpaca-sources-directory (expand-file-name "repos/" elpaca-directory))
+;; Must match where clones actually live on disk (upstream default: `sources/`).
+(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
 ;; If MELPA's sparse clone failed, `cache/melpa/recipes' is missing and Elpaca errors.
 (let* ((melpa-dir (expand-file-name "cache/melpa" elpaca-directory))
        (recipes-dir (expand-file-name "recipes" melpa-dir)))
